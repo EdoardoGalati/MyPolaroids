@@ -251,6 +251,18 @@
       "default_icon": "camera.metering.center",
       "year_introduced": 2015,
       "film_type": "i-Type/600/SX-70"
+    },
+    {
+      "id": "polaroid_sunshine3",
+      "name": "sun3",
+      "brand": "Polaroid",
+      "model": "sunshine3",
+      "specific_model": "original3",
+      "capacity": 8,
+      "default_image": "camera.metering.center",
+      "default_icon": "camera.metering.center",
+      "year_introduced": 2015,
+      "film_type": "i-Type/600/SX-70"
     }
   ]
 }
