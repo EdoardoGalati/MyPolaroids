@@ -4,49 +4,42 @@
       "id": "600",
       "name": "600",
       "default_capacity": 8,
-      "compatible_cameras": ["Polaroid 600", "Polaroid i-Type"],
       "description": "Film classico compatibile con fotocamere 600 e i-Type"
     },
     {
       "id": "itype",
       "name": "i-Type",
       "default_capacity": 8,
-      "compatible_cameras": ["Polaroid i-Type", "Polaroid 600", "Polaroid Now", "Polaroid OneStep+", "Polaroid OneStep 2"],
       "description": "Film moderno senza batteria integrata"
     },
     {
       "id": "sx70",
       "name": "SX-70",
       "default_capacity": 10,
-      "compatible_cameras": ["Polaroid SX-70"],
       "description": "Film per fotocamere folding SX-70"
     },
     {
       "id": "go",
       "name": "Go",
       "default_capacity": 8,
-      "compatible_cameras": ["Polaroid Go"],
       "description": "Film compatto per fotocamera Go"
     },
     {
       "id": "spectra",
       "name": "Spectra",
       "default_capacity": 10,
-      "compatible_cameras": ["Polaroid Spectra"],
       "description": "Film wide per fotocamere Spectra"
     },
     {
       "id": "8x10",
       "name": "8x10",
       "default_capacity": 1,
-      "compatible_cameras": ["Polaroid 8x10"],
       "description": "Film grande formato 8x10"
     },
     {
       "id": "4x5",
       "name": "4x5",
       "default_capacity": 1,
-      "compatible_cameras": ["Polaroid 4x5"],
       "description": "Film medio formato 4x5"
     }
   ],
@@ -56,126 +49,301 @@
       "name": "Color",
       "description": "Film a colori standard Polaroid",
       "category": "standard",
-      "colors": ["rosso", "blu", "giallo", "verde"]
+      "gradient": {
+        "stops": [
+          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.00},
+          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
+          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.47},
+          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.73},
+          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
+        ],
+        "startPoint": {"x": 0.2, "y": 0.85},
+        "endPoint": {"x": 0.9, "y": 0.25}
+      }
+    },
+    {
+      "id": "black_white",
+      "name": "BW",
+      "description": "Film bianco e nero classico",
+      "category": "monochrome",
+      "gradient": {
+        "stops": [
+          {"color": {"red": 0.5, "green": 0.5, "blue": 0.5}, "location": 0.52},
+          {"color": {"red": 0.92, "green": 0.92, "blue": 0.92}, "location": 0.52}
+        ],
+        "startPoint": {"x": 0.2, "y": 0.85},
+        "endPoint": {"x": 0.9, "y": 0.25}
+      }
+    },
+    {
+      "id": "multicolor_600",
+      "name": "Multicolor 600",
+      "description": "Film multicolore per fotocamere 600",
+      "category": "special",
+      "gradient": {
+        "stops": [
+          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.22},
+          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
+          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.49},
+          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.49},
+          {"color": {"red": 0.45, "green": 0.68, "blue": 0.42}, "location": 0.77},
+          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 0.77},
+          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
+        ],
+        "startPoint": {"x": 0.2, "y": 0.85},
+        "endPoint": {"x": 0.9, "y": 0.25}
+      }
+    },
+    {
+      "id": "rounded",
+      "name": "Rounded",
+      "description": "Film con effetto rotondo multicolore",
+      "category": "special",
+      "gradient": {
+        "type": "elliptical",
+        "stops": [
+          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 0.00},
+          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 0.23},
+          {"color": {"red": 0.45, "green": 0.68, "blue": 0.42}, "location": 0.23},
+          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.51},
+          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.51},
+          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.78},
+          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.78}
+        ],
+        "center": {"x": 0.5, "y": 0.5}
+      }
     },
     {
       "id": "black_white",
       "name": "Black & White",
       "description": "Film bianco e nero classico",
       "category": "monochrome",
-      "colors": ["grigioScuro", "nero"]
+      "gradient": {
+        "stops": [
+          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.00},
+          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
+          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.47},
+          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.73},
+          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
+        ],
+        "startPoint": {"x": 0.2, "y": 0.85},
+        "endPoint": {"x": 0.9, "y": 0.25}
+      }
     },
     {
       "id": "black_frame_bw",
       "name": "Black Frame B&W",
       "description": "Bianco e nero con cornice nera",
       "category": "monochrome",
-      "colors": ["grigioScuro", "nero", "bianco"]
+      "gradient": {
+        "stops": [
+          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.00},
+          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
+          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.47},
+          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.73},
+          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
+        ],
+        "startPoint": {"x": 0.2, "y": 0.85},
+        "endPoint": {"x": 0.9, "y": 0.25}
+      }
     },
     {
       "id": "color_frame",
       "name": "Color Frame",
       "description": "Film con cornice colorata",
       "category": "framed",
-      "colors": ["rosso", "blu", "giallo", "verde", "rosa"]
+      "gradient": {
+        "stops": [
+          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.00},
+          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
+          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.47},
+          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.73},
+          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
+        ],
+        "startPoint": {"x": 0.2, "y": 0.85},
+        "endPoint": {"x": 0.9, "y": 0.25}
+      }
     },
     {
       "id": "duochrome_blue",
       "name": "Duochrome (Blue)",
       "description": "Film monocromatico blu",
       "category": "duochrome",
-      "colors": ["blu", "ciano"]
+      "gradient": {
+        "stops": [
+          {"color": {"red": 0.29, "green": 0.29, "blue": 0.29}, "location": 0.52},
+          {"color": {"red": 0.13, "green": 0.71, "blue": 0.86}, "location": 0.52}
+        ],
+        "startPoint": {"x": 0.2, "y": 0.85},
+        "endPoint": {"x": 0.9, "y": 0.25}
+      }
     },
     {
       "id": "duochrome_green",
       "name": "Duochrome (Green)",
       "description": "Film monocromatico verde",
       "category": "duochrome",
-      "colors": ["verde", "giallo"]
+      "gradient": {
+        "stops": [
+          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.00},
+          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
+          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.47},
+          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.73},
+          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
+        ],
+        "startPoint": {"x": 0.2, "y": 0.85},
+        "endPoint": {"x": 0.9, "y": 0.25}
+      }
     },
     {
       "id": "duochrome_yellow",
       "name": "Duochrome (Yellow)",
       "description": "Film monocromatico giallo",
       "category": "duochrome",
-      "colors": ["giallo", "arancione"]
+      "gradient": {
+        "stops": [
+          {"color": {"red": 0.29, "green": 0.29, "blue": 0.29}, "location": 0.52},
+          {"color": {"red": 0.97, "green": 0.87, "blue": 0.25}, "location": 0.52}
+        ],
+        "startPoint": {"x": 0.2, "y": 0.85},
+        "endPoint": {"x": 0.9, "y": 0.25}
+      }
     },
     {
       "id": "duochrome_red",
       "name": "Duochrome (Red)",
       "description": "Film monocromatico rosso",
       "category": "duochrome",
-      "colors": ["rosso", "rosa"]
+      "gradient": {
+        "stops": [
+          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.00},
+          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
+          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.47},
+          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.73},
+          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
+        ],
+        "startPoint": {"x": 0.2, "y": 0.85},
+        "endPoint": {"x": 0.9, "y": 0.25}
+      }
     },
     {
       "id": "duochrome_orange",
       "name": "Duochrome (Orange)",
       "description": "Film monocromatico arancione",
       "category": "duochrome",
-      "colors": ["arancione", "giallo"]
+      "gradient": {
+        "stops": [
+          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.00},
+          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
+          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.47},
+          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.73},
+          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
+        ],
+        "startPoint": {"x": 0.2, "y": 0.85},
+        "endPoint": {"x": 0.9, "y": 0.25}
+      }
     },
     {
       "id": "metallic",
       "name": "Metallic",
       "description": "Film con effetto metallizzato",
       "category": "special",
-      "colors": ["argento", "oro"]
+      "gradient": {
+        "stops": [
+          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.00},
+          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
+          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.47},
+          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.73},
+          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
+        ],
+        "startPoint": {"x": 0.2, "y": 0.85},
+        "endPoint": {"x": 0.9, "y": 0.25}
+      }
     },
     {
       "id": "gold_frame",
       "name": "Gold Frame",
       "description": "Film con cornice dorata",
       "category": "framed",
-      "colors": ["oro", "giallo", "beige"]
-    },
-    {
-      "id": "duochrome_orange",
-      "name": "Duochrome (Orange)",
-      "description": "Film monocromatico arancione",
-      "category": "duochrome",
-      "colors": ["arancione", "giallo"]
-    },
-    {
-      "id": "metallic",
-      "name": "Metallic",
-      "description": "Film con effetto metallizzato",
-      "category": "special",
-      "colors": ["argento", "oro"]
-    },
-    {
-      "id": "gold_frame",
-      "name": "Gold Frame",
-      "description": "Film con cornice dorata",
-      "category": "framed",
-      "colors": ["oro", "giallo", "beige"]
+      "gradient": {
+        "stops": [
+          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.00},
+          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
+          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.47},
+          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.73},
+          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
+        ],
+        "startPoint": {"x": 0.2, "y": 0.85},
+        "endPoint": {"x": 0.9, "y": 0.25}
+      }
     },
     {
       "id": "silver_frame",
       "name": "Silver Frame",
       "description": "Film con cornice argentata",
       "category": "framed",
-      "colors": ["argento", "grigio", "bianco"]
+      "gradient": {
+        "stops": [
+          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.00},
+          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
+          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.47},
+          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.73},
+          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
+        ],
+        "startPoint": {"x": 0.2, "y": 0.85},
+        "endPoint": {"x": 0.9, "y": 0.25}
+      }
     },
     {
       "id": "round_frame",
       "name": "Round Frame",
       "description": "Film con cornice rotonda",
       "category": "framed",
-      "colors": ["blu", "verde", "giallo", "rosso"]
+      "gradient": {
+        "stops": [
+          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.00},
+          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
+          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.47},
+          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.73},
+          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
+        ],
+        "startPoint": {"x": 0.2, "y": 0.85},
+        "endPoint": {"x": 0.9, "y": 0.25}
+      }
     },
     {
       "id": "retro",
       "name": "Retro",
       "description": "Film con stile retrò",
       "category": "special",
-      "colors": ["marrone", "beige", "crema"]
+      "gradient": {
+        "stops": [
+          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.00},
+          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
+          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.47},
+          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.73},
+          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
+        ],
+        "startPoint": {"x": 0.2, "y": 0.85},
+        "endPoint": {"x": 0.9, "y": 0.25}
+      }
     },
     {
       "id": "vintage",
       "name": "Vintage",
       "description": "Film con stile vintage",
       "category": "special",
-      "colors": ["marrone", "grigio", "beige"]
+      "gradient": {
+        "stops": [
+          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.00},
+          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
+          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.47},
+          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.73},
+          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
+        ],
+        "startPoint": {"x": 0.2, "y": 0.85},
+        "endPoint": {"x": 0.9, "y": 0.25}
+      }
     }
   ]
 }

@@ -3,95 +3,137 @@ import Combine
 
 struct ListaFotocamereView: View {
     @ObservedObject var viewModel: CameraViewModel
+    @Binding var selectedTab: Int
     @State private var mostraAggiungiFotocamera = false
     @State private var mostraModificaFotocamera = false
     @State private var fotocameraDaModificare: Camera?
+    @State private var mostraImpostazioni = false
+    @State private var animationTrigger = false
+    @State private var nuovaCameraId: UUID?
     
     var body: some View {
         VStack(spacing: 0) {
-            // Header personalizzato
+            // Header con titolo e pulsante aggiungi
             HStack {
-                Text("My Polaroids")
+                Text("My Cameras")
                     .font(.system(size: 24, weight: .medium))
                     .foregroundColor(.black)
                 
                 Spacer()
                 
-                Button(action: {
-                    mostraAggiungiFotocamera = true
-                }) {
+                Button(action: { mostraImpostazioni = true }) {
+                    Image(systemName: "gearshape")
+                        .font(.title2)
+                        .foregroundColor(.black)
+                }
+                
+                Button(action: { mostraAggiungiFotocamera = true }) {
                     Image(systemName: "plus")
                         .font(.title2)
                         .foregroundColor(.black)
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 24)
+            .padding(.horizontal, 20)
+            .padding(.top, 20)
             .padding(.bottom, 24)
             .background(Color(red: 244/255, green: 244/255, blue: 244/255))
+            
+            // Lista fotocamere
+            ScrollView {
                 
-                // Lista fotocamere
-                ScrollView {
-
-                    LazyVStack(spacing: 1) {
-                        if viewModel.fotocamere.isEmpty {
-                            VStack(spacing: 16) {
-                                Image(systemName: "camera.fill")
-                                    .font(.system(size: 60))
-                                    .foregroundColor(.gray)
-                                
-                                Text("Nessuna fotocamera")
-                                    .font(.title2)
-                                    .fontWeight(.medium)
-                                
-                                Text("Aggiungi la tua prima fotocamera Polaroid per iniziare la collezione!")
-                                    .font(.body)
-                                    .foregroundColor(.secondary)
-                                    .multilineTextAlignment(.center)
+                LazyVStack(spacing: 1) {
+                    if viewModel.fotocamere.isEmpty {
+                        VStack(spacing: 16) {
+                            Image(systemName: "camera.fill")
+                                .font(.system(size: 60))
+                                .foregroundColor(.gray)
+                            
+                            Text("No cameras")
+                                .font(.title2)
+                                .fontWeight(.medium)
+                            
+                            Text("Add your first Polaroid camera to start your collection!")
+                                .font(.body)
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                            
+                            Button(action: { mostraAggiungiFotocamera = true }) {
+                                HStack {
+                                    Image(systemName: "plus.circle.fill")
+                                    Text("Add First Camera")
+                                }
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
+                                .background(Color.black)
+                                .cornerRadius(16)
                             }
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 40)
-                        } else {
-                                                                            ForEach(viewModel.fotocamere) { fotocamera in
-                            NavigationLink(destination: DettagliFotocameraView(fotocamera: fotocamera, viewModel: viewModel)) {
-                                FotocameraRowView(fotocamera: fotocamera, filmPackViewModel: viewModel.filmPackViewModel!)
-                            }
-                            .onTapGesture {
-                                print("🔵 TAP su NavigationLink: \(fotocamera.nickname)")
+                            .padding(.horizontal, 20)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .frame(maxHeight: .infinity)
+                        .padding(.top, 50)
+                        .padding(.vertical, 40)
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 80)
+                    } else {
+                        LazyVStack(spacing: 0.1) {
+                            ForEach(viewModel.fotocamereOrdinate) { fotocamera in
+                                NavigationLink(destination: DettagliFotocameraView(fotocamera: fotocamera, viewModel: viewModel, selectedTab: $selectedTab)) {
+                                    FotocameraRowView(fotocamera: fotocamera, filmPackViewModel: viewModel.filmPackViewModel!)
+                                }
+                                .scaleEffect(fotocamera.id == nuovaCameraId && animationTrigger ? 1.02 : 1.0)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .fill(fotocamera.id == nuovaCameraId && animationTrigger ? Color.gray.opacity(0.15) : Color.clear)
+                                )
+                                .onTapGesture {
+                                    print("🔵 TAP su NavigationLink: \(fotocamera.nickname)")
+                                }
                             }
                         }
                     }
                 }
+                .padding(.bottom, 80)
+                .animation(.spring(response: 0.6, dampingFraction: 0.8), value: animationTrigger)
             }
         }
         .onTapGesture {
             print("🟡 TAP su VStack principale")
         }
-        .navigationBarHidden(true) // Nasconde la navigation bar predefinita
-            .sheet(isPresented: $mostraAggiungiFotocamera) {
-                AggiungiFotocameraView(viewModel: viewModel)
+        .sheet(isPresented: $mostraAggiungiFotocamera) {
+            AggiungiFotocameraView(viewModel: viewModel)
+        }
+        .sheet(isPresented: $mostraImpostazioni) {
+            ImpostazioniView()
+        }
+        .onReceive(viewModel.filmPackViewModel?.$pacchiFilm.eraseToAnyPublisher() ?? Just([FilmPack]()).eraseToAnyPublisher()) { _ in
+            // Forza l'aggiornamento quando i pacchi film cambiano
+            DispatchQueue.main.async {
+                // Forza la ricostruzione della vista
+                viewModel.objectWillChange.send()
             }
-            .onReceive(viewModel.filmPackViewModel?.$pacchiFilm.eraseToAnyPublisher() ?? Just([FilmPack]()).eraseToAnyPublisher()) { _ in
-                // Forza l'aggiornamento quando i pacchi film cambiano
-                DispatchQueue.main.async {
-                    // Forza la ricostruzione della vista
-                    viewModel.objectWillChange.send()
-                }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)) { _ in
+            // Forza l'aggiornamento quando cambiano le impostazioni di ordinamento
+            DispatchQueue.main.async {
+                viewModel.objectWillChange.send()
             }
-            .sheet(isPresented: $mostraModificaFotocamera) {
-                if let fotocamera = fotocameraDaModificare {
-                    ModificaFotocameraView(
-                        fotocamera: Binding(
-                            get: { fotocamera },
-                            set: { newValue in
-                                if let index = viewModel.fotocamere.firstIndex(where: { $0.id == fotocamera.id }) {
-                                    viewModel.fotocamere[index] = newValue
-                                }
+        }
+        .sheet(isPresented: $mostraModificaFotocamera) {
+            if let fotocamera = fotocameraDaModificare {
+                ModificaFotocameraView(
+                    fotocamera: Binding(
+                        get: { fotocamera },
+                        set: { newValue in
+                            if let index = viewModel.fotocamere.firstIndex(where: { $0.id == fotocamera.id }) {
+                                viewModel.fotocamere[index] = newValue
                             }
-                        ),
-                        viewModel: viewModel
-                    )
-                }
+                        }
+                    ),
+                    viewModel: viewModel
+                )
             }
         }
     }
@@ -111,20 +153,16 @@ struct ListaFotocamereView: View {
                         .frame(width: 24, height: 24)
                     
                     // Nome e modello
-                    HStack(spacing: 4) {
+                    VStack(alignment: .leading, spacing: 2) {
                         if !fotocamera.nickname.isEmpty && fotocamera.nickname != fotocamera.modello {
-                            // Con nickname custom: nickname nero + modello grigio
+                            // Con nickname custom: nickname nero sopra, modello grigio sotto
                             Text(fotocamera.nickname)
                                 .font(.body)
                                 .fontWeight(.medium)
                                 .foregroundColor(.primary)
                             
-                            Text("·")
-                                .font(.body)
-                                .foregroundColor(.secondary)
-                            
                             Text(fotocamera.modello)
-                                .font(.body)
+                                .font(.caption)
                                 .foregroundColor(.secondary)
                         } else {
                             // Senza nickname custom: solo modello in nero
@@ -181,8 +219,8 @@ struct ListaFotocamereView: View {
             .padding(.vertical, 0.5)
         }
     }
-
+}
 
 #Preview {
-    ListaFotocamereView(viewModel: CameraViewModel())
+    ListaFotocamereView(viewModel: CameraViewModel(), selectedTab: .constant(0))
 }

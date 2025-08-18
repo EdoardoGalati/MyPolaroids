@@ -1,0 +1,45 @@
+{
+  "film_pack_types": [
+    {
+      "id": "600",
+      "name": "600",
+      "default_capacity": 8,
+      "description": "Film classico compatibile con fotocamere 600 e i-Type"
+    },
+    {
+      "id": "itype",
+      "name": "i-Type",
+      "default_capacity": 8,
+      "description": "Film moderno senza batteria integrata"
+    },
+    {
+      "id": "sx70",
+      "name": "SX-70",
+      "default_capacity": 10,
+      "description": "Film per fotocamere folding SX-70"
+    }
+  ],
+  "film_pack_models": [
+    {
+      "id": "600_color",
+      "name": "Color",
+      "type": "600",
+      "capacity": 8,
+      "description": "Film a colori classico"
+    },
+    {
+      "id": "600_bw",
+      "name": "Black & White",
+      "type": "600",
+      "capacity": 8,
+      "description": "Film in bianco e nero"
+    },
+    {
+      "id": "sx70_color",
+      "name": "Color",
+      "type": "SX-70",
+      "capacity": 10,
+      "description": "Film SX-70 a colori"
+    }
+  ]
+}
