@@ -68,7 +68,7 @@
       "specific_model": "Original",
       "capacity": 8,
       "default_image": "camera.fill",
-      "default_icon": "Polaroid600",
+      "default_icon": "polaroid600.fill",
       "year_introduced": 1981,
       "film_type": "600/i-Type"
     },
@@ -80,7 +80,7 @@
       "specific_model": "OneStep",
       "capacity": 8,
       "default_image": "camera.fill",
-      "default_icon": "Polaroid600",
+      "default_icon": "polaroid600.fill",
       "year_introduced": 1983,
       "film_type": "600/i-Type"
     },
@@ -92,7 +92,7 @@
       "specific_model": "Express",
       "capacity": 8,
       "default_image": "camera.fill",
-      "default_icon": "Polaroid600",
+      "default_icon": "polaroid600.fill",
       "year_introduced": 1984,
       "film_type": "600/i-Type"
     },
