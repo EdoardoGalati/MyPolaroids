@@ -172,8 +172,8 @@
       "id": "polaroid_i2",
       "name": "I-2",
       "brand": "Polaroid",
-      "model": "I-2",
-      "specific_model": "Original",
+      "model": "I",
+      "specific_model": "2",
       "capacity": 8,
       "default_image": "camera.metering.center",
       "default_icon": "camera.metering.center",
@@ -229,16 +229,16 @@
       "film_type": "Spectra"
     },
     {
-      "id": "polaroid_Test2",
-      "name": "Test2",
+      "id": "polaroid_i1",
+      "name": "I-1",
       "brand": "Polaroid",
-      "model": "Test2",
-      "specific_model": "Test2",
+      "model": "I",
+      "specific_model": "1",
       "capacity": 8,
       "default_image": "camera.metering.center",
       "default_icon": "camera.metering.center",
-      "year_introduced": 2025,
-      "film_type": "Spectra"
+      "year_introduced": 2015,
+      "film_type": "i-Type/600/SX-70"
     }
   ]
 }
