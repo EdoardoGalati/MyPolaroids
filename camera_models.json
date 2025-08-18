@@ -275,6 +275,18 @@
       "default_icon": "camera.metering.center",
       "year_introduced": 2015,
       "film_type": "i-Type/600/SX-70"
+    },
+    {
+      "id": "polaroid_love",
+      "name": "love",
+      "brand": "Polaroid",
+      "model": "love",
+      "specific_model": "love2",
+      "capacity": 8,
+      "default_image": "camera.metering.center",
+      "default_icon": "camera.metering.center",
+      "year_introduced": 2015,
+      "film_type": "i-Type/600/SX-70"
     }
   ]
 }
