@@ -215,6 +215,18 @@
       "default_icon": "camera.metering.center",
       "year_introduced": 1970,
       "film_type": "4x5"
+    },
+    {
+      "id": "polaroid_Test",
+      "name": "Test",
+      "brand": "Polaroid",
+      "model": "Test",
+      "specific_model": "Test",
+      "capacity": 8,
+      "default_image": "camera.metering.center",
+      "default_icon": "camera.metering.center",
+      "year_introduced": 2025,
+      "film_type": "Spectra"
     }
   ]
 }
