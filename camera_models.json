@@ -227,6 +227,18 @@
       "default_icon": "camera.metering.center",
       "year_introduced": 2025,
       "film_type": "Spectra"
+    },
+    {
+      "id": "polaroid_Test2",
+      "name": "Test2",
+      "brand": "Polaroid",
+      "model": "Test2",
+      "specific_model": "Test2",
+      "capacity": 8,
+      "default_image": "camera.metering.center",
+      "default_icon": "camera.metering.center",
+      "year_introduced": 2025,
+      "film_type": "Spectra"
     }
   ]
 }
