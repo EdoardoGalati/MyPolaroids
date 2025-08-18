@@ -18,7 +18,7 @@ struct CaricaFilmView: View {
         
         let filmFiltrati = viewModel.pacchiFilm.filter { pacco in
             // Verifica compatibilità con cache intelligente
-            let compatibile = viewModel.isCompatibile(pacco.tipo, con: fotocamera.modello)
+            let compatibile = viewModel.isCompatibile(pacco.tipo, con: fotocamera)
             // Verifica che non sia già in uso
             let nonInUso = !pacco.isInUso
             // Verifica che abbia scatti disponibili
@@ -39,91 +39,121 @@ struct CaricaFilmView: View {
         return filmFiltrati
     }
     
+    // Aggrega i pacchi per tipo e modello
+    var filmCompatibiliAggregati: [FilmPackAggregato] {
+        var aggregati: [String: FilmPackAggregato] = [:]
+        
+        for pacco in filmCompatibili {
+            let chiave = "\(pacco.tipo)_\(pacco.modello)"
+            
+            if let esistente = aggregati[chiave] {
+                // Aggiorna il pacco esistente
+                aggregati[chiave] = FilmPackAggregato(
+                    tipo: esistente.tipo,
+                    modello: esistente.modello,
+                    conteggio: esistente.conteggio + 1,
+                    scattiTotali: esistente.scattiTotali + pacco.scattiRimanenti,
+                    modelliDisponibili: esistente.modelliDisponibili
+                )
+            } else {
+                // Crea un nuovo aggregato
+                aggregati[chiave] = FilmPackAggregato(
+                    tipo: pacco.tipo,
+                    modello: pacco.modello,
+                    conteggio: 1,
+                    scattiTotali: pacco.scattiRimanenti,
+                    modelliDisponibili: viewModel.modelliFilm
+                )
+            }
+        }
+        
+        // Ordina per tipo e poi per modello
+        return aggregati.values.sorted { first, second in
+            if first.tipo == second.tipo {
+                return first.modello < second.modello
+            }
+            return first.tipo < second.modello
+        }
+    }
+    
     var body: some View {
         NavigationView {
-            VStack(spacing: 20) {
-                // Header fotocamera
-                VStack(spacing: 16) {
-                    Image(systemName: "camera.fill")
-                        .font(.system(size: 50))
-                        .foregroundColor(.blue)
-                    
-                    Text(fotocamera.nickname)
-                        .font(.title2)
-                        .fontWeight(.bold)
-                    
-                    Text(fotocamera.modello)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-                
-                if filmCompatibili.isEmpty {
+            VStack(spacing: 0) {
+                if filmCompatibiliAggregati.isEmpty {
                     // Nessun film compatibile
-                    VStack(spacing: 20) {
-                        Image(systemName: "exclamationmark.triangle")
-                            .font(.system(size: 40))
-                            .foregroundColor(.orange)
+                    VStack(spacing: 1) {
+                        // Cella con icona e testo
+                        VStack(spacing: 20) {
+                            Image(systemName: "exclamationmark.triangle")
+                                .font(.system(size: 40))
+                                .foregroundColor(.orange)
+                            
+                            Text("No compatible film available")
+                                .font(.headline)
+                                .multilineTextAlignment(.center)
+                            
+                            Text("All compatible films are in use, finished or expired")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 32)
                         
-                        Text("Nessun film compatibile disponibile")
-                            .font(.headline)
-                            .multilineTextAlignment(.center)
-                        
-                        Text("Tutti i film compatibili sono in uso, finiti o scaduti")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-                        
+                        // Cella con pulsante (senza background)
                         Button(action: {
                             mostraAggiungiFilm = true
                         }) {
                             HStack {
                                 Image(systemName: "plus.circle.fill")
-                                Text("Aggiungi Nuovo Film")
+                                Text("Add New Film")
                             }
                             .font(.headline)
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.green)
-                            .cornerRadius(12)
+                            .padding(.vertical, 16)
+                            .background(Color.black)
+                            .cornerRadius(16)
                         }
-                        .padding(.horizontal)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 16)
                     }
-                    .padding()
                 } else {
                     // Lista film compatibili
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Film Compatibili Disponibili")
-                            .font(.headline)
-                            .padding(.horizontal)
-                        
-                        List(filmCompatibili) { pacco in
-                            FilmPackRowView(pacco: pacco, modelliDisponibili: viewModel.modelliFilm)
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    filmSelezionato = pacco
-                                    mostraAlert = true
-                                }
+                    ScrollView {
+                        LazyVStack(spacing: 1) {
+                            ForEach(filmCompatibiliAggregati) { pacco in
+                                FilmPackRowView(pacco: pacco)
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        // Trova un pacco disponibile di questo tipo
+                                        if let paccoDisponibile = filmCompatibili.first(where: { 
+                                            $0.tipo == pacco.tipo && $0.modello == pacco.modello 
+                                        }) {
+                                            filmSelezionato = paccoDisponibile
+                                            mostraAlert = true
+                                        }
+                                    }
+                            }
                         }
-                        .listStyle(PlainListStyle())
+                        .padding(.vertical, 16)
                     }
                 }
                 
                 Spacer()
             }
-            .padding()
-            .navigationTitle("Carica Film")
+            .navigationTitle("Load \(fotocamera.nickname.isEmpty ? fotocamera.modello : fotocamera.nickname)")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Annulla") {
+                    Button("Cancel") {
                         dismiss()
                     }
                 }
             }
-            .alert("Carica Film", isPresented: $mostraAlert) {
-                Button("Annulla", role: .cancel) { }
-                Button("Carica") {
+            .alert("Load Film", isPresented: $mostraAlert) {
+                Button("Cancel", role: .cancel) { }
+                Button("Load") {
                     if let pacco = filmSelezionato {
                         viewModel.caricaFilm(pacco, in: fotocamera)
                         dismiss()
@@ -131,9 +161,18 @@ struct CaricaFilmView: View {
                 }
             } message: {
                 if let pacco = filmSelezionato {
-                    Text("Vuoi caricare il film \(pacco.tipo) \(pacco.modello) con \(pacco.scattiRimanenti) scatti rimanenti in \(fotocamera.nickname)?")
+                    // Trova l'aggregato corrispondente per mostrare il conteggio
+                    let aggregato = filmCompatibiliAggregati.first { 
+                        $0.tipo == pacco.tipo && $0.modello == pacco.modello 
+                    }
+                    
+                    if let agg = aggregato {
+                        Text("Do you want to load a \(pacco.tipo) \(pacco.modello) film pack? You have \(agg.conteggio) pack\(agg.conteggio == 1 ? "" : "s") available.")
+                    } else {
+                        Text("Do you want to load the film \(pacco.tipo) \(pacco.modello)?")
+                    }
                 } else {
-                    Text("Seleziona un film da caricare")
+                    Text("Select a film to load")
                 }
             }
             .sheet(isPresented: $mostraAggiungiFilm) {
@@ -144,17 +183,36 @@ struct CaricaFilmView: View {
                 filmCompatibiliCache.removeAll()
             }
         }
+        .presentationDetents([.medium])
+    }
+}
+
+// MARK: - Struct per pacchi aggregati
+struct FilmPackAggregato: Identifiable {
+    let id: String
+    let tipo: String
+    let modello: String
+    let conteggio: Int
+    let scattiTotali: Int
+    let modelliDisponibili: [FilmPackModel]
+    
+    init(tipo: String, modello: String, conteggio: Int, scattiTotali: Int, modelliDisponibili: [FilmPackModel]) {
+        self.id = "\(tipo)_\(modello)"
+        self.tipo = tipo
+        self.modello = modello
+        self.conteggio = conteggio
+        self.scattiTotali = scattiTotali
+        self.modelliDisponibili = modelliDisponibili
     }
 }
 
 struct FilmPackRowView: View {
-    let pacco: FilmPack
-    let modelliDisponibili: [FilmPackModel]
+    let pacco: FilmPackAggregato
     
     var body: some View {
         HStack(spacing: 16) {
             // Indicatore colori del pacco
-            FilmPackColorIndicator(tipo: pacco.tipo, modello: pacco.modello, modelliDisponibili: modelliDisponibili, size: 40)
+            FilmPackColorIndicator(tipo: pacco.tipo, modello: pacco.modello, modelliDisponibili: pacco.modelliDisponibili, size: 40)
             
             // Informazioni film
             VStack(alignment: .leading, spacing: 4) {
@@ -162,25 +220,9 @@ struct FilmPackRowView: View {
                     .font(.headline)
                     .fontWeight(.semibold)
                 
-                Text("\(pacco.scattiRimanenti) scatti rimanenti")
+                Text("\(pacco.conteggio) pack\(pacco.conteggio == 1 ? "" : "s") available")
                     .font(.subheadline)
-                    .foregroundColor(.blue)
-                
-                if let giorni = pacco.giorniAllaScadenza {
-                    if pacco.isScaduto {
-                        Text("Scaduto")
-                            .font(.caption)
-                            .foregroundColor(.red)
-                    } else if pacco.isInScadenza {
-                        Text("Scade in \(giorni) giorni")
-                            .font(.caption)
-                            .foregroundColor(.orange)
-                    } else {
-                        Text("Scade in \(giorni) giorni")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                }
+                    .foregroundColor(.black)
             }
             
             Spacer()
@@ -188,17 +230,21 @@ struct FilmPackRowView: View {
             Image(systemName: "chevron.right")
                 .foregroundColor(.secondary)
         }
-        .padding(.vertical, 8)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 16)
+        .background(Color.white)
+        .cornerRadius(16)
     }
 }
 
 #Preview {
-    CaricaFilmView(
-        fotocamera: Camera(
-            nickname: "Polaroid 600",
-            modello: "Polaroid 600",
-            descrizione: "Fotocamera vintage"
-        ),
+    let fotocamera = Camera(
+        nickname: "Fotocamera temporanea",
+        modello: "Polaroid 600",
+        coloreIcona: "000"
+    )
+    return CaricaFilmView(
+        fotocamera: fotocamera,
         viewModel: FilmPackViewModel()
     )
 }

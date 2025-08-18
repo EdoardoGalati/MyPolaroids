@@ -21,6 +21,13 @@ class FilmPackViewModel: ObservableObject {
         pulisciCacheCompatibilita()
     }
     
+    // Aggiunge un nuovo pacco film all'inizio della lista
+    func aggiungiPaccoFilmInCima(_ pacco: FilmPack) {
+        pacchiFilm.insert(pacco, at: 0)
+        salvaPacchiFilm()
+        pulisciCacheCompatibilita()
+    }
+    
     // Rimuove un pacco film
     func rimuoviPaccoFilm(_ pacco: FilmPack) {
         if let index = pacchiFilm.firstIndex(where: { $0.id == pacco.id }) {
@@ -67,24 +74,46 @@ class FilmPackViewModel: ObservableObject {
         return pacchiFilm.filter { $0.fotocameraAssociata == fotocamera.id }
     }
     
-    // Ottiene i pacchi film disponibili (non associati)
+    // Proprietà computata per i pacchi film ordinati
+    var pacchiFilmOrdinate: [FilmPack] {
+        let sortingOption = UserDefaults.standard.string(forKey: "filmPackSortingOption") ?? SortingOption.dateAdded.rawValue
+        
+        switch sortingOption {
+        case SortingOption.alphabeticalAZ.rawValue:
+            return pacchiFilm.sorted { "\($0.tipo) \($0.modello)".lowercased() < "\($1.tipo) \($1.modello)".lowercased() }
+        case SortingOption.alphabeticalZA.rawValue:
+            return pacchiFilm.sorted { "\($0.tipo) \($0.modello)".lowercased() > "\($1.tipo) \($1.modello)".lowercased() }
+        case SortingOption.dateAdded.rawValue:
+            return pacchiFilm // Ordine originale di aggiunta
+        case SortingOption.dateAddedReverse.rawValue:
+            return pacchiFilm.reversed() // Ordine inverso di aggiunta
+        default:
+            return pacchiFilm
+        }
+    }
+    
+    // Ottiene i pacchi film disponibili (non associati) ordinati
     var pacchiDisponibili: [FilmPack] {
-        return pacchiFilm.filter { $0.fotocameraAssociata == nil && !$0.isFinito && !$0.isScaduto }
+        let disponibili = pacchiFilmOrdinate.filter { $0.fotocameraAssociata == nil && !$0.isFinito && !$0.isScaduto }
+        return disponibili
     }
     
-    // Ottiene i pacchi film in scadenza
+    // Ottiene i pacchi film in scadenza ordinati
     var pacchiInScadenza: [FilmPack] {
-        return pacchiFilm.filter { $0.isInScadenza }
+        let inScadenza = pacchiFilmOrdinate.filter { $0.isInScadenza }
+        return inScadenza
     }
     
-    // Ottiene i pacchi film scaduti
+    // Ottiene i pacchi film scaduti ordinati
     var pacchiScaduti: [FilmPack] {
-        return pacchiFilm.filter { $0.isScaduto }
+        let scaduti = pacchiFilmOrdinate.filter { $0.isScaduto }
+        return scaduti
     }
     
-    // Ottiene i pacchi film finiti
+    // Ottiene i pacchi film finiti ordinati
     var pacchiFiniti: [FilmPack] {
-        return pacchiFilm.filter { $0.isFinito }
+        let finiti = pacchiFilmOrdinate.filter { $0.isFinito }
+        return finiti
     }
     
     // Salva i pacchi film in UserDefaults
@@ -106,53 +135,91 @@ class FilmPackViewModel: ObservableObject {
     
     // Carica i modelli di pacchi film dal JSON
     private func caricaModelli() {
-        guard let url = Bundle.main.url(forResource: "film_pack_models", withExtension: "json") else {
-            print("File film_pack_models.json non trovato")
-            // Fallback: crea modelli di default se il JSON non è disponibile
-            setupModelliDefault()
-            return
+        print("🔄 [FilmPackViewModel] Inizio caricamento modelli...")
+        
+        // Prima prova a caricare dalla cache locale
+        print("🔄 [FilmPackViewModel] ===== INIZIO CARICAMENTO MODELLI =====")
+        
+        if let cachedModelli = DataDownloader.shared.loadFromCache(forKey: DataConfig.UserDefaultsKeys.filmPackModelsCache, type: [FilmPackModel].self) {
+            modelliFilm = cachedModelli
+            print("📱 [FilmPackViewModel] ✅ Cache modelli trovata: \(modelliFilm.count) modelli")
+        } else {
+            print("📱 [FilmPackViewModel] ❌ Cache modelli vuota o non trovata")
         }
         
+        if let cachedTipi = DataDownloader.shared.loadFromCache(forKey: DataConfig.UserDefaultsKeys.filmPackTypesCache, type: [FilmPackType].self) {
+            tipiFilm = cachedTipi
+            print("📱 [FilmPackViewModel] ✅ Cache tipi trovata: \(tipiFilm.count) tipi")
+        } else {
+            print("📱 [FilmPackViewModel] ❌ Cache tipi vuota o non trovata")
+        }
+        
+        // Poi prova a scaricare online
+        print("🌐 [FilmPackViewModel] 🚀 Avvio download online in background...")
+        Task {
+            await downloadModelliOnline()
+        }
+        print("🔄 [FilmPackViewModel] ===== FINE CARICAMENTO MODELLI =====")
+    }
+    
+    // Scarica i modelli online
+    @MainActor
+    private func downloadModelliOnline() async {
+        print("🌐 [FilmPackViewModel] ===== INIZIO DOWNLOAD ONLINE =====")
+        print("🌐 [FilmPackViewModel] Chiamata a DataDownloader.shared.downloadFilmPackModels() e downloadFilmPackTypes()...")
+        
         do {
-            let data = try Data(contentsOf: url)
-            let decoded = try JSONDecoder().decode(FilmPackModelsData.self, from: data)
-            tipiFilm = decoded.film_pack_types
-            modelliFilm = decoded.film_pack_models
+            // Scarica entrambi i tipi di dati in parallelo
+            async let filmPacks = DataDownloader.shared.downloadFilmPackModels()
+            async let types = DataDownloader.shared.downloadFilmPackTypes()
+            
+            print("🌐 [FilmPackViewModel] ⏳ Attendo completamento download parallelo...")
+            let (downloadedFilmPacks, downloadedTypes) = try await (filmPacks, types)
+            
+            print("🌐 [FilmPackViewModel] ✅ DOWNLOAD COMPLETATO:")
+            print("   - Film Packs: \(downloadedFilmPacks.count)")
+            print("   - Tipi: \(downloadedTypes.count)")
+            
+            // Aggiorna i tipi e modelli con i dati scaricati
+            tipiFilm = downloadedTypes
+            modelliFilm = downloadedFilmPacks
+            
+            print("✅ [FilmPackViewModel] Modelli scaricati online con successo!")
+            print("📋 [FilmPackViewModel] Tipi film scaricati: \(tipiFilm.count)")
+            print("📋 [FilmPackViewModel] Modelli film scaricati: \(modelliFilm.count)")
+            print("🌐 [FilmPackViewModel] ===== DOWNLOAD ONLINE COMPLETATO =====")
+            
         } catch {
-            print("Errore nel caricamento dei modelli: \(error)")
-            setupModelliDefault()
+            print("❌ [FilmPackViewModel] ❌ ERRORE nel download online: \(error)")
+            print("❌ [FilmPackViewModel] Dettagli errore: \(error.localizedDescription)")
+            
+            // Se non ci sono dati in cache, usa i modelli di default
+            if tipiFilm.isEmpty && modelliFilm.isEmpty {
+                print("⚠️ [FilmPackViewModel] Usando modelli di default perché cache vuota")
+                setupModelliDefault()
+            } else {
+                print("📱 [FilmPackViewModel] Mantenendo dati dalla cache: \(tipiFilm.count) tipi, \(modelliFilm.count) modelli")
+            }
+            print("🌐 [FilmPackViewModel] ===== DOWNLOAD ONLINE FALLITO =====")
         }
     }
     
     // Setup modelli di default se il JSON non è disponibile
     private func setupModelliDefault() {
+        print("⚠️ [FilmPackViewModel] Setup modelli di default (JSON non disponibile)")
+        
         tipiFilm = [
-            FilmPackType(id: "600", name: "600", default_capacity: 8, compatible_cameras: ["Polaroid 600", "Polaroid i-Type"], description: "Film classico compatibile con fotocamere 600 e i-Type"),
-            FilmPackType(id: "itype", name: "i-Type", default_capacity: 8, compatible_cameras: ["Polaroid i-Type", "Polaroid 600", "Polaroid Now", "Polaroid OneStep+", "Polaroid OneStep 2"], description: "Film moderno senza batteria integrata"),
-            FilmPackType(id: "sx70", name: "SX-70", default_capacity: 10, compatible_cameras: ["Polaroid SX-70"], description: "Film per fotocamere folding SX-70"),
-            FilmPackType(id: "go", name: "Go", default_capacity: 16, compatible_cameras: ["Polaroid Go"], description: "Film compatto per fotocamera Go"),
-            FilmPackType(id: "spectra", name: "Spectra", default_capacity: 10, compatible_cameras: ["Polaroid Spectra"], description: "Film wide per fotocamere Spectra"),
-            FilmPackType(id: "8x10", name: "8x10", default_capacity: 1, compatible_cameras: ["Polaroid 8x10"], description: "Film grande formato 8x10"),
-            FilmPackType(id: "4x5", name: "4x5", default_capacity: 1, compatible_cameras: ["Polaroid 4x5"], description: "Film medio formato 4x5")
+            FilmPackType(id: "600", name: "600", default_capacity: 8, description: "Film classico compatibile con fotocamere 600 e i-Type"),
+            FilmPackType(id: "itype", name: "i-Type", default_capacity: 8, description: "Film moderno senza batteria integrata"),
+            FilmPackType(id: "sx70", name: "SX-70", default_capacity: 10, description: "Film per fotocamere folding SX-70"),
+            FilmPackType(id: "go", name: "Go", default_capacity: 16, description: "Film compatto per fotocamera Go"),
+            FilmPackType(id: "spectra", name: "Spectra", default_capacity: 10, description: "Film wide per fotocamere Spectra"),
+            FilmPackType(id: "8x10", name: "8x10", default_capacity: 1, description: "Film grande formato 8x10"),
+            FilmPackType(id: "4x5", name: "4x5", default_capacity: 1, description: "Film medio formato 4x5")
         ]
         
-        modelliFilm = [
-            FilmPackModel(id: "color", name: "Color", description: "Film a colori standard Polaroid", category: "standard", colors: ["rosso", "blu", "giallo", "verde"]),
-            FilmPackModel(id: "black_white", name: "Black & White", description: "Film bianco e nero classico", category: "monochrome", colors: ["grigioScuro", "nero"]),
-            FilmPackModel(id: "black_frame_bw", name: "Black Frame B&W", description: "Bianco e nero con cornice nera", category: "monochrome", colors: ["grigioScuro", "nero", "bianco"]),
-            FilmPackModel(id: "color_frame", name: "Color Frame", description: "Film con cornice colorata", category: "framed", colors: ["rosso", "blu", "giallo", "verde", "rosa"]),
-            FilmPackModel(id: "duochrome_blue", name: "Duochrome (Blue)", description: "Film monocromatico blu", category: "duochrome", colors: ["blu", "ciano"]),
-            FilmPackModel(id: "duochrome_green", name: "Duochrome (Green)", description: "Film monocromatico verde", category: "duochrome", colors: ["verde", "giallo"]),
-            FilmPackModel(id: "duochrome_yellow", name: "Duochrome (Yellow)", description: "Film monocromatico giallo", category: "duochrome", colors: ["giallo", "arancione"]),
-            FilmPackModel(id: "duochrome_red", name: "Duochrome (Red)", description: "Film monocromatico rosso", category: "duochrome", colors: ["rosso", "rosa"]),
-            FilmPackModel(id: "duochrome_orange", name: "Duochrome (Orange)", description: "Film monocromatico arancione", category: "duochrome", colors: ["arancione", "giallo"]),
-            FilmPackModel(id: "metallic", name: "Metallic", description: "Film con effetto metallizzato", category: "special", colors: ["argento", "oro"]),
-            FilmPackModel(id: "gold_frame", name: "Gold Frame", description: "Film con cornice dorata", category: "framed", colors: ["oro", "giallo", "beige"]),
-            FilmPackModel(id: "silver_frame", name: "Silver Frame", description: "Film con cornice argentata", category: "framed", colors: ["argento", "grigio", "bianco"]),
-            FilmPackModel(id: "round_frame", name: "Round Frame", description: "Film con cornice rotonda", category: "framed", colors: ["blu", "verde", "giallo", "rosso"]),
-            FilmPackModel(id: "retro", name: "Retro", description: "Film con stile retrò", category: "special", colors: ["marrone", "beige", "crema"]),
-            FilmPackModel(id: "vintage", name: "Vintage", description: "Film con stile vintage", category: "special", colors: ["marrone", "grigio", "beige"])
-        ]
+        modelliFilm = []
+        print("📋 [FilmPackViewModel] Modelli di default impostati: \(modelliFilm.count) modelli")
     }
     
     // Ottiene i tipi di film disponibili
@@ -162,7 +229,24 @@ class FilmPackViewModel: ObservableObject {
     
     // Ottiene i modelli disponibili per un tipo specifico
     func modelliPerTipo(_ tipo: String) -> [String] {
-        return modelliFilm.map { $0.name }
+        // Usa i modelli scaricati online se disponibili, altrimenti fallback
+        if !modelliFilm.isEmpty {
+            let modelliPerTipo = modelliFilm.filter { $0.category.lowercased() == tipo.lowercased() }
+            return modelliPerTipo.map { $0.name }
+        }
+        
+        // Fallback ai modelli hardcoded se non ci sono dati online
+        let modelliPerTipo: [String: [String]] = [
+            "600": ["Color", "Black & White", "Color Frame", "Black Frame B&W", "Duochrome (Blue)", "Duochrome (Green)", "Duochrome (Yellow)", "Duochrome (Red)", "Duochrome (Orange)", "Metallic", "Gold Frame", "Silver Frame", "Round Frame", "Retro", "Vintage"],
+            "i-Type": ["Color", "Black & White", "Color Frame", "Black Frame B&W", "Duochrome (Blue)", "Duochrome (Green)", "Duochrome (Yellow)", "Duochrome (Red)", "Duochrome (Orange)", "Metallic", "Gold Frame", "Silver Frame", "Round Frame", "Retro", "Vintage"],
+            "SX-70": ["Color", "Black & White", "Color Frame", "Black Frame B&W", "Duochrome (Blue)", "Duochrome (Green)", "Duochrome (Yellow)", "Duochrome (Red)", "Duochrome (Orange)", "Metallic", "Gold Frame", "Silver Frame", "Round Frame", "Retro", "Vintage"],
+            "Go": ["Color", "Black & White", "Color Frame", "Black Frame B&W"],
+            "Spectra": ["Color", "Black & White", "Color Frame", "Black Frame B&W"],
+            "8x10": ["Color", "Black & White"],
+            "4x5": ["Color", "Black & White"]
+        ]
+        
+        return modelliPerTipo[tipo] ?? ["Color", "Black & White"]
     }
     
     // Ottiene la capacità di default per un tipo di film
@@ -175,10 +259,20 @@ class FilmPackViewModel: ObservableObject {
     
     // Ottiene le fotocamere compatibili per un tipo di film
     func fotocamereCompatibiliPerTipo(_ tipo: String) -> [String] {
-        if let tipoFilm = tipiFilm.first(where: { $0.name == tipo }) {
-            return tipoFilm.compatible_cameras
-        }
-        return []
+        // Usa il fallback per ottenere le fotocamere compatibili
+        let fotocamereCompatibili = isCompatibileFallback(tipo, con: "")
+        // Restituisce le fotocamere compatibili dal fallback
+        let compatibilitaHardcoded: [String: [String]] = [
+            "600": ["Polaroid 600", "Polaroid i-Type", "Polaroid I-2"],
+            "i-Type": ["Polaroid i-Type", "Polaroid 600", "Polaroid Now", "Polaroid OneStep+", "Polaroid OneStep 2", "Polaroid I-2"],
+            "SX-70": ["Polaroid SX-70", "Polaroid I-2"],
+            "Go": ["Polaroid Go"],
+            "Spectra": ["Polaroid Spectra"],
+            "8x10": ["Polaroid 8x10"],
+            "4x5": ["Polaroid 4x5"]
+        ]
+        
+        return compatibilitaHardcoded[tipo] ?? []
     }
     
     // Cache per la compatibilità con timestamp per controllo periodico
@@ -186,8 +280,15 @@ class FilmPackViewModel: ObservableObject {
     private let intervalloAggiornamentoCache: TimeInterval = 1.0 // 1 secondo
     
     // Verifica se un tipo di film è compatibile con una fotocamera (con cache intelligente)
-    func isCompatibile(_ tipoFilm: String, con fotocamera: String) -> Bool {
-        let chiaveCache = "\(tipoFilm)_\(fotocamera)"
+    func isCompatibile(_ tipoFilm: String, con fotocamera: Camera) -> Bool {
+        // Controlla se l'utente ha attivato l'opzione per ignorare la compatibilità
+        let ignoreCompatibility = UserDefaults.standard.bool(forKey: "ignoreCompatibility")
+        if ignoreCompatibility {
+            print("🔧 [FilmPackViewModel] Compatibilità ignorata per impostazione utente")
+            return true
+        }
+        
+        let chiaveCache = "\(tipoFilm)_\(fotocamera.id)"
         let ora = Date()
         
         // Controlla se è in cache e se è ancora valida
@@ -200,17 +301,11 @@ class FilmPackViewModel: ObservableObject {
             }
         }
         
-        // Calcola la compatibilità (nuova o cache scaduta)
-        let fotocamereCompatibili = fotocamereCompatibiliPerTipo(tipoFilm)
-        let isCompatibile = fotocamereCompatibili.contains(fotocamera)
+        // Calcola la compatibilità basata sul film_type della fotocamera
+        let isCompatibile = isFilmTypeCompatibile(tipoFilm, con: fotocamera)
         
         // Aggiorna la cache con timestamp
         compatibilitaCache[chiaveCache] = (risultato: isCompatibile, timestamp: ora)
-        
-        // Debug: stampa solo quando aggiorna la cache
-    //    print("🔄 Aggiornamento cache compatibilità: tipo '\(tipoFilm)' con fotocamera '\(fotocamera)'")
-    //    print("   📸 Fotocamere compatibili: \(fotocamereCompatibili)")
-    //    print("   ✅ Risultato: \(isCompatibile)")
         
         // Pulisce periodicamente la cache scaduta
         pulisciCacheScaduta()
@@ -218,12 +313,61 @@ class FilmPackViewModel: ObservableObject {
         return isCompatibile
     }
     
+    // Verifica se un tipo di film è compatibile con una fotocamera basandosi sul film_type
+    private func isFilmTypeCompatibile(_ tipoFilm: String, con fotocamera: Camera) -> Bool {
+        guard let filmType = fotocamera.filmType else { 
+            // Se non c'è film_type, fallback alla compatibilità basata sul nome del modello
+            return isCompatibileFallback(tipoFilm, con: fotocamera.modello)
+        }
+        
+        // Il film_type può contenere più tipi separati da "/" (es: "i-Type/600/SX70")
+        let tipiSupportati = filmType.components(separatedBy: "/")
+        
+        // Mappa i nomi dei tipi di film ai valori del film_type
+        let mappaTipi: [String: String] = [
+            "600": "600",
+            "i-Type": "i-Type", 
+            "SX-70": "SX-70",
+            "Go": "Go",
+            "Spectra": "Spectra",
+            "8x10": "8x10",
+            "4x5": "4x5"
+        ]
+        
+        // Verifica se il tipo di film richiesto è supportato dalla fotocamera
+        if let tipoMappato = mappaTipi[tipoFilm] {
+            return tipiSupportati.contains(tipoMappato)
+        }
+        
+        return false
+    }
+    
+    // Fallback per compatibilità basata sul nome del modello (per fotocamere senza film_type)
+    private func isCompatibileFallback(_ tipoFilm: String, con modelloFotocamera: String) -> Bool {
+        // Mappa di compatibilità hardcoded per fotocamere senza film_type
+        let compatibilitaHardcoded: [String: [String]] = [
+            "600": ["Polaroid 600", "Polaroid i-Type", "Polaroid I-2"],
+            "i-Type": ["Polaroid i-Type", "Polaroid 600", "Polaroid Now", "Polaroid OneStep+", "Polaroid OneStep 2", "Polaroid I-2"],
+            "SX-70": ["Polaroid SX-70", "Polaroid I-2"],
+            "Go": ["Polaroid Go"],
+            "Spectra": ["Polaroid Spectra"],
+            "8x10": ["Polaroid 8x10"],
+            "4x5": ["Polaroid 4x5"]
+        ]
+        
+        if let fotocamereCompatibili = compatibilitaHardcoded[tipoFilm] {
+            return fotocamereCompatibili.contains(modelloFotocamera)
+        }
+        
+        return false
+    }
+    
     // Ottiene le tipologie raggruppate per tipo e modello
     var tipologieRaggruppate: [TipologiaPaccoFilm] {
         var tipologie: [TipologiaPaccoFilm] = []
         var tipologieProcessate: Set<String> = []
         
-        for pacco in pacchiFilm {
+        for pacco in pacchiFilmOrdinate {
             let chiave = "\(pacco.tipo)_\(pacco.modello)"
             
             if !tipologieProcessate.contains(chiave) {
@@ -233,12 +377,35 @@ class FilmPackViewModel: ObservableObject {
             }
         }
         
-        // Ordina per tipo e poi per modello
-        return tipologie.sorted { first, second in
-            if first.tipo == second.tipo {
-                return first.modello < second.modello
+        // Applica l'ordinamento personalizzato
+        let sortingOption = UserDefaults.standard.string(forKey: "filmPackSortingOption") ?? SortingOption.dateAdded.rawValue
+        
+        switch sortingOption {
+        case SortingOption.alphabeticalAZ.rawValue:
+            return tipologie.sorted { first, second in
+                if first.tipo == second.tipo {
+                    return first.modello < second.modello
+                }
+                return first.tipo < second.tipo
             }
-            return first.tipo < second.tipo
+        case SortingOption.alphabeticalZA.rawValue:
+            return tipologie.sorted { first, second in
+                if first.tipo == second.tipo {
+                    return first.modello > second.modello
+                }
+                return first.tipo > second.tipo
+            }
+        case SortingOption.dateAdded.rawValue:
+            return tipologie // Mantiene l'ordine di aggiunta
+        case SortingOption.dateAddedReverse.rawValue:
+            return tipologie.reversed() // Ordine inverso di aggiunta
+        default:
+            return tipologie.sorted { first, second in
+                if first.tipo == second.tipo {
+                    return first.modello < second.modello
+                }
+                return first.tipo < second.tipo
+            }
         }
     }
     

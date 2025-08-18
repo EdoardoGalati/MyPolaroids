@@ -2,160 +2,95 @@ import SwiftUI
 
 struct FilmPackColors {
     
-    // Colori standard per i pacchi film
-    static let coloriPolaroid: [String: Color] = [
-        "bianco": Color.white,
-        "nero": Color.black,
-        "grigio": Color.gray,
-        "grigioScuro": Color(red: 0.3, green: 0.3, blue: 0.3),
-        "rosso": Color.red,
-        "blu": Color.blue,
-        "verde": Color.green,
-        "giallo": Color.yellow,
-        "arancione": Color.orange,
-        "rosa": Color.pink,
-        "viola": Color.purple,
-        "marrone": Color.brown,
-        "ciano": Color.cyan,
-        "magenta": Color.pink,
-        "beige": Color(red: 0.96, green: 0.96, blue: 0.86),
-        "crema": Color(red: 1.0, green: 0.99, blue: 0.82),
-        "argento": Color(red: 0.75, green: 0.75, blue: 0.75),
-        "oro": Color(red: 1.0, green: 0.84, blue: 0.0)
-    ]
+    // Helper per convertire colori hex in RGBColor
+    static func hexToRGB(_ hex: String) -> RGBColor {
+        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        var int: UInt64 = 0
+        Scanner(string: hex).scanHexInt64(&int)
+        let a, r, g, b: UInt64
+        switch hex.count {
+        case 3: // RGB (12-bit)
+            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
+        case 6: // RGB (24-bit)
+            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
+        case 8: // ARGB (32-bit)
+            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
+        default:
+            (a, r, g, b) = (1, 1, 1, 0)
+        }
+
+        return RGBColor(
+            red: Double(r) / 255.0,
+            green: Double(g) / 255.0,
+            blue: Double(b) / 255.0
+        )
+    }
     
-    // Configurazione colori per ogni tipo di pacco
-    static func coloriPerTipo(_ tipo: String, modello: String, modelliDisponibili: [FilmPackModel] = []) -> [Color] {
-        // Se abbiamo i modelli disponibili, cerca il colore nel JSON
-        if let modelloFilm = modelliDisponibili.first(where: { $0.id.lowercased() == modello.lowercased() }) {
-            return modelloFilm.colors.compactMap { coloreNome in
-                coloriPolaroid[coloreNome.lowercased()]
-            }
+    // Configurazione gradienti per ogni tipo di pacco
+    static func gradientePerTipo(_ tipo: String, modello: String, modelliDisponibili: [FilmPackModel] = []) -> FilmPackGradient? {
+        // Normalizza il nome del modello per la ricerca
+        let modelloNormalizzato = normalizzaNomeModello(modello)
+        
+        // Cerca il gradiente nel JSON
+        if let modelloFilm = modelliDisponibili.first(where: { $0.id.lowercased() == modelloNormalizzato.lowercased() }) {
+            return modelloFilm.gradient
         }
         
-        // Fallback ai colori hardcoded se non troviamo il modello
-        switch tipo {
-        case "600":
-            return coloriPerModello600(modello)
-        case "i-Type":
-            return coloriPerModelloIType(modello)
-        case "SX-70":
-            return coloriPerModelloSX70(modello)
-        case "Go":
-            return coloriPerModelloGo(modello)
-        case "Spectra":
-            return coloriPerModelloSpectra(modello)
-        case "8x10":
-            return coloriPerModello8x10(modello)
-        case "4x5":
-            return coloriPerModello4x5(modello)
-        default:
-            return [coloriPolaroid["grigio"]!]
-        }
+        // Se non troviamo il modello, restituiamo nil (nessun fallback hardcoded)
+        print("⚠️ Modello non trovato: '\(modello)' (normalizzato: '\(modelloNormalizzato)')")
+        print("📋 Modelli disponibili: \(modelliDisponibili.map { $0.id })")
+        return nil
     }
     
-    // Colori per pacco 600
-    private static func coloriPerModello600(_ modello: String) -> [Color] {
-        switch modello.lowercased() {
+    // Normalizza i nomi dei modelli per la compatibilità
+    private static func normalizzaNomeModello(_ modello: String) -> String {
+        let modelloLower = modello.lowercased()
+        
+        // Mappa i nomi comuni ai loro ID nel JSON
+        switch modelloLower {
+        case "bw", "black & white", "black and white":
+            return "black_white"
         case "color":
-            return [coloriPolaroid["rosso"]!, coloriPolaroid["blu"]!, coloriPolaroid["giallo"]!]
-        case "bw", "black & white":
-            return [coloriPolaroid["grigioScuro"]!, coloriPolaroid["nero"]!]
-        case "duochrome":
-            return [coloriPolaroid["rosso"]!, coloriPolaroid["giallo"]!]
+            return "color"
+        case "black frame bw", "black frame b&w":
+            return "black_frame_bw"
+        case "color frame":
+            return "color_frame"
+        case "duochrome blue", "duochrome (blue)":
+            return "duochrome_blue"
+        case "duochrome green", "duochrome (green)":
+            return "duochrome_green"
+        case "duochrome yellow", "duochrome (yellow)":
+            return "duochrome_yellow"
+        case "duochrome red", "duochrome (red)":
+            return "duochrome_red"
+        case "duochrome orange", "duochrome (orange)":
+            return "duochrome_orange"
         case "metallic":
-            return [coloriPolaroid["argento"]!, coloriPolaroid["oro"]!]
-        case "round":
-            return [coloriPolaroid["blu"]!, coloriPolaroid["verde"]!, coloriPolaroid["giallo"]!]
+            return "metallic"
+        case "gold frame":
+            return "gold_frame"
+        case "silver frame":
+            return "silver_frame"
+        case "round frame":
+            return "round_frame"
+        case "retro":
+            return "retro"
+        case "vintage":
+            return "vintage"
+        case "multicolor 600":
+            return "multicolor_600"
+        case "rounded":
+            return "rounded"
         default:
-            return [coloriPolaroid["grigio"]!, coloriPolaroid["nero"]!]
+            return modello
         }
     }
     
-    // Colori per pacco i-Type
-    private static func coloriPerModelloIType(_ modello: String) -> [Color] {
-        switch modello.lowercased() {
-        case "color":
-            return [coloriPolaroid["rosso"]!, coloriPolaroid["blu"]!, coloriPolaroid["giallo"]!, coloriPolaroid["verde"]!]
-        case "bw", "black & white":
-            return [coloriPolaroid["grigioScuro"]!, coloriPolaroid["nero"]!]
-        case "duochrome":
-            return [coloriPolaroid["rosso"]!, coloriPolaroid["giallo"]!]
-        case "metallic":
-            return [coloriPolaroid["argento"]!, coloriPolaroid["oro"]!]
-        default:
-            return [coloriPolaroid["grigio"]!, coloriPolaroid["nero"]!]
-        }
-    }
-    
-    // Colori per pacco SX-70
-    private static func coloriPerModelloSX70(_ modello: String) -> [Color] {
-        switch modello.lowercased() {
-        case "color":
-            return [coloriPolaroid["rosso"]!, coloriPolaroid["blu"]!, coloriPolaroid["giallo"]!]
-        case "bw", "black & white":
-            return [coloriPolaroid["grigioScuro"]!, coloriPolaroid["nero"]!]
-        case "time zero":
-            return [coloriPolaroid["grigio"]!, coloriPolaroid["beige"]!]
-        default:
-            return [coloriPolaroid["grigio"]!, coloriPolaroid["nero"]!]
-        }
-    }
-    
-    // Colori per pacco Go
-    private static func coloriPerModelloGo(_ modello: String) -> [Color] {
-        switch modello.lowercased() {
-        case "color":
-            return [coloriPolaroid["rosso"]!, coloriPolaroid["blu"]!, coloriPolaroid["giallo"]!]
-        case "bw", "black & white":
-            return [coloriPolaroid["grigioScuro"]!, coloriPolaroid["nero"]!]
-        case "duochrome":
-            return [coloriPolaroid["rosso"]!, coloriPolaroid["giallo"]!]
-        default:
-            return [coloriPolaroid["grigio"]!, coloriPolaroid["nero"]!]
-        }
-    }
-    
-    // Colori per pacco Spectra
-    private static func coloriPerModelloSpectra(_ modello: String) -> [Color] {
-        switch modello.lowercased() {
-        case "color":
-            return [coloriPolaroid["rosso"]!, coloriPolaroid["blu"]!, coloriPolaroid["giallo"]!, coloriPolaroid["verde"]!]
-        case "bw", "black & white":
-            return [coloriPolaroid["grigioScuro"]!, coloriPolaroid["nero"]!]
-        case "metallic":
-            return [coloriPolaroid["argento"]!, coloriPolaroid["oro"]!]
-        default:
-            return [coloriPolaroid["grigio"]!, coloriPolaroid["nero"]!]
-        }
-    }
-    
-    // Colori per pacco 8x10
-    private static func coloriPerModello8x10(_ modello: String) -> [Color] {
-        switch modello.lowercased() {
-        case "color":
-            return [coloriPolaroid["rosso"]!, coloriPolaroid["blu"]!, coloriPolaroid["giallo"]!, coloriPolaroid["verde"]!, coloriPolaroid["magenta"]!]
-        case "bw", "black & white":
-            return [coloriPolaroid["grigioScuro"]!, coloriPolaroid["nero"]!]
-        default:
-            return [coloriPolaroid["grigio"]!, coloriPolaroid["nero"]!]
-        }
-    }
-    
-    // Colori per pacco 4x5
-    private static func coloriPerModello4x5(_ modello: String) -> [Color] {
-        switch modello.lowercased() {
-        case "color":
-            return [coloriPolaroid["rosso"]!, coloriPolaroid["blu"]!, coloriPolaroid["giallo"]!, coloriPolaroid["verde"]!]
-        case "bw", "black & white":
-            return [coloriPolaroid["grigioScuro"]!, coloriPolaroid["nero"]!]
-        default:
-            return [coloriPolaroid["grigio"]!, coloriPolaroid["nero"]!]
-        }
-    }
+
 }
 
-// Vista per visualizzare i pallini colorati identificativi
+// Vista per visualizzare i gradienti dei film pack
 struct FilmPackColorIndicator: View {
     let tipo: String
     let modello: String
@@ -170,96 +105,15 @@ struct FilmPackColorIndicator: View {
     }
     
     var body: some View {
-        let colori = FilmPackColors.coloriPerTipo(tipo, modello: modello, modelliDisponibili: modelliDisponibili)
+        let gradient = FilmPackColors.gradientePerTipo(tipo, modello: modello, modelliDisponibili: modelliDisponibili)
         
-        ZStack {
-            // Cerchio di sfondo
-            Circle()
-                .fill(Color.white)
-                .frame(width: size, height: size)
-                .overlay(
-                    Circle()
-                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                )
-            
-            // Pallini colorati
-            if colori.count == 1 {
-                // Un solo colore: cerchio pieno
-                Circle()
-                    .fill(colori[0])
-                    .frame(width: size * 0.6, height: size * 0.6)
-            } else if colori.count == 2 {
-                // Due colori: divisi verticalmente
-                HStack(spacing: 0) {
-                    Circle()
-                        .fill(colori[0])
-                        .frame(width: size * 0.4, height: size * 0.4)
-                    Circle()
-                        .fill(colori[1])
-                        .frame(width: size * 0.4, height: size * 0.4)
-                }
-            } else if colori.count == 3 {
-                // Tre colori: triangolo
-                ZStack {
-                    Circle()
-                        .fill(colori[0])
-                        .frame(width: size * 0.4, height: size * 0.4)
-                        .offset(y: -size * 0.15)
-                    
-                    Circle()
-                        .fill(colori[1])
-                        .frame(width: size * 0.4, height: size * 0.4)
-                        .offset(x: -size * 0.15, y: size * 0.15)
-                    
-                    Circle()
-                        .fill(colori[2])
-                        .frame(width: size * 0.4, height: size * 0.4)
-                        .offset(x: size * 0.15, y: size * 0.15)
-                }
-            } else if colori.count == 4 {
-                // Quattro colori: quadrato
-                VStack(spacing: 2) {
-                    HStack(spacing: 2) {
-                        Circle()
-                            .fill(colori[0])
-                            .frame(width: size * 0.25, height: size * 0.25)
-                        Circle()
-                            .fill(colori[1])
-                            .frame(width: size * 0.25, height: size * 0.25)
-                    }
-                    HStack(spacing: 2) {
-                        Circle()
-                            .fill(colori[2])
-                            .frame(width: size * 0.25, height: size * 0.25)
-                        Circle()
-                            .fill(colori[3])
-                            .frame(width: size * 0.25, height: size * 0.25)
-                    }
-                }
-            } else if colori.count >= 5 {
-                // Cinque o più colori: cerchio centrale + satelliti
-                ZStack {
-                    // Colore centrale
-                    Circle()
-                        .fill(colori[0])
-                        .frame(width: size * 0.3, height: size * 0.3)
-                    
-                    // Colori satelliti
-                    ForEach(1..<min(6, colori.count), id: \.self) { index in
-                        let angle = Double(index - 1) * (2 * .pi / Double(min(5, colori.count - 1)))
-                        let radius = size * 0.35
-                        
-                        Circle()
-                            .fill(colori[index])
-                            .frame(width: size * 0.2, height: size * 0.2)
-                            .offset(
-                                x: cos(angle) * radius,
-                                y: sin(angle) * radius
-                            )
-                    }
-                }
-            }
-        }
+        // Debug: stampa informazioni per capire cosa sta succedendo
+        let _ = print("🔍 FilmPackColorIndicator - Tipo: \(tipo), Modello: \(modello)")
+        let _ = print("🔍 Modelli disponibili count: \(modelliDisponibili.count)")
+        let _ = print("🔍 Modelli disponibili IDs: \(modelliDisponibili.map { $0.id })")
+        let _ = print("🔍 Gradiente trovato: \(gradient != nil)")
+        
+        ColorWheelView(gradient: gradient, size: size)
     }
 }
 
@@ -283,23 +137,6 @@ struct FilmPackColorIndicator: View {
             VStack {
                 Text("i-Type Color")
                 FilmPackColorIndicator(tipo: "i-Type", modello: "color")
-            }
-        }
-        
-        HStack(spacing: 20) {
-            VStack {
-                Text("SX-70 BW")
-                FilmPackColorIndicator(tipo: "SX-70", modello: "bw")
-            }
-            
-            VStack {
-                Text("Go Color")
-                FilmPackColorIndicator(tipo: "Go", modello: "color")
-            }
-            
-            VStack {
-                Text("8x10 Color")
-                FilmPackColorIndicator(tipo: "8x10", modello: "color")
             }
         }
     }

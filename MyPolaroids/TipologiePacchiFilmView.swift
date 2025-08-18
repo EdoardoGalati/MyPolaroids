@@ -1,8 +1,11 @@
 import SwiftUI
+import Combine
 
 struct TipologiePacchiFilmView: View {
     @ObservedObject var viewModel: FilmPackViewModel
+    @Binding var selectedTab: Int
     @State private var mostraAggiungi = false
+    @State private var mostraImpostazioni = false
     
     var body: some View {
         ZStack {
@@ -19,6 +22,12 @@ struct TipologiePacchiFilmView: View {
                     
                     Spacer()
                     
+                    Button(action: { mostraImpostazioni = true }) {
+                        Image(systemName: "gearshape")
+                            .font(.title2)
+                            .foregroundColor(.black)
+                    }
+                    
                     Button(action: {
                         mostraAggiungi = true
                     }) {
@@ -27,12 +36,12 @@ struct TipologiePacchiFilmView: View {
                             .foregroundColor(.black)
                     }
                 }
-                .padding(.horizontal, 16)
-                .padding(.top, 24)
+                .padding(.horizontal, 20)
+                .padding(.top, 20)
                 .padding(.bottom, 24)
                 .background(Color(red: 244/255, green: 244/255, blue: 244/255))
                 
-                // Lista tipologie
+                // Lista tipologie che arriva fino a fine pagina
                 ScrollView {
                     LazyVStack(spacing: 1) {
                         if viewModel.tipologieRaggruppate.isEmpty {
@@ -55,11 +64,15 @@ struct TipologiePacchiFilmView: View {
                         } else {
                             ForEach(viewModel.tipologieRaggruppate.indices, id: \.self) { index in
                                 let tipologia = viewModel.tipologieRaggruppate[index]
-                                NavigationLink(destination: DettagliTipologiaView(tipologia: tipologia, viewModel: viewModel)) {
+                                NavigationLink(destination: DettagliTipologiaView(tipologia: tipologia, viewModel: viewModel, selectedTab: $selectedTab)) {
                                     TipologiaRowView(tipologia: tipologia, modelliDisponibili: viewModel.modelliFilm)
                                 }
                                 .buttonStyle(PlainButtonStyle())
                             }
+                            
+                            // Spazio extra alla fine della lista
+                            Spacer(minLength: 0)
+                                .frame(height: 80)
                         }
                     }
                 }
@@ -67,6 +80,15 @@ struct TipologiePacchiFilmView: View {
             .navigationBarHidden(true) // Nasconde la navigation bar predefinita
             .sheet(isPresented: $mostraAggiungi) {
                 AggiungiPaccoFilmView(viewModel: viewModel)
+            }
+            .sheet(isPresented: $mostraImpostazioni) {
+                ImpostazioniView()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)) { _ in
+                // Forza l'aggiornamento quando cambiano le impostazioni di ordinamento
+                DispatchQueue.main.async {
+                    viewModel.objectWillChange.send()
+                }
             }
         }
     }
@@ -136,5 +158,5 @@ struct TipologiePacchiFilmView: View {
     
 }
 #Preview {
-    TipologiePacchiFilmView(viewModel: FilmPackViewModel())
+    TipologiePacchiFilmView(viewModel: FilmPackViewModel(), selectedTab: .constant(0))
 }

@@ -12,11 +12,11 @@ struct MainTabView: View {
                     .ignoresSafeArea()
                 
                 TabView(selection: $selectedTab) {
-                ListaFotocamereView(viewModel: cameraViewModel)
+                ListaFotocamereView(viewModel: cameraViewModel, selectedTab: $selectedTab)
                     .tag(0)
                 
                 if let filmPackViewModel = cameraViewModel.filmPackViewModel {
-                    TipologiePacchiFilmView(viewModel: filmPackViewModel)
+                    TipologiePacchiFilmView(viewModel: filmPackViewModel, selectedTab: $selectedTab)
                         .tag(1)
                 }
             }
