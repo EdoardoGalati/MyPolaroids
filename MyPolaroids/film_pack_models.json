@@ -1,0 +1,181 @@
+{
+  "film_pack_types": [
+    {
+      "id": "600",
+      "name": "600",
+      "default_capacity": 8,
+      "compatible_cameras": ["Polaroid 600", "Polaroid i-Type"],
+      "description": "Film classico compatibile con fotocamere 600 e i-Type"
+    },
+    {
+      "id": "itype",
+      "name": "i-Type",
+      "default_capacity": 8,
+      "compatible_cameras": ["Polaroid i-Type", "Polaroid 600", "Polaroid Now", "Polaroid OneStep+", "Polaroid OneStep 2"],
+      "description": "Film moderno senza batteria integrata"
+    },
+    {
+      "id": "sx70",
+      "name": "SX-70",
+      "default_capacity": 10,
+      "compatible_cameras": ["Polaroid SX-70"],
+      "description": "Film per fotocamere folding SX-70"
+    },
+    {
+      "id": "go",
+      "name": "Go",
+      "default_capacity": 8,
+      "compatible_cameras": ["Polaroid Go"],
+      "description": "Film compatto per fotocamera Go"
+    },
+    {
+      "id": "spectra",
+      "name": "Spectra",
+      "default_capacity": 10,
+      "compatible_cameras": ["Polaroid Spectra"],
+      "description": "Film wide per fotocamere Spectra"
+    },
+    {
+      "id": "8x10",
+      "name": "8x10",
+      "default_capacity": 1,
+      "compatible_cameras": ["Polaroid 8x10"],
+      "description": "Film grande formato 8x10"
+    },
+    {
+      "id": "4x5",
+      "name": "4x5",
+      "default_capacity": 1,
+      "compatible_cameras": ["Polaroid 4x5"],
+      "description": "Film medio formato 4x5"
+    }
+  ],
+  "film_pack_models": [
+    {
+      "id": "color",
+      "name": "Color",
+      "description": "Film a colori standard Polaroid",
+      "category": "standard",
+      "colors": ["rosso", "blu", "giallo", "verde"]
+    },
+    {
+      "id": "black_white",
+      "name": "Black & White",
+      "description": "Film bianco e nero classico",
+      "category": "monochrome",
+      "colors": ["grigioScuro", "nero"]
+    },
+    {
+      "id": "black_frame_bw",
+      "name": "Black Frame B&W",
+      "description": "Bianco e nero con cornice nera",
+      "category": "monochrome",
+      "colors": ["grigioScuro", "nero", "bianco"]
+    },
+    {
+      "id": "color_frame",
+      "name": "Color Frame",
+      "description": "Film con cornice colorata",
+      "category": "framed",
+      "colors": ["rosso", "blu", "giallo", "verde", "rosa"]
+    },
+    {
+      "id": "duochrome_blue",
+      "name": "Duochrome (Blue)",
+      "description": "Film monocromatico blu",
+      "category": "duochrome",
+      "colors": ["blu", "ciano"]
+    },
+    {
+      "id": "duochrome_green",
+      "name": "Duochrome (Green)",
+      "description": "Film monocromatico verde",
+      "category": "duochrome",
+      "colors": ["verde", "giallo"]
+    },
+    {
+      "id": "duochrome_yellow",
+      "name": "Duochrome (Yellow)",
+      "description": "Film monocromatico giallo",
+      "category": "duochrome",
+      "colors": ["giallo", "arancione"]
+    },
+    {
+      "id": "duochrome_red",
+      "name": "Duochrome (Red)",
+      "description": "Film monocromatico rosso",
+      "category": "duochrome",
+      "colors": ["rosso", "rosa"]
+    },
+    {
+      "id": "duochrome_orange",
+      "name": "Duochrome (Orange)",
+      "description": "Film monocromatico arancione",
+      "category": "duochrome",
+      "colors": ["arancione", "giallo"]
+    },
+    {
+      "id": "metallic",
+      "name": "Metallic",
+      "description": "Film con effetto metallizzato",
+      "category": "special",
+      "colors": ["argento", "oro"]
+    },
+    {
+      "id": "gold_frame",
+      "name": "Gold Frame",
+      "description": "Film con cornice dorata",
+      "category": "framed",
+      "colors": ["oro", "giallo", "beige"]
+    },
+    {
+      "id": "duochrome_orange",
+      "name": "Duochrome (Orange)",
+      "description": "Film monocromatico arancione",
+      "category": "duochrome",
+      "colors": ["arancione", "giallo"]
+    },
+    {
+      "id": "metallic",
+      "name": "Metallic",
+      "description": "Film con effetto metallizzato",
+      "category": "special",
+      "colors": ["argento", "oro"]
+    },
+    {
+      "id": "gold_frame",
+      "name": "Gold Frame",
+      "description": "Film con cornice dorata",
+      "category": "framed",
+      "colors": ["oro", "giallo", "beige"]
+    },
+    {
+      "id": "silver_frame",
+      "name": "Silver Frame",
+      "description": "Film con cornice argentata",
+      "category": "framed",
+      "colors": ["argento", "grigio", "bianco"]
+    },
+    {
+      "id": "round_frame",
+      "name": "Round Frame",
+      "description": "Film con cornice rotonda",
+      "category": "framed",
+      "colors": ["blu", "verde", "giallo", "rosso"]
+    },
+    {
+      "id": "retro",
+      "name": "Retro",
+      "description": "Film con stile retrò",
+      "category": "special",
+      "colors": ["marrone", "beige", "crema"]
+    },
+    {
+      "id": "vintage",
+      "name": "Vintage",
+      "description": "Film con stile vintage",
+      "category": "special",
+      "colors": ["marrone", "grigio", "beige"]
+    }
+  ]
+}

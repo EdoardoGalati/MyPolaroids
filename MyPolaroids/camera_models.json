@@ -1,0 +1,104 @@
+{
+  "camera_models": [
+    {
+      "id": "polaroid_600",
+      "name": "Polaroid 600",
+      "capacity": 8,
+      "default_image": "camera.fill",
+      "default_icon": "camera.fill",
+      "description": "Classica fotocamera Polaroid 600, compatibile con film 600 e i-Type",
+      "year_introduced": 1981,
+      "film_type": "600/i-Type"
+    },
+    {
+      "id": "polaroid_sx70",
+      "name": "Polaroid SX-70",
+      "capacity": 10,
+      "default_image": "camera.aperture",
+      "default_icon": "camera.aperture",
+      "description": "Iconica fotocamera folding SX-70, la prima Polaroid istantanea",
+      "year_introduced": 1972,
+      "film_type": "SX-70"
+    },
+    {
+      "id": "polaroid_itype",
+      "name": "Polaroid i-Type",
+      "capacity": 8,
+      "default_image": "camera.metering.center",
+      "default_icon": "camera.metering.center",
+      "description": "Fotocamera moderna compatibile con film i-Type, senza batteria integrata",
+      "year_introduced": 2017,
+      "film_type": "i-Type"
+    },
+    {
+      "id": "polaroid_go",
+      "name": "Polaroid Go",
+      "capacity": 16,
+      "default_image": "camera.metering.none",
+      "default_icon": "camera.metering.none",
+      "description": "Fotocamera compatta e portatile, perfetta per viaggi",
+      "year_introduced": 2021,
+      "film_type": "Go"
+    },
+    {
+      "id": "polaroid_now",
+      "name": "Polaroid Now",
+      "capacity": 8,
+      "default_image": "camera.metering.partial",
+      "default_icon": "camera.metering.partial",
+      "description": "Fotocamera moderna con autofocus e flash integrato",
+      "year_introduced": 2019,
+      "film_type": "i-Type"
+    },
+    {
+      "id": "polaroid_onestep_plus",
+      "name": "Polaroid OneStep+",
+      "capacity": 8,
+      "default_image": "camera.metering.spot",
+      "default_icon": "camera.metering.spot",
+      "description": "Fotocamera con connettività Bluetooth e app companion",
+      "year_introduced": 2018,
+      "film_type": "i-Type"
+    },
+    {
+      "id": "polaroid_onestep2",
+      "name": "Polaroid OneStep 2",
+      "capacity": 8,
+      "default_image": "camera.metering.unknown",
+      "default_icon": "camera.metering.unknown",
+      "description": "Fotocamera entry-level con design retrò",
+      "year_introduced": 2017,
+      "film_type": "i-Type"
+    },
+    {
+      "id": "polaroid_nowplus",
+      "name": "Polaroid Polaroid Now+",
+      "capacity": 8,
+      "default_image": "camera.metering.unknown",
+      "default_icon": "camera.metering.unknown",
+      "description": "The classic instant camera plus app connectivity",
+      "year_introduced": 2017,
+      "film_type": "i-Type/600"
+    },
+    {
+      "id": "polaroid_flip",
+      "name": "Polaroid Flip",
+      "capacity": 8,
+      "default_image": "camera.metering.unknown",
+      "default_icon": "camera.metering.unknown",
+      "description": "The classic instant camera plus app connectivity",
+      "year_introduced": 2017,
+      "film_type": "i-Type/600"
+    },
+    {
+      "id": "polaroid_I2",
+      "name": "Polaroid I-2",
+      "capacity": 8,
+      "default_image": "camera.metering.unknown",
+      "default_icon": "camera.metering.unknown",
+      "description": "The classic instant camera plus app connectivity",
+      "year_introduced": 2017,
+      "film_type": "i-Type/600/SX70"
+    }
+  ]
+}
