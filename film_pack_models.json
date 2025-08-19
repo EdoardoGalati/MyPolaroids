@@ -869,12 +869,14 @@
       "gradient": {
         "type": "elliptical",
         "stops": [
-          { "color": { "red": 0.26, "green": 0.54, "blue": 0.83 }, "location": 0.00 },
-          { "color": { "red": 0.45, "green": 0.68, "blue": 0.42 }, "location": 0.25 },
-          { "color": { "red": 0.53, "green": 0.74, "blue": 0.25 }, "location": 0.50 },
-          { "color": { "red": 0.96, "green": 0.72, "blue": 0.25 }, "location": 0.75 },
-          { "color": { "red": 0.86, "green": 0.29, "blue": 0.21 }, "location": 1.00 }
-        ],
+    { "color": { "red": 0.26, "green": 0.54, "blue": 0.83 }, "location": 0.00 },
+    { "color": { "red": 0.26, "green": 0.54, "blue": 0.83 }, "location": 0.23 },
+    { "color": { "red": 0.45, "green": 0.68, "blue": 0.42 }, "location": 0.23 },
+    { "color": { "red": 0.53, "green": 0.74, "blue": 0.25 }, "location": 0.51 },
+    { "color": { "red": 0.96, "green": 0.72, "blue": 0.25 }, "location": 0.51 },
+    { "color": { "red": 0.94, "green": 0.54, "blue": 0.2 }, "location": 0.78 },
+    { "color": { "red": 0.86, "green": 0.29, "blue": 0.21 }, "location": 0.78 }
+  ],
         "center": { "x": 0.5, "y": 0.5 }
       }
     },
@@ -905,16 +907,18 @@
       "available": true,
       "year_introduced": 2022,
       "gradient": {
-        "stops": [
-          { "color": { "red": 0.86, "green": 0.29, "blue": 0.21 }, "location": 0.0 },
-          { "color": { "red": 0.94, "green": 0.54, "blue": 0.2 }, "location": 0.22 },
-          { "color": { "red": 0.96, "green": 0.72, "blue": 0.25 }, "location": 0.47 },
-          { "color": { "red": 0.53, "green": 0.74, "blue": 0.25 }, "location": 0.73 },
-          { "color": { "red": 0.26, "green": 0.54, "blue": 0.83 }, "location": 1.0 }
-        ],
-        "startPoint": { "x": 0.2, "y": 0.85 },
-        "endPoint": { "x": 0.9, "y": 0.25 }
-      }
+  "type": "elliptical",
+  "stops": [
+    { "color": { "red": 0.26, "green": 0.54, "blue": 0.83 }, "location": 0.00 },
+    { "color": { "red": 0.26, "green": 0.54, "blue": 0.83 }, "location": 0.23 },
+    { "color": { "red": 0.45, "green": 0.68, "blue": 0.42 }, "location": 0.23 },
+    { "color": { "red": 0.53, "green": 0.74, "blue": 0.25 }, "location": 0.51 },
+    { "color": { "red": 0.96, "green": 0.72, "blue": 0.25 }, "location": 0.51 },
+    { "color": { "red": 0.94, "green": 0.54, "blue": 0.2 }, "location": 0.78 },
+    { "color": { "red": 0.86, "green": 0.29, "blue": 0.21 }, "location": 0.78 }
+  ],
+  "center": { "x": 0.5, "y": 0.5 }
+}
     },
     {
       "id": "600_duochrome_black_green",
