@@ -439,8 +439,8 @@
       "model": "OneStep",
       "specific_model": "2",
       "capacity": 8,
-      "default_image": "camera.metering.unknown",
-      "default_icon": "camera.metering.unknown",
+      "default_image": "polaroid.now.fill.symbols",
+      "default_icon": "polaroid.now.fill.symbols",
       "year_introduced": 2017,
       "film_type": "i-Type"
     },
