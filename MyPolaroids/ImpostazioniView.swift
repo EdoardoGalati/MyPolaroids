@@ -1,4 +1,6 @@
 import SwiftUI
+import RevenueCat
+import RevenueCatUI
 
 struct ImpostazioniView: View {
     @Environment(\.dismiss) private var dismiss
@@ -142,6 +144,47 @@ struct ImpostazioniView: View {
                         .padding(.vertical, 16)
                         .background(AppColors.backgroundSecondary)
                         .cornerRadius(16)
+                        
+                        // Sezione Donations
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                Image(systemName: "heart.fill")
+                                    .foregroundColor(.black)
+                                    .font(.title2)
+                                
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Donations")
+                                        .font(.headline)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.primary)
+                                    
+                                    Text("Support the project")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                        .multilineTextAlignment(.leading)
+                                }
+                                
+                                Spacer()
+                                
+                                Image(systemName: "chevron.right")
+                                    .foregroundColor(.gray)
+                                    .font(.caption)
+                            }
+                        }
+                        .contentShape(Rectangle())
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 16)
+                        .background(AppColors.backgroundSecondary)
+                        .cornerRadius(16)
+                        .presentPaywallIfNeeded(
+                            requiredEntitlementIdentifier: "donations",
+                            purchaseCompleted: { customerInfo in
+                                print("✅ Purchase completed: \(customerInfo.entitlements)")
+                            },
+                            restoreCompleted: { customerInfo in
+                                print("✅ Purchases restored: \(customerInfo.entitlements)")
+                            }
+                        )
                         
                         // Sezione Versione
                         VStack(alignment: .leading, spacing: 12) {

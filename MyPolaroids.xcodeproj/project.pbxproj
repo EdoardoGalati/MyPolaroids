@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		90E2A5CA2E54D5A9007CD00A /* ReceiptParser in Frameworks */ = {isa = PBXBuildFile; productRef = 90E2A5C92E54D5A9007CD00A /* ReceiptParser */; };
+		90E2A5CC2E54D5A9007CD00A /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 90E2A5CB2E54D5A9007CD00A /* RevenueCat */; };
+		90E2A5CE2E54D5A9007CD00A /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = 90E2A5CD2E54D5A9007CD00A /* RevenueCatUI */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		90798F8D2E4F6F2D00B9C053 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -65,6 +71,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				90E2A5CC2E54D5A9007CD00A /* RevenueCat in Frameworks */,
+				90E2A5CA2E54D5A9007CD00A /* ReceiptParser in Frameworks */,
+				90E2A5CE2E54D5A9007CD00A /* RevenueCatUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,6 +134,9 @@
 			);
 			name = MyPolaroids;
 			packageProductDependencies = (
+				90E2A5C92E54D5A9007CD00A /* ReceiptParser */,
+				90E2A5CB2E54D5A9007CD00A /* RevenueCat */,
+				90E2A5CD2E54D5A9007CD00A /* RevenueCatUI */,
 			);
 			productName = MyPolaroids;
 			productReference = 90798F7F2E4F6F2A00B9C053 /* MyPolaroids.app */;
@@ -208,6 +220,9 @@
 			);
 			mainGroup = 90798F762E4F6F2A00B9C053;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				90E2A5C82E54D5A9007CD00A /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 90798F802E4F6F2A00B9C053 /* Products */;
 			projectDirPath = "";
@@ -642,6 +657,35 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		90E2A5C82E54D5A9007CD00A /* XCRemoteSwiftPackageReference "purchases-ios-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RevenueCat/purchases-ios-spm.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.35.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		90E2A5C92E54D5A9007CD00A /* ReceiptParser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 90E2A5C82E54D5A9007CD00A /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
+			productName = ReceiptParser;
+		};
+		90E2A5CB2E54D5A9007CD00A /* RevenueCat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 90E2A5C82E54D5A9007CD00A /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
+			productName = RevenueCat;
+		};
+		90E2A5CD2E54D5A9007CD00A /* RevenueCatUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 90E2A5C82E54D5A9007CD00A /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
+			productName = RevenueCatUI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 90798F772E4F6F2A00B9C053 /* Project object */;
 }
