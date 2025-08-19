@@ -816,12 +816,12 @@
       "year_introduced": 2022,
       "gradient": {
         "stops": [
-          { "color": { "red": 0.5, "green": 0.5, "blue": 0.5 }, "location": 0.0 },
-          { "color": { "red": 0.75, "green": 0.75, "blue": 0.75 }, "location": 1.0 }
-        ],
-        "startPoint": { "x": 0.2, "y": 0.9 },
-        "endPoint": { "x": 0.8, "y": 0.2 }
-      }
+    { "color": { "red": 0.32, "green": 0.56, "blue": 0.8 }, "location": 0.52 },
+    { "color": { "red": 0.83, "green": 0.85, "blue": 0.28 }, "location": 0.52 }
+  ],
+  "startPoint": { "x": 0.2, "y": 0.85 },
+  "endPoint": { "x": 0.9, "y": 0.25 }
+}
     },
     {
       "id": "itype_black_frame",
@@ -1002,14 +1002,14 @@
       "is_limited_edition": true,
       "year_introduced": 2024,
       "gradient": {
-        "stops": [
-          { "color": { "red": 0.2, "green": 0.6, "blue": 0.3 }, "location": 0.0 },
-          { "color": { "red": 0.4, "green": 0.8, "blue": 0.2 }, "location": 0.5 },
-          { "color": { "red": 0.8, "green": 0.9, "blue": 0.1 }, "location": 1.0 }
-        ],
-        "startPoint": { "x": 0.2, "y": 0.85 },
-        "endPoint": { "x": 0.9, "y": 0.25 }
-      }
+  "stops": [
+    { "color": { "red": 0.18, "green": 0.38, "blue": 0.85 }, "location": 0.0 },
+    { "color": { "red": 0.32, "green": 0.56, "blue": 0.8 }, "location": 0.5 },
+    { "color": { "red": 0.68, "green": 0.82, "blue": 0.95 }, "location": 1.0 }
+  ],
+  "startPoint": { "x": 0.2, "y": 0.85 },
+  "endPoint": { "x": 0.9, "y": 0.25 }
+}
     },
     {
       "id": "go_black_frame",
