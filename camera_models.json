@@ -106,7 +106,7 @@
       "default_image": "polaroid.600.fill.symbols",
       "default_icon": "polaroid.600.fill.symbols",
       "year_introduced": 1983,
-      "film_type": "600/i-Type"
+      "film_type": "600"
     },
     {
       "id": "polaroid_600_express",
@@ -118,7 +118,7 @@
       "default_image": "polaroid.600.fill.symbols",
       "default_icon": "polaroid.600.fill.symbols",
       "year_introduced": 1984,
-      "film_type": "600/i-Type"
+      "film_type": "600"
     },
     {
       "id": "polaroid_600_autofocus",
@@ -130,7 +130,7 @@
       "default_image": "polaroid.600.fill.symbols",
       "default_icon": "polaroid.600.fill.symbols",
       "year_introduced": 1986,
-      "film_type": "600/i-Type"
+      "film_type": "600"
     },
     {
       "id": "polaroid_600_impulse",
@@ -142,7 +142,7 @@
       "default_image": "polaroid.600.fill.symbols",
       "default_icon": "polaroid.600.fill.symbols",
       "year_introduced": 1988,
-      "film_type": "600/i-Type"
+      "film_type": "600"
     },
     {
       "id": "polaroid_600_impulse_af",
@@ -154,7 +154,7 @@
       "default_image": "polaroid.600.fill.symbols",
       "default_icon": "polaroid.600.fill.symbols",
       "year_introduced": 1988,
-      "film_type": "600/i-Type"
+      "film_type": "600"
     },
     {
       "id": "polaroid_600_sun640",
@@ -166,7 +166,7 @@
       "default_image": "polaroid.600.fill.symbols",
       "default_icon": "polaroid.600.fill.symbols",
       "year_introduced": 1981,
-      "film_type": "600/i-Type"
+      "film_type": "600"
     },
     {
       "id": "polaroid_600_sun650",
@@ -178,7 +178,7 @@
       "default_image": "polaroid.600.fill.symbols",
       "default_icon": "polaroid.600.fill.symbols",
       "year_introduced": 1982,
-      "film_type": "600/i-Type"
+      "film_type": "600"
     },
     {
       "id": "polaroid_600_sun660",
@@ -190,7 +190,7 @@
       "default_image": "polaroid.600.fill.symbols",
       "default_icon": "polaroid.600.fill.symbols",
       "year_introduced": 1981,
-      "film_type": "600/i-Type"
+      "film_type": "600"
     },
     {
       "id": "polaroid_600_cool_cam",
@@ -202,7 +202,7 @@
       "default_image": "polaroid.600.fill.symbols",
       "default_icon": "polaroid.600.fill.symbols",
       "year_introduced": 1988,
-      "film_type": "600/i-Type"
+      "film_type": "600"
     },
     {
       "id": "polaroid_600_jobpro",
@@ -214,7 +214,7 @@
       "default_image": "polaroid.600.fill.symbols",
       "default_icon": "polaroid.600.fill.symbols",
       "year_introduced": 1992,
-      "film_type": "600/i-Type"
+      "film_type": "600"
     },
     {
       "id": "polaroid_600_jobpro2",
@@ -226,7 +226,7 @@
       "default_image": "polaroid.600.fill.symbols",
       "default_icon": "polaroid.600.fill.symbols",
       "year_introduced": 2000,
-      "film_type": "600/i-Type"
+      "film_type": "600"
     },
     {
       "id": "polaroid_slr680",
@@ -262,7 +262,7 @@
       "default_image": "polaroid.one600.fill.symbols",
       "default_icon": "polaroid.one600.fill.symbols",
       "year_introduced": 2004,
-      "film_type": "600/i-Type"
+      "film_type": "600"
     },
     {
       "id": "polaroid_one600_pro",
@@ -274,7 +274,7 @@
       "default_image": "polaroid.one600.fill.symbols",
       "default_icon": "polaroid.one600.fill.symbols",
       "year_introduced": 2004,
-      "film_type": "600/i-Type"
+      "film_type": "600"
     },
     {
       "id": "polaroid_one600_ultra",
@@ -286,7 +286,7 @@
       "default_image": "polaroid.one600.fill.symbols",
       "default_icon": "polaroid.one600.fill.symbols",
       "year_introduced": 2004,
-      "film_type": "600/i-Type"
+      "film_type": "600"
     },
     {
       "id": "polaroid_spectra_original",
@@ -341,7 +341,7 @@
       "name": "Spectra Pro",
       "brand": "Polaroid",
       "model": "Spectra",
-      "specific_model": "Pro",
+      "specific_model": "Spectra",
       "capacity": 10,
       "default_image": "polaroid.spectra.fill.symbols",
       "default_icon": "polaroid.spectra.fill.symbols",
