@@ -242,7 +242,7 @@
     },
     {
       "id": "600_green_reclaimed",
-      "name": "Green Reclaimed Series",
+      "name": "Green Reclaimed Edition",
       "description": "Film verde sperimentale con materiali recuperati",
       "category": "special",
       "film_type": "600",
@@ -769,7 +769,7 @@
     },
     {
       "id": "itype_color_frames",
-      "name": "Color i-Type Color Frames Film",
+      "name": "Color Frames Film",
       "description": "Film i-Type con cornici colorate.",
       "category": "framed",
       "film_type": "i-Type",
@@ -807,7 +807,7 @@
     },
     {
       "id": "itype_moma",
-      "name": "Polaroid Color i-Type Film MoMA Edition",
+      "name": "Color MoMA Edition",
       "description": "Edizione speciale per il MoMA.",
       "category": "special",
       "film_type": "i-Type",
@@ -825,7 +825,7 @@
     },
     {
       "id": "itype_black_frame",
-      "name": "Color i-Type Black Frame Film",
+      "name": "Color Black Frame",
       "description": "Film a colori con cornice nera per i-Type.",
       "category": "framed",
       "film_type": "i-Type",
@@ -842,7 +842,7 @@
     },
     {
       "id": "itype_black_frame_bw",
-      "name": "Color i-Type Black Frame Film BW",
+      "name": "Black Frame Black & White",
       "description": "Film bianco e nero con cornice nera per i-Type.",
       "category": "framed",
       "film_type": "i-Type",
@@ -859,7 +859,7 @@
     },
     {
       "id": "itype_round_frame_retinex_double",
-      "name": "Round Frame Retinex Double",
+      "name": "Round Frame Retinex",
       "description": "Cornici rotonde Retinex con confezione doppia (edizione limitata artistica).",
       "category": "special",
       "film_type": "i-Type",
@@ -918,7 +918,7 @@
     },
     {
       "id": "600_duochrome_black_green",
-      "name": "Duochrome Film for 600 – Black & Green Edition",
+      "name": "Duochrome – Black & Green",
       "description": "Film duocromatico verde e nero per fotocamere 600.",
       "category": "duochrome",
       "film_type": "600",
@@ -936,7 +936,7 @@
     },
     {
       "id": "600_duochrome_black_yellow",
-      "name": "Duochrome Film for 600 - Black & Yellow Edition",
+      "name": "Duochrome - Black & Yellow",
       "description": "Film duocromatico giallo e nero per fotocamere 600.",
       "category": "duochrome",
       "film_type": "600",
@@ -954,7 +954,7 @@
     },
     {
       "id": "600_duochrome_pink",
-      "name": "Duochrome Film for 600 - Pink Edition",
+      "name": "Duochrome - Black & Pink",
       "description": "Film duocromatico rosa e nero per fotocamere 600.",
       "category": "duochrome",
       "film_type": "600",
@@ -972,7 +972,7 @@
     },
     {
       "id": "600_duochrome_black_blue",
-      "name": "Duochrome Film for 600 - Black & Blue Edition",
+      "name": "Duochrome - Black & Blue",
       "description": "Film duocromatico nero e blu per fotocamere 600.",
       "category": "duochrome",
       "film_type": "600",
@@ -990,7 +990,7 @@
     },
     {
       "id": "600_blue_reclaimed",
-      "name": "Polaroid Blue 600 Film - Reclaimed Edition",
+      "name": "Blue - Reclaimed Edition",
       "description": "Film blu eco-sostenibile per 600 (edizione limitata).",
       "category": "special",
       "film_type": "600",
