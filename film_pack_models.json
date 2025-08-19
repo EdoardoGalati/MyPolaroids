@@ -1013,7 +1013,7 @@
     },
     {
       "id": "go_black_frame",
-      "name": "Polaroid Go Color - Black Frame",
+      "name": "Color - Black Frame",
       "description": "Film Go a colori con cornice nera.",
       "category": "framed",
       "film_type": "Go",
@@ -1033,7 +1033,7 @@
     },
     {
       "id": "go_purple_haze_frame",
-      "name": "Polaroid Go Color Film Purple Haze Frame",
+      "name": "Color - Purple Haze Frame",
       "description": "Film Go a colori con cornice viola Purple Haze.",
       "category": "framed",
       "film_type": "Go",
