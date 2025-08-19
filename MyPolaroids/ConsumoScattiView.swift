@@ -78,11 +78,11 @@ struct ConsumoScattiView: View {
                 }
                 .font(.headline)
                 .fontWeight(.semibold)
-                .foregroundColor(.white)
+                .foregroundColor(AppColors.buttonText)
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)
-                .background(Color.black)
+                .background(AppColors.buttonPrimary)
                 .cornerRadius(16)
             }
             .disabled(scattiDisponibili == 0)
@@ -102,7 +102,7 @@ struct ConsumoScattiView: View {
             .padding(.bottom, 20)
         }
         .frame(maxHeight: .infinity)
-        .background(Color(hex: "f4f4f4"))
+        .background(AppColors.backgroundPrimary)
         .presentationDetents([.medium])
         .interactiveDismissDisabled()
     }

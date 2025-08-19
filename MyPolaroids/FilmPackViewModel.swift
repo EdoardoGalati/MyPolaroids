@@ -12,6 +12,7 @@ class FilmPackViewModel: ObservableObject {
     init() {
         caricaModelli()
         caricaPacchiFilm()
+        inizializzaOrdineTipologieStabile()
     }
     
     // Aggiunge un nuovo pacco film
@@ -22,16 +23,53 @@ class FilmPackViewModel: ObservableObject {
     }
     
     // Aggiunge un nuovo pacco film all'inizio della lista
+    // IMPORTANTE: Questa funzione mantiene l'ordine stabile delle tipologie
+    // per evitare il bug di navigazione. Quando viene aggiunto un nuovo pacco:
+    // 1. Se è di una tipologia esistente, l'ordine rimane invariato
+    // 2. Se è di una nuova tipologia, viene aggiunta alla fine dell'ordine stabile
+    // 3. La UI si aggiorna senza cambiare la navigazione corrente
     func aggiungiPaccoFilmInCima(_ pacco: FilmPack) {
+        // Inserisci il nuovo pacco all'inizio
         pacchiFilm.insert(pacco, at: 0)
+        
+        // Aggiorna l'ordine stabile delle tipologie se necessario
+        let chiave = "\(pacco.tipo)_\(pacco.modello)"
+        if !ordineTipologieStabile.contains(chiave) {
+            ordineTipologieStabile.append(chiave)
+            print("🔒 [FilmPackViewModel] Nuova tipologia aggiunta all'ordine stabile: \(chiave)")
+        }
+        
+        // Salva e pulisci la cache
         salvaPacchiFilm()
         pulisciCacheCompatibilita()
+        
+        // Forza l'aggiornamento della UI per le tipologie
+        // Questo è cruciale per mantenere la stabilità della navigazione
+        objectWillChange.send()
+        
+        print("📦 [FilmPackViewModel] Nuovo pacco aggiunto in cima: \(pacco.tipo) • \(pacco.modello)")
+        print("📦 [FilmPackViewModel] Ordine tipologie mantenuto stabile per evitare bug di navigazione")
     }
     
     // Rimuove un pacco film
     func rimuoviPaccoFilm(_ pacco: FilmPack) {
         if let index = pacchiFilm.firstIndex(where: { $0.id == pacco.id }) {
             pacchiFilm.remove(at: index)
+            
+            // Controlla se ci sono ancora pacchi di questo tipo e modello
+            let chiave = "\(pacco.tipo)_\(pacco.modello)"
+            let pacchiRimanenti = pacchiFilm.filter { 
+                "\($0.tipo)_\($0.modello)" == chiave 
+            }
+            
+            // Se non ci sono più pacchi di questo tipo, rimuovi dall'ordine stabile
+            if pacchiRimanenti.isEmpty {
+                if let indexStabile = ordineTipologieStabile.firstIndex(of: chiave) {
+                    ordineTipologieStabile.remove(at: indexStabile)
+                    print("🔒 [FilmPackViewModel] Tipologia rimossa dall'ordine stabile: \(chiave)")
+                }
+            }
+            
             salvaPacchiFilm()
             pulisciCacheCompatibilita()
         }
@@ -40,7 +78,33 @@ class FilmPackViewModel: ObservableObject {
     // Aggiorna un pacco film esistente
     func aggiornaPaccoFilm(_ pacco: FilmPack) {
         if let index = pacchiFilm.firstIndex(where: { $0.id == pacco.id }) {
+            let paccoVecchio = pacchiFilm[index]
             pacchiFilm[index] = pacco
+            
+            // Se il tipo o modello è cambiato, aggiorna l'ordine stabile
+            let chiaveVecchia = "\(paccoVecchio.tipo)_\(paccoVecchio.modello)"
+            let chiaveNuova = "\(pacco.tipo)_\(pacco.modello)"
+            
+            if chiaveVecchia != chiaveNuova {
+                // Rimuovi la vecchia tipologia dall'ordine stabile se non ci sono più pacchi
+                let pacchiVecchiaTipologia = pacchiFilm.filter { 
+                    "\($0.tipo)_\($0.modello)" == chiaveVecchia 
+                }
+                
+                if pacchiVecchiaTipologia.isEmpty {
+                    if let indexStabile = ordineTipologieStabile.firstIndex(of: chiaveVecchia) {
+                        ordineTipologieStabile.remove(at: indexStabile)
+                        print("🔒 [FilmPackViewModel] Vecchia tipologia rimossa dall'ordine stabile: \(chiaveVecchia)")
+                    }
+                }
+                
+                // Aggiungi la nuova tipologia all'ordine stabile se non esiste
+                if !ordineTipologieStabile.contains(chiaveNuova) {
+                    ordineTipologieStabile.append(chiaveNuova)
+                    print("🔒 [FilmPackViewModel] Nuova tipologia aggiunta all'ordine stabile: \(chiaveNuova)")
+                }
+            }
+            
             salvaPacchiFilm()
             pulisciCacheCompatibilita()
         }
@@ -80,16 +144,70 @@ class FilmPackViewModel: ObservableObject {
         
         switch sortingOption {
         case SortingOption.alphabeticalAZ.rawValue:
-            return pacchiFilm.sorted { "\($0.tipo) \($0.modello)".lowercased() < "\($1.tipo) \($1.modello)".lowercased() }
+            return pacchiFilm.sorted { first, second in
+                let firstString = "\(first.tipo) \(first.modello)"
+                let secondString = "\(second.tipo) \(second.modello)"
+                return compareStringsNatural(firstString, secondString)
+            }
         case SortingOption.alphabeticalZA.rawValue:
-            return pacchiFilm.sorted { "\($0.tipo) \($0.modello)".lowercased() > "\($1.tipo) \($1.modello)".lowercased() }
+            return pacchiFilm.sorted { first, second in
+                let firstString = "\(first.tipo) \(first.modello)"
+                let secondString = "\(second.tipo) \(second.modello)"
+                return !compareStringsNatural(firstString, secondString) // Inverti per Z-A
+            }
         case SortingOption.dateAdded.rawValue:
-            return pacchiFilm // Ordine originale di aggiunta
+            return pacchiFilm.sorted { $0.dataAcquisto < $1.dataAcquisto } // Ordine per data di acquisto (più vecchio prima)
         case SortingOption.dateAddedReverse.rawValue:
-            return pacchiFilm.reversed() // Ordine inverso di aggiunta
+            return pacchiFilm.sorted { $0.dataAcquisto > $1.dataAcquisto } // Ordine per data di acquisto (più recente prima)
         default:
             return pacchiFilm
         }
+    }
+    
+    // Funzione helper per confronto naturale delle stringhe (numeri alla fine)
+    private func compareStringsNatural(_ first: String, _ second: String) -> Bool {
+        let firstLower = first.lowercased()
+        let secondLower = second.lowercased()
+        
+        // Se entrambe le stringhe sono uguali, sono uguali
+        if firstLower == secondLower {
+            return false // Non importa l'ordine se sono uguali
+        }
+        
+        // Se entrambe le stringhe iniziano con numeri, ordina numericamente
+        if firstLower.first?.isNumber == true && secondLower.first?.isNumber == true {
+            // Estrai i numeri iniziali
+            let firstNumber = extractLeadingNumber(from: firstLower)
+            let secondNumber = extractLeadingNumber(from: secondLower)
+            
+            if firstNumber != secondNumber {
+                return firstNumber < secondNumber
+            }
+            
+            // Se i numeri sono uguali, confronta le parti rimanenti
+            let firstRemaining = String(firstLower.dropFirst(String(firstNumber).count))
+            let secondRemaining = String(secondLower.dropFirst(String(secondNumber).count))
+            return firstRemaining < secondRemaining
+        }
+        
+        // Se solo la prima inizia con numero, metti la seconda prima (numeri alla fine)
+        if firstLower.first?.isNumber == true && secondLower.first?.isNumber == false {
+            return false // La prima (con numero) va dopo
+        }
+        
+        // Se solo la seconda inizia con numero, metti la prima prima (numeri alla fine)
+        if firstLower.first?.isNumber == false && secondLower.first?.isNumber == true {
+            return true // La prima (senza numero) va prima
+        }
+        
+        // Altrimenti, ordinamento alfabetico standard
+        return firstLower < secondLower
+    }
+    
+    // Funzione helper per estrarre il numero iniziale da una stringa
+    private func extractLeadingNumber(from string: String) -> Int {
+        let numbers = string.prefix { $0.isNumber }
+        return Int(numbers) ?? 0
     }
     
     // Ottiene i pacchi film disponibili (non associati) ordinati
@@ -130,6 +248,8 @@ class FilmPackViewModel: ObservableObject {
         if let data = UserDefaults.standard.data(forKey: "pacchiFilm"),
            let decoded = try? JSONDecoder().decode([FilmPack].self, from: data) {
             pacchiFilm = decoded
+            // Aggiorna l'ordine stabile delle tipologie dopo aver caricato i pacchi
+            inizializzaOrdineTipologieStabile()
         }
     }
     
@@ -143,6 +263,12 @@ class FilmPackViewModel: ObservableObject {
         if let cachedModelli = DataDownloader.shared.loadFromCache(forKey: DataConfig.UserDefaultsKeys.filmPackModelsCache, type: [FilmPackModel].self) {
             modelliFilm = cachedModelli
             print("📱 [FilmPackViewModel] ✅ Cache modelli trovata: \(modelliFilm.count) modelli")
+            print("📱 [FilmPackViewModel] 🔍 Primi 3 modelli:")
+            for (index, modello) in modelliFilm.prefix(3).enumerated() {
+                print("   \(index): ID=\(modello.id), Name=\(modello.name), film_type=\(modello.film_type ?? "nil"), gradient=\(modello.gradient != nil ? "presente" : "nil")")
+            }
+            print("📱 [FilmPackViewModel] 🔍 Modelli con gradienti: \(modelliFilm.filter { $0.gradient != nil }.count)")
+            print("📱 [FilmPackViewModel] 🔍 Modelli senza gradienti: \(modelliFilm.filter { $0.gradient == nil }.count)")
         } else {
             print("📱 [FilmPackViewModel] ❌ Cache modelli vuota o non trovata")
         }
@@ -187,6 +313,12 @@ class FilmPackViewModel: ObservableObject {
             print("✅ [FilmPackViewModel] Modelli scaricati online con successo!")
             print("📋 [FilmPackViewModel] Tipi film scaricati: \(tipiFilm.count)")
             print("📋 [FilmPackViewModel] Modelli film scaricati: \(modelliFilm.count)")
+            print("📱 [FilmPackViewModel] 🔍 Primi 3 modelli scaricati:")
+            for (index, modello) in modelliFilm.prefix(3).enumerated() {
+                print("   \(index): ID=\(modello.id), Name=\(modello.name), film_type=\(modello.film_type ?? "nil"), gradient=\(modello.gradient != nil ? "presente" : "nil")")
+            }
+            print("📱 [FilmPackViewModel] 🔍 Modelli con gradienti: \(modelliFilm.filter { $0.gradient != nil }.count)")
+            print("📱 [FilmPackViewModel] 🔍 Modelli senza gradienti: \(modelliFilm.filter { $0.gradient == nil }.count)")
             print("🌐 [FilmPackViewModel] ===== DOWNLOAD ONLINE COMPLETATO =====")
             
         } catch {
@@ -202,6 +334,47 @@ class FilmPackViewModel: ObservableObject {
             }
             print("🌐 [FilmPackViewModel] ===== DOWNLOAD ONLINE FALLITO =====")
         }
+    }
+    
+    // Test di decodifica JSON per debug
+    func testDecodificaJSON() {
+        print("🧪 [FilmPackViewModel] ===== TEST DECODIFICA JSON =====")
+        
+        // Prova a caricare il JSON locale
+        if let url = Bundle.main.url(forResource: "film_pack_models", withExtension: "json") {
+            do {
+                let data = try Data(contentsOf: url)
+                let decoder = JSONDecoder()
+                let jsonData = try decoder.decode(FilmPackModelsData.self, from: data)
+                
+                print("✅ [FilmPackViewModel] JSON decodificato con successo!")
+                print("📋 [FilmPackViewModel] Tipi: \(jsonData.film_pack_types.count)")
+                print("📋 [FilmPackViewModel] Modelli: \(jsonData.film_pack_models.count)")
+                print("📱 [FilmPackViewModel] 🔍 Modelli con gradienti: \(jsonData.film_pack_models.filter { $0.gradient != nil }.count)")
+                print("📱 [FilmPackViewModel] 🔍 Primi 3 modelli:")
+                for (index, modello) in jsonData.film_pack_models.prefix(3).enumerated() {
+                    print("   \(index): ID=\(modello.id), Name=\(modello.name), film_type=\(modello.film_type ?? "nil"), gradient=\(modello.gradient != nil ? "presente" : "nil")")
+                }
+                
+            } catch {
+                print("❌ [FilmPackViewModel] ERRORE decodifica JSON: \(error)")
+                print("❌ [FilmPackViewModel] Dettagli: \(error.localizedDescription)")
+            }
+        } else {
+            print("❌ [FilmPackViewModel] File JSON non trovato nel bundle")
+        }
+        
+        print("🧪 [FilmPackViewModel] ===== FINE TEST DECODIFICA =====")
+    }
+    
+    // Pulisce la cache e forza il ricaricamento
+    func pulisciCacheModelli() {
+        print("🧹 [FilmPackViewModel] Pulizia cache modelli...")
+        DataDownloader.shared.clearCache()
+        modelliFilm = []
+        tipiFilm = []
+        print("🧹 [FilmPackViewModel] Cache pulita, ricaricamento modelli...")
+        caricaModelli()
     }
     
     // Setup modelli di default se il JSON non è disponibile
@@ -231,7 +404,12 @@ class FilmPackViewModel: ObservableObject {
     func modelliPerTipo(_ tipo: String) -> [String] {
         // Usa i modelli scaricati online se disponibili, altrimenti fallback
         if !modelliFilm.isEmpty {
-            let modelliPerTipo = modelliFilm.filter { $0.category.lowercased() == tipo.lowercased() }
+            let modelliPerTipo = modelliFilm.filter { 
+                if let filmType = $0.film_type {
+                    return filmType.lowercased() == tipo.lowercased()
+                }
+                return false
+            }
             return modelliPerTipo.map { $0.name }
         }
         
@@ -362,11 +540,62 @@ class FilmPackViewModel: ObservableObject {
         return false
     }
     
+    // Resetta l'ordine stabile delle tipologie (utile per debug o reset)
+    func resettaOrdineTipologieStabile() {
+        ordineTipologieStabile.removeAll()
+        inizializzaOrdineTipologieStabile()
+        print("🔒 [FilmPackViewModel] Ordine stabile tipologie resettato")
+    }
+    
+    // Debug: stampa l'ordine stabile delle tipologie
+    func debugOrdineTipologieStabile() {
+        print("🔒 [FilmPackViewModel] === DEBUG ORDINE STABILE ===")
+        print("🔒 [FilmPackViewModel] Ordine attuale: \(ordineTipologieStabile)")
+        print("🔒 [FilmPackViewModel] Numero tipologie: \(ordineTipologieStabile.count)")
+        print("🔒 [FilmPackViewModel] =========================")
+    }
+    
+    // Inizializza l'ordine stabile delle tipologie
+    // Questa funzione viene chiamata:
+    // 1. All'inizializzazione del viewModel
+    // 2. Dopo aver caricato i pacchi film da UserDefaults
+    // 3. Quando viene resettato l'ordine stabile
+    // Garantisce che l'ordine sia sempre sincronizzato con i dati esistenti
+    private func inizializzaOrdineTipologieStabile() {
+        guard ordineTipologieStabile.isEmpty else { return }
+        
+        var tipologieProcessate: Set<String> = []
+        
+        for pacco in pacchiFilm {
+            let chiave = "\(pacco.tipo)_\(pacco.modello)"
+            
+            if !tipologieProcessate.contains(chiave) {
+                ordineTipologieStabile.append(chiave)
+                tipologieProcessate.insert(chiave)
+            }
+        }
+        
+        print("🔒 [FilmPackViewModel] Ordine stabile tipologie inizializzato: \(ordineTipologieStabile)")
+    }
+    
+    // Proprietà per mantenere l'ordine stabile delle tipologie
+    // Questa array memorizza l'ordine di prima apparizione di ogni tipologia
+    // e viene utilizzato per garantire che l'ordine rimanga stabile
+    // anche quando vengono aggiunti, rimossi o modificati i pacchi film
+    private var ordineTipologieStabile: [String] = []
+    
     // Ottiene le tipologie raggruppate per tipo e modello
+    // IMPORTANTE: Manteniamo l'ordine stabile per evitare bug di navigazione
+    // quando vengono aggiunti nuovi pacchi film. Il problema era che:
+    // 1. L'utente navigava a una tipologia specifica
+    // 2. Aggiungeva un nuovo pacco con "Add Film Pack of This Type"
+    // 3. La vista passava automaticamente a un'altra tipologia
+    // Questo sistema risolve il problema mantenendo l'ordine di prima apparizione
     var tipologieRaggruppate: [TipologiaPaccoFilm] {
         var tipologie: [TipologiaPaccoFilm] = []
         var tipologieProcessate: Set<String> = []
         
+        // Prima crea tutte le tipologie esistenti mantenendo l'ordine di prima apparizione
         for pacco in pacchiFilmOrdinate {
             let chiave = "\(pacco.tipo)_\(pacco.modello)"
             
@@ -377,35 +606,82 @@ class FilmPackViewModel: ObservableObject {
             }
         }
         
-        // Applica l'ordinamento personalizzato
+        // Applica l'ordinamento personalizzato, ma mantieni stabile l'ordine per tipologie con stesso tipo
         let sortingOption = UserDefaults.standard.string(forKey: "filmPackSortingOption") ?? SortingOption.dateAdded.rawValue
         
         switch sortingOption {
         case SortingOption.alphabeticalAZ.rawValue:
-            return tipologie.sorted { first, second in
+            return tipologie.sorted { (first: TipologiaPaccoFilm, second: TipologiaPaccoFilm) in
                 if first.tipo == second.tipo {
-                    return first.modello < second.modello
+                    return compareStringsNatural(first.modello, second.modello)
                 }
-                return first.tipo < second.tipo
+                return compareStringsNatural(first.tipo, second.tipo)
             }
         case SortingOption.alphabeticalZA.rawValue:
-            return tipologie.sorted { first, second in
+            return tipologie.sorted { (first: TipologiaPaccoFilm, second: TipologiaPaccoFilm) in
                 if first.tipo == second.tipo {
-                    return first.modello > second.modello
+                    return !compareStringsNatural(first.modello, second.modello) // Inverti per Z-A
                 }
-                return first.tipo > second.tipo
+                return !compareStringsNatural(first.tipo, second.tipo) // Inverti per Z-A
             }
         case SortingOption.dateAdded.rawValue:
-            return tipologie // Mantiene l'ordine di aggiunta
-        case SortingOption.dateAddedReverse.rawValue:
-            return tipologie.reversed() // Ordine inverso di aggiunta
-        default:
-            return tipologie.sorted { first, second in
-                if first.tipo == second.tipo {
-                    return first.modello < second.modello
-                }
-                return first.tipo < second.tipo
+            // Ordina per data di acquisto del primo pacco di ogni tipologia (più vecchio prima)
+            return tipologie.sorted { (first: TipologiaPaccoFilm, second: TipologiaPaccoFilm) in
+                let firstDate = first.pacchiDellaTipologia.min(by: { (pacco1: FilmPack, pacco2: FilmPack) -> Bool in
+                    return pacco1.dataAcquisto < pacco2.dataAcquisto
+                })?.dataAcquisto ?? Date.distantFuture
+                let secondDate = second.pacchiDellaTipologia.min(by: { (pacco1: FilmPack, pacco2: FilmPack) -> Bool in
+                    return pacco1.dataAcquisto < pacco2.dataAcquisto
+                })?.dataAcquisto ?? Date.distantFuture
+                return firstDate < secondDate
             }
+        case SortingOption.dateAddedReverse.rawValue:
+            // Ordina per data di acquisto del primo pacco di ogni tipologia (più recente prima)
+            return tipologie.sorted { (first: TipologiaPaccoFilm, second: TipologiaPaccoFilm) in
+                let firstDate = first.pacchiDellaTipologia.min(by: { (pacco1: FilmPack, pacco2: FilmPack) -> Bool in
+                    return pacco1.dataAcquisto < pacco2.dataAcquisto
+                })?.dataAcquisto ?? Date.distantFuture
+                let secondDate = second.pacchiDellaTipologia.min(by: { (pacco1: FilmPack, pacco2: FilmPack) -> Bool in
+                    return pacco1.dataAcquisto < pacco2.dataAcquisto
+                })?.dataAcquisto ?? Date.distantFuture
+                return firstDate > secondDate
+            }
+        default:
+            // Default: ordine di prima apparizione per mantenere la stabilità della navigazione
+            return ordinaTipologiePerOrdineStabile(tipologie)
+        }
+    }
+    
+    // Funzione helper per mantenere l'ordine stabile delle tipologie
+    // Questa funzione garantisce che l'ordine delle tipologie rimanga stabile
+    // anche quando vengono aggiunti nuovi pacchi film, evitando il bug di navigazione
+    // dove la vista passava a tipologie diverse dopo l'aggiunta di un pacco
+    private func ordinaTipologiePerOrdineStabile(_ tipologie: [TipologiaPaccoFilm]) -> [TipologiaPaccoFilm] {
+        return tipologie.sorted { first, second in
+            let chiaveFirst = "\(first.tipo)_\(first.modello)"
+            let chiaveSecond = "\(second.tipo)_\(second.modello)"
+            
+            let indexFirst = ordineTipologieStabile.firstIndex(of: chiaveFirst) ?? Int.max
+            let indexSecond = ordineTipologieStabile.firstIndex(of: chiaveSecond) ?? Int.max
+            
+            // Se entrambe le tipologie sono nell'ordine stabile, ordina per indice
+            if indexFirst != Int.max && indexSecond != Int.max {
+                return indexFirst < indexSecond
+            }
+            
+            // Se solo una è nell'ordine stabile, metti quella prima
+            if indexFirst != Int.max && indexSecond == Int.max {
+                return true
+            }
+            if indexFirst == Int.max && indexSecond != Int.max {
+                return false
+            }
+            
+            // Se nessuna è nell'ordine stabile, ordina alfabeticamente con ordinamento naturale
+            if first.tipo == second.tipo {
+                return compareStringsNatural(first.modello, second.modello)
+            }
+            return compareStringsNatural(first.tipo, second.tipo)
         }
     }
     

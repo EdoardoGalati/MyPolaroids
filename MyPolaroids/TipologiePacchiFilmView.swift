@@ -10,7 +10,7 @@ struct TipologiePacchiFilmView: View {
     var body: some View {
         ZStack {
             // Sfondo principale
-            Color(red: 244/255, green: 244/255, blue: 244/255)
+            AppColors.backgroundPrimary
                 .ignoresSafeArea()
             
             VStack(spacing: 0) {
@@ -18,14 +18,14 @@ struct TipologiePacchiFilmView: View {
                 HStack {
                     Text("Film Packs")
                         .font(.system(size: 24, weight: .medium))
-                        .foregroundColor(.black)
+                        .foregroundColor(AppColors.textPrimary)
                     
                     Spacer()
                     
                     Button(action: { mostraImpostazioni = true }) {
                         Image(systemName: "gearshape")
                             .font(.title2)
-                            .foregroundColor(.black)
+                            .foregroundColor(AppColors.textPrimary)
                     }
                     
                     Button(action: {
@@ -33,37 +33,54 @@ struct TipologiePacchiFilmView: View {
                     }) {
                         Image(systemName: "plus")
                             .font(.title2)
-                            .foregroundColor(.black)
+                            .foregroundColor(AppColors.textPrimary)
                     }
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 20)
                 .padding(.bottom, 24)
-                .background(Color(red: 244/255, green: 244/255, blue: 244/255))
+                .background(AppColors.backgroundPrimary)
                 
                 // Lista tipologie che arriva fino a fine pagina
                 ScrollView {
                     LazyVStack(spacing: 1) {
                         if viewModel.tipologieRaggruppate.isEmpty {
                             VStack(spacing: 16) {
-                                Image(systemName: "film.stack")
+                                Image("polaroid.film.symbols")
                                     .font(.system(size: 60))
                                     .foregroundColor(.gray)
                                 
-                                Text("Nessun pacco film")
+                                Text("No film packs")
                                     .font(.title2)
                                     .fontWeight(.medium)
                                 
-                                Text("Aggiungi il tuo primo pacco film per iniziare la tua collezione")
+                                Text("Add your first film pack to start.")
                                     .font(.body)
                                     .foregroundColor(.secondary)
                                     .multilineTextAlignment(.center)
+                                
+                                Button(action: { mostraAggiungi = true }) {
+                                    HStack {
+                                        Image(systemName: "plus.circle.fill")
+                                        Text("Add First Film Pack")
+                                    }
+                                    .font(.headline)
+                                    .foregroundColor(AppColors.buttonText)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 16)
+                                    .background(AppColors.buttonPrimary)
+                                    .cornerRadius(16)
+                                }
+                                .padding(.horizontal, 20)
                             }
                             .frame(maxWidth: .infinity)
+                            .frame(maxHeight: .infinity)
+                            .padding(.top, 50)
                             .padding(.vertical, 40)
+                            .padding(.horizontal, 20)
+                            .padding(.bottom, 80)
                         } else {
-                            ForEach(viewModel.tipologieRaggruppate.indices, id: \.self) { index in
-                                let tipologia = viewModel.tipologieRaggruppate[index]
+                            ForEach(viewModel.tipologieRaggruppate, id: \.id) { tipologia in
                                 NavigationLink(destination: DettagliTipologiaView(tipologia: tipologia, viewModel: viewModel, selectedTab: $selectedTab)) {
                                     TipologiaRowView(tipologia: tipologia, modelliDisponibili: viewModel.modelliFilm)
                                 }
@@ -124,13 +141,13 @@ struct TipologiePacchiFilmView: View {
                 Spacer()
                 
                 // LATO DESTRO: Numero di pacchi
-                Text("\(tipologia.conteggioTotale)")
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundColor(.black)
+                                        Text("\(tipologia.conteggioTotale)")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(AppColors.textPrimary)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 32)
-            .background(Color.white)
+            .background(AppColors.backgroundSecondary)
             .cornerRadius(16)
         }
         

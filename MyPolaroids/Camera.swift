@@ -15,6 +15,7 @@ struct Camera: Identifiable, Codable {
     var fotoPersonalizzata: Data?
     var paccoFilmCaricato: FilmPack?
     var filmType: String?
+    var dataAggiunta: Date
     
     init(nickname: String, modello: String, immagine: String? = nil, coloreIcona: String? = nil, modelliDisponibili: [CameraModel] = []) {
         self.id = UUID()
@@ -29,6 +30,7 @@ struct Camera: Identifiable, Codable {
         self.fotoPersonalizzata = nil
         self.paccoFilmCaricato = nil
         self.filmType = Camera.filmTypeDefault(modello: modello, modelliDisponibili: modelliDisponibili)
+        self.dataAggiunta = Date()
     }
     
     // Calcola la capienza in base al modello
@@ -92,13 +94,31 @@ struct Camera: Identifiable, Codable {
     // Converte il nome del colore in Color di SwiftUI
     static func coloreDaNome(_ nomeColore: String) -> Color {
         switch nomeColore {
-        case "000": return Color(hex: "000000") // Nero
+        case "000": 
+            // In dark mode, il nero diventa bianco per il contrasto
+            return Color(UIColor { traitCollection in
+                switch traitCollection.userInterfaceStyle {
+                case .dark:
+                    return UIColor.white
+                default:
+                    return UIColor.black
+                }
+            })
         case "D60027": return Color(hex: "D60027") // Rosso
         case "FF8200": return Color(hex: "FF8200") // Arancione
         case "FFB503": return Color(hex: "FFB503") // Giallo
         case "78BE1F": return Color(hex: "78BE1F") // Verde
         case "198CD9": return Color(hex: "198CD9") // Blu
-        default: return Color(hex: "000000") // Nero di default
+        default: 
+            // In dark mode, il nero di default diventa bianco per il contrasto
+            return Color(UIColor { traitCollection in
+                switch traitCollection.userInterfaceStyle {
+                case .dark:
+                    return UIColor.white
+                default:
+                    return UIColor.black
+                }
+            })
         }
     }
 }

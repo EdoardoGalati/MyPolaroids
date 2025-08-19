@@ -43,7 +43,7 @@ struct ModificaRapidaPaccoView: View {
                             .padding(.horizontal, 16)
                             .padding(.vertical, 16)
                             .frame(maxWidth: .infinity)
-                            .background(Color.white)
+                            .background(AppColors.backgroundSecondary)
                             .cornerRadius(16)
                             
                             HStack {
@@ -58,7 +58,7 @@ struct ModificaRapidaPaccoView: View {
                             .padding(.horizontal, 16)
                             .padding(.vertical, 16)
                             .frame(maxWidth: .infinity)
-                            .background(Color.white)
+                            .background(AppColors.backgroundSecondary)
                             .cornerRadius(16)
                             
                             HStack {
@@ -73,14 +73,14 @@ struct ModificaRapidaPaccoView: View {
                             .padding(.horizontal, 16)
                             .padding(.vertical, 16)
                             .frame(maxWidth: .infinity)
-                            .background(Color.white)
+                            .background(AppColors.backgroundSecondary)
                             .cornerRadius(16)
                         }
                         .padding(.horizontal, 0)
                     }
                     .padding(.horizontal, 0)
                     .padding(.vertical, 20)
-                    .background(Color(red: 0.96, green: 0.96, blue: 0.96))
+                    .background(AppColors.backgroundPrimary)
                     .cornerRadius(16)
                     
                     // Expiration Date Section
@@ -96,8 +96,8 @@ struct ModificaRapidaPaccoView: View {
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 16)
                                 .frame(maxWidth: .infinity)
-                                .background(Color.white)
-                                .cornerRadius(16)
+                                                            .background(AppColors.backgroundSecondary)
+                            .cornerRadius(16)
                                 .onChange(of: mostraScadenza) { newValue in
                                     if newValue && dataScadenza == nil {
                                         // Se attivo il toggle e non c'è data, imposta oggi come default
@@ -113,14 +113,14 @@ struct ModificaRapidaPaccoView: View {
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 16)
                                 .frame(maxWidth: .infinity)
-                                .background(Color.white)
+                                .background(AppColors.backgroundSecondary)
                                 .cornerRadius(16)
                             }
                         }
                     }
                     .padding(.horizontal, 0)
                     .padding(.vertical, 20)
-                    .background(Color(red: 0.96, green: 0.96, blue: 0.96))
+                    .background(AppColors.backgroundPrimary)
                     .cornerRadius(16)
                     
                     // Delete Pack Section
@@ -135,7 +135,7 @@ struct ModificaRapidaPaccoView: View {
                                     .font(.headline)
                                     .fontWeight(.semibold)
                             }
-                            .foregroundColor(.white)
+                            .foregroundColor(AppColors.buttonText)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 16)
                             .background(Color.red.opacity(0.8))
@@ -145,12 +145,12 @@ struct ModificaRapidaPaccoView: View {
                     }
                     .padding(.horizontal, 0)
                     .padding(.vertical, 20)
-                    .background(Color(red: 0.96, green: 0.96, blue: 0.96))
+                    .background(AppColors.backgroundPrimary)
                     .cornerRadius(16)
                 }
                 .padding(.top, 20)
             }
-            .background(Color(red: 0.96, green: 0.96, blue: 0.96))
+            .background(AppColors.backgroundPrimary)
             .navigationTitle("Edit Pack")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

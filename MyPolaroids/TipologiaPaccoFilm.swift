@@ -10,6 +10,7 @@ struct TipologiaPaccoFilm: Identifiable {
     let pacchiInScadenza: Int
     let pacchiScaduti: Int
     let pacchiCompletati: Int
+    let pacchiDellaTipologia: [FilmPack]
     
     init(tipo: String, modello: String, pacchi: [FilmPack]) {
         self.id = "\(tipo)_\(modello)"
@@ -18,6 +19,7 @@ struct TipologiaPaccoFilm: Identifiable {
         
         // Filtra i pacchi di questa tipologia
         let pacchiTipologia = pacchi.filter { $0.tipo == tipo && $0.modello == modello }
+        self.pacchiDellaTipologia = pacchiTipologia
         
         self.conteggioTotale = pacchiTipologia.count
         

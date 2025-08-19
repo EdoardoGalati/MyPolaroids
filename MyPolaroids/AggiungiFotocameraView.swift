@@ -35,7 +35,7 @@ struct AggiungiFotocameraView: View {
                     .padding(.vertical, 16)
                 }
             }
-            .background(Color(hex: "f4f4f4"))
+            .background(AppColors.backgroundPrimary)
             .navigationTitle("Add Camera")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -72,7 +72,7 @@ struct AggiungiFotocameraView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .background(Color.white)
+        .background(AppColors.backgroundSecondary)
         .cornerRadius(26)
         .padding(.horizontal, 20)
         .padding(.top, 20)
@@ -82,13 +82,13 @@ struct AggiungiFotocameraView: View {
     // MARK: - Bottone Fotocamera
     private func bottoneFotocamera(modello: CameraModel) -> some View {
         HStack {
-            Image(systemName: modello.default_icon)
+            Image(modello.default_icon)
                 .font(.title2)
-                .foregroundColor(.black)
+                .foregroundColor(AppColors.textPrimary)
             
             Text(modello.name)
                 .font(.system(size: 16, weight: .medium))
-                .foregroundColor(.black)
+                .foregroundColor(AppColors.textPrimary)
             
             Spacer()
             
@@ -98,7 +98,7 @@ struct AggiungiFotocameraView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 16)
-        .background(Color.white)
+        .background(AppColors.backgroundSecondary)
         .cornerRadius(16)
     }
     
@@ -149,7 +149,7 @@ struct PersonalizzazioneView: View {
                 .padding(.vertical, 16)
             }
         }
-        .background(Color(hex: "f4f4f4"))
+        .background(AppColors.backgroundPrimary)
         .navigationTitle("Customize")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -168,7 +168,7 @@ struct PersonalizzazioneView: View {
             Spacer(minLength: 0)
             VStack(spacing: 12) {
                 // Icona fotocamera
-                Image(systemName: modello.default_icon)
+                Image(modello.default_icon)
                     .font(.system(size: 80))
                     .foregroundColor(Camera.coloreDaNome(coloreSelezionato))
                 
@@ -176,14 +176,14 @@ struct PersonalizzazioneView: View {
                 Text(modello.name)
                     .font(.title2)
                     .fontWeight(.bold)
-                    .foregroundColor(.black)
+                    .foregroundColor(AppColors.textPrimary)
             }
             .frame(maxWidth: .infinity)
             Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 50)
-        .background(Color.white)
+        .background(AppColors.backgroundSecondary)
         .cornerRadius(16)
     }
     
@@ -204,7 +204,7 @@ struct PersonalizzazioneView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 16)
-        .background(Color.white)
+        .background(AppColors.backgroundSecondary)
         .cornerRadius(16)
     }
     
@@ -232,7 +232,7 @@ struct PersonalizzazioneView: View {
                             ), size: 32)
                                 .overlay(
                                     Circle()
-                                        .stroke(Color.black, lineWidth: coloreSelezionato == colore ? 2 : 0)
+                                        .stroke(AppColors.accentPrimary, lineWidth: coloreSelezionato == colore ? 2 : 0)
                                 )
                         }
                     }
@@ -241,7 +241,7 @@ struct PersonalizzazioneView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 16)
-        .background(Color.white)
+        .background(AppColors.backgroundSecondary)
         .cornerRadius(16)
     }
     
@@ -262,7 +262,7 @@ struct PersonalizzazioneView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 16)
-        .background(Color.white)
+        .background(AppColors.backgroundSecondary)
         .cornerRadius(16)
     }
     
@@ -283,7 +283,7 @@ struct PersonalizzazioneView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 16)
-        .background(Color.white)
+        .background(AppColors.backgroundSecondary)
         .cornerRadius(16)
     }
     

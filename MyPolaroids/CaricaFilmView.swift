@@ -109,10 +109,10 @@ struct CaricaFilmView: View {
                                 Text("Add New Film")
                             }
                             .font(.headline)
-                            .foregroundColor(.white)
+                            .foregroundColor(AppColors.buttonText)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 16)
-                            .background(Color.black)
+                            .background(AppColors.buttonPrimary)
                             .cornerRadius(16)
                         }
                         .padding(.horizontal, 16)
@@ -219,10 +219,11 @@ struct FilmPackRowView: View {
                 Text("\(pacco.tipo) • \(pacco.modello)")
                     .font(.headline)
                     .fontWeight(.semibold)
+                    .foregroundColor(AppColors.textPrimary)
                 
                 Text("\(pacco.conteggio) pack\(pacco.conteggio == 1 ? "" : "s") available")
                     .font(.subheadline)
-                    .foregroundColor(.black)
+                    .foregroundColor(AppColors.textSecondary)
             }
             
             Spacer()
@@ -232,8 +233,8 @@ struct FilmPackRowView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 16)
-        .background(Color.white)
-        .cornerRadius(16)
+                                .background(AppColors.backgroundSecondary)
+                        .cornerRadius(16)
     }
 }
 

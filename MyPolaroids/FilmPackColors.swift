@@ -28,63 +28,15 @@ struct FilmPackColors {
     
     // Configurazione gradienti per ogni tipo di pacco
     static func gradientePerTipo(_ tipo: String, modello: String, modelliDisponibili: [FilmPackModel] = []) -> FilmPackGradient? {
-        // Normalizza il nome del modello per la ricerca
-        let modelloNormalizzato = normalizzaNomeModello(modello)
-        
-        // Cerca il gradiente nel JSON
-        if let modelloFilm = modelliDisponibili.first(where: { $0.id.lowercased() == modelloNormalizzato.lowercased() }) {
+        // Cerca il gradiente direttamente per nome del modello (più semplice e diretto)
+        if let modelloFilm = modelliDisponibili.first(where: { $0.name.lowercased() == modello.lowercased() }) {
             return modelloFilm.gradient
         }
         
-        // Se non troviamo il modello, restituiamo nil (nessun fallback hardcoded)
-        print("⚠️ Modello non trovato: '\(modello)' (normalizzato: '\(modelloNormalizzato)')")
-        print("📋 Modelli disponibili: \(modelliDisponibili.map { $0.id })")
+        // Se non troviamo il modello, restituiamo nil
+        print("⚠️ Modello non trovato: '\(modello)'")
+        print("📋 Modelli disponibili: \(modelliDisponibili.map { $0.name })")
         return nil
-    }
-    
-    // Normalizza i nomi dei modelli per la compatibilità
-    private static func normalizzaNomeModello(_ modello: String) -> String {
-        let modelloLower = modello.lowercased()
-        
-        // Mappa i nomi comuni ai loro ID nel JSON
-        switch modelloLower {
-        case "bw", "black & white", "black and white":
-            return "black_white"
-        case "color":
-            return "color"
-        case "black frame bw", "black frame b&w":
-            return "black_frame_bw"
-        case "color frame":
-            return "color_frame"
-        case "duochrome blue", "duochrome (blue)":
-            return "duochrome_blue"
-        case "duochrome green", "duochrome (green)":
-            return "duochrome_green"
-        case "duochrome yellow", "duochrome (yellow)":
-            return "duochrome_yellow"
-        case "duochrome red", "duochrome (red)":
-            return "duochrome_red"
-        case "duochrome orange", "duochrome (orange)":
-            return "duochrome_orange"
-        case "metallic":
-            return "metallic"
-        case "gold frame":
-            return "gold_frame"
-        case "silver frame":
-            return "silver_frame"
-        case "round frame":
-            return "round_frame"
-        case "retro":
-            return "retro"
-        case "vintage":
-            return "vintage"
-        case "multicolor 600":
-            return "multicolor_600"
-        case "rounded":
-            return "rounded"
-        default:
-            return modello
-        }
     }
     
 

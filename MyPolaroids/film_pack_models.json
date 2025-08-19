@@ -1,16 +1,16 @@
 {
   "film_pack_types": [
     {
-      "id": "600",
-      "name": "600",
-      "default_capacity": 8,
-      "description": "Film classico compatibile con fotocamere 600 e i-Type"
-    },
-    {
       "id": "itype",
       "name": "i-Type",
       "default_capacity": 8,
-      "description": "Film moderno senza batteria integrata"
+      "description": "Film moderno senza batteria integrata per fotocamere moderne"
+    },
+    {
+      "id": "600",
+      "name": "600",
+      "default_capacity": 8,
+      "description": "Film classico con batteria integrata, compatibile con fotocamere vintage e moderne"
     },
     {
       "id": "sx70",
@@ -19,16 +19,16 @@
       "description": "Film per fotocamere folding SX-70"
     },
     {
+      "id": "spectra",
+      "name": "Spectra",
+      "default_capacity": 10,
+      "description": "Film wide format per fotocamere Spectra (produzione terminata 2008)"
+    },
+    {
       "id": "go",
       "name": "Go",
       "default_capacity": 8,
       "description": "Film compatto per fotocamera Go"
-    },
-    {
-      "id": "spectra",
-      "name": "Spectra",
-      "default_capacity": 10,
-      "description": "Film wide per fotocamere Spectra"
     },
     {
       "id": "8x10",
@@ -45,304 +45,1064 @@
   ],
   "film_pack_models": [
     {
-      "id": "color",
+      "id": "itype_color",
       "name": "Color",
-      "description": "Film a colori standard Polaroid",
+      "description": "Film a colori standard per fotocamere i-Type",
       "category": "standard",
+      "film_type": "i-Type",
+      "available": true,
+      "year_introduced": 2016,
       "gradient": {
         "stops": [
-          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.00},
-          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
-          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.47},
-          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.73},
-          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
+          {
+            "color": {
+              "red": 0.86,
+              "green": 0.29,
+              "blue": 0.21
+            },
+            "location": 0.0
+          },
+          {
+            "color": {
+              "red": 0.94,
+              "green": 0.54,
+              "blue": 0.2
+            },
+            "location": 0.22
+          },
+          {
+            "color": {
+              "red": 0.96,
+              "green": 0.72,
+              "blue": 0.25
+            },
+            "location": 0.47
+          },
+          {
+            "color": {
+              "red": 0.53,
+              "green": 0.74,
+              "blue": 0.25
+            },
+            "location": 0.73
+          },
+          {
+            "color": {
+              "red": 0.26,
+              "green": 0.54,
+              "blue": 0.83
+            },
+            "location": 1.0
+          }
         ],
-        "startPoint": {"x": 0.2, "y": 0.85},
-        "endPoint": {"x": 0.9, "y": 0.25}
+        "startPoint": {
+          "x": 0.2,
+          "y": 0.85
+        },
+        "endPoint": {
+          "x": 0.9,
+          "y": 0.25
+        }
       }
     },
     {
-      "id": "black_white",
-      "name": "BW",
-      "description": "Film bianco e nero classico",
+      "id": "itype_bw",
+      "name": "Black & White",
+      "description": "Film bianco e nero per fotocamere i-Type",
       "category": "monochrome",
+      "film_type": "i-Type",
+      "available": true,
+      "year_introduced": 2016,
       "gradient": {
         "stops": [
-          {"color": {"red": 0.5, "green": 0.5, "blue": 0.5}, "location": 0.52},
-          {"color": {"red": 0.92, "green": 0.92, "blue": 0.92}, "location": 0.52}
+          {
+            "color": {
+              "red": 0.5,
+              "green": 0.5,
+              "blue": 0.5
+            },
+            "location": 0.52
+          },
+          {
+            "color": {
+              "red": 0.92,
+              "green": 0.92,
+              "blue": 0.92
+            },
+            "location": 0.52
+          }
         ],
-        "startPoint": {"x": 0.2, "y": 0.85},
-        "endPoint": {"x": 0.9, "y": 0.25}
+        "startPoint": {
+          "x": 0.2,
+          "y": 0.85
+        },
+        "endPoint": {
+          "x": 0.9,
+          "y": 0.25
+        }
       }
     },
     {
-      "id": "multicolor_600",
-      "name": "Multicolor 600",
-      "description": "Film multicolore per fotocamere 600",
-      "category": "special",
+      "id": "600_color",
+      "name": "Color",
+      "description": "Film a colori standard per fotocamere 600",
+      "category": "standard",
+      "film_type": "600",
+      "available": true,
+      "year_introduced": 1982,
       "gradient": {
         "stops": [
-          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.22},
-          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
-          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.49},
-          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.49},
-          {"color": {"red": 0.45, "green": 0.68, "blue": 0.42}, "location": 0.77},
-          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 0.77},
-          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
+          {
+            "color": {
+              "red": 0.86,
+              "green": 0.29,
+              "blue": 0.21
+            },
+            "location": 0.0
+          },
+          {
+            "color": {
+              "red": 0.94,
+              "green": 0.54,
+              "blue": 0.2
+            },
+            "location": 0.22
+          },
+          {
+            "color": {
+              "red": 0.96,
+              "green": 0.72,
+              "blue": 0.25
+            },
+            "location": 0.47
+          },
+          {
+            "color": {
+              "red": 0.53,
+              "green": 0.74,
+              "blue": 0.25
+            },
+            "location": 0.73
+          },
+          {
+            "color": {
+              "red": 0.26,
+              "green": 0.54,
+              "blue": 0.83
+            },
+            "location": 1.0
+          }
         ],
-        "startPoint": {"x": 0.2, "y": 0.85},
-        "endPoint": {"x": 0.9, "y": 0.25}
+        "startPoint": {
+          "x": 0.2,
+          "y": 0.85
+        },
+        "endPoint": {
+          "x": 0.9,
+          "y": 0.25
+        }
       }
     },
     {
-      "id": "rounded",
-      "name": "Rounded",
-      "description": "Film con effetto rotondo multicolore",
+      "id": "600_bw",
+      "name": "Black & White",
+      "description": "Film bianco e nero per fotocamere 600",
+      "category": "monochrome",
+      "film_type": "600",
+      "available": true,
+      "year_introduced": 1985,
+      "gradient": {
+        "stops": [
+          {
+            "color": {
+              "red": 0.5,
+              "green": 0.5,
+              "blue": 0.5
+            },
+            "location": 0.52
+          },
+          {
+            "color": {
+              "red": 0.92,
+              "green": 0.92,
+              "blue": 0.92
+            },
+            "location": 0.52
+          }
+        ],
+        "startPoint": {
+          "x": 0.2,
+          "y": 0.85
+        },
+        "endPoint": {
+          "x": 0.9,
+          "y": 0.25
+        }
+      }
+    },
+    {
+      "id": "600_green_reclaimed",
+      "name": "Green Reclaimed Series",
+      "description": "Film verde sperimentale con materiali recuperati",
       "category": "special",
+      "film_type": "600",
+      "available": true,
+      "year_introduced": 2024,
+      "is_limited_edition": true,
+      "gradient": {
+        "stops": [
+          {
+            "color": {
+              "red": 0.2,
+              "green": 0.6,
+              "blue": 0.3
+            },
+            "location": 0.0
+          },
+          {
+            "color": {
+              "red": 0.4,
+              "green": 0.8,
+              "blue": 0.2
+            },
+            "location": 0.5
+          },
+          {
+            "color": {
+              "red": 0.8,
+              "green": 0.9,
+              "blue": 0.1
+            },
+            "location": 1.0
+          }
+        ],
+        "startPoint": {
+          "x": 0.2,
+          "y": 0.85
+        },
+        "endPoint": {
+          "x": 0.9,
+          "y": 0.25
+        }
+      }
+    },
+    {
+      "id": "sx70_color",
+      "name": "Color",
+      "description": "Film a colori standard per fotocamere SX-70",
+      "category": "standard",
+      "film_type": "SX-70",
+      "available": true,
+      "year_introduced": 1972,
+      "gradient": {
+        "stops": [
+          {
+            "color": {
+              "red": 0.86,
+              "green": 0.29,
+              "blue": 0.21
+            },
+            "location": 0.0
+          },
+          {
+            "color": {
+              "red": 0.94,
+              "green": 0.54,
+              "blue": 0.2
+            },
+            "location": 0.22
+          },
+          {
+            "color": {
+              "red": 0.96,
+              "green": 0.72,
+              "blue": 0.25
+            },
+            "location": 0.47
+          },
+          {
+            "color": {
+              "red": 0.53,
+              "green": 0.74,
+              "blue": 0.25
+            },
+            "location": 0.73
+          },
+          {
+            "color": {
+              "red": 0.26,
+              "green": 0.54,
+              "blue": 0.83
+            },
+            "location": 1.0
+          }
+        ],
+        "startPoint": {
+          "x": 0.2,
+          "y": 0.85
+        },
+        "endPoint": {
+          "x": 0.9,
+          "y": 0.25
+        }
+      }
+    },
+    {
+      "id": "sx70_bw",
+      "name": "Black & White",
+      "description": "Film bianco e nero per fotocamere SX-70",
+      "category": "monochrome",
+      "film_type": "SX-70",
+      "available": true,
+      "year_introduced": 1975,
+      "gradient": {
+        "stops": [
+          {
+            "color": {
+              "red": 0.5,
+              "green": 0.5,
+              "blue": 0.5
+            },
+            "location": 0.52
+          },
+          {
+            "color": {
+              "red": 0.92,
+              "green": 0.92,
+              "blue": 0.92
+            },
+            "location": 0.52
+          }
+        ],
+        "startPoint": {
+          "x": 0.2,
+          "y": 0.85
+        },
+        "endPoint": {
+          "x": 0.9,
+          "y": 0.25
+        }
+      }
+    },
+    {
+      "id": "spectra_color",
+      "name": "Color",
+      "description": "Film a colori wide format per fotocamere Spectra",
+      "category": "historical",
+      "film_type": "Spectra",
+      "available": false,
+      "year_introduced": 1986,
+      "discontinued": 2008,
+      "gradient": {
+        "stops": [
+          {
+            "color": {
+              "red": 0.86,
+              "green": 0.29,
+              "blue": 0.21
+            },
+            "location": 0.0
+          },
+          {
+            "color": {
+              "red": 0.94,
+              "green": 0.54,
+              "blue": 0.2
+            },
+            "location": 0.22
+          },
+          {
+            "color": {
+              "red": 0.96,
+              "green": 0.72,
+              "blue": 0.25
+            },
+            "location": 0.47
+          },
+          {
+            "color": {
+              "red": 0.53,
+              "green": 0.74,
+              "blue": 0.25
+            },
+            "location": 0.73
+          },
+          {
+            "color": {
+              "red": 0.26,
+              "green": 0.54,
+              "blue": 0.83
+            },
+            "location": 1.0
+          }
+        ],
+        "startPoint": {
+          "x": 0.2,
+          "y": 0.85
+        },
+        "endPoint": {
+          "x": 0.9,
+          "y": 0.25
+        }
+      }
+    },
+    {
+      "id": "spectra_bw",
+      "name": "Black & White",
+      "description": "Film bianco e nero wide format per fotocamere Spectra",
+      "category": "historical",
+      "film_type": "Spectra",
+      "available": false,
+      "year_introduced": 1990,
+      "discontinued": 2008,
+      "gradient": {
+        "stops": [
+          {
+            "color": {
+              "red": 0.5,
+              "green": 0.5,
+              "blue": 0.5
+            },
+            "location": 0.52
+          },
+          {
+            "color": {
+              "red": 0.92,
+              "green": 0.92,
+              "blue": 0.92
+            },
+            "location": 0.52
+          }
+        ],
+        "startPoint": {
+          "x": 0.2,
+          "y": 0.85
+        },
+        "endPoint": {
+          "x": 0.9,
+          "y": 0.25
+        }
+      }
+    },
+    {
+      "id": "spectra_pro",
+      "name": "Pro",
+      "description": "Film professionale per fotocamere Spectra",
+      "category": "historical",
+      "film_type": "Spectra",
+      "available": false,
+      "year_introduced": 1995,
+      "discontinued": 2008,
+      "gradient": {
+        "stops": [
+          {
+            "color": {
+              "red": 0.86,
+              "green": 0.29,
+              "blue": 0.21
+            },
+            "location": 0.0
+          },
+          {
+            "color": {
+              "red": 0.94,
+              "green": 0.54,
+              "blue": 0.2
+            },
+            "location": 0.22
+          },
+          {
+            "color": {
+              "red": 0.96,
+              "green": 0.72,
+              "blue": 0.25
+            },
+            "location": 0.47
+          },
+          {
+            "color": {
+              "red": 0.53,
+              "green": 0.74,
+              "blue": 0.25
+            },
+            "location": 0.73
+          },
+          {
+            "color": {
+              "red": 0.26,
+              "green": 0.54,
+              "blue": 0.83
+            },
+            "location": 1.0
+          }
+        ],
+        "startPoint": {
+          "x": 0.2,
+          "y": 0.85
+        },
+        "endPoint": {
+          "x": 0.9,
+          "y": 0.25
+        }
+      }
+    },
+    {
+      "id": "spectra_sepia",
+      "name": "Sepia",
+      "description": "Film seppia vintage per fotocamere Spectra",
+      "category": "historical",
+      "film_type": "Spectra",
+      "available": false,
+      "year_introduced": 1998,
+      "discontinued": 2008,
+      "gradient": {
+        "stops": [
+          {
+            "color": {
+              "red": 0.8,
+              "green": 0.6,
+              "blue": 0.4
+            },
+            "location": 0.0
+          },
+          {
+            "color": {
+              "red": 0.6,
+              "green": 0.4,
+              "blue": 0.2
+            },
+            "location": 1.0
+          }
+        ],
+        "startPoint": {
+          "x": 0.2,
+          "y": 0.85
+        },
+        "endPoint": {
+          "x": 0.9,
+          "y": 0.25
+        }
+      }
+    },
+    {
+      "id": "go_color",
+      "name": "Color",
+      "description": "Film a colori compatto per fotocamere Go",
+      "category": "standard",
+      "film_type": "Go",
+      "available": true,
+      "year_introduced": 2021,
+      "gradient": {
+        "stops": [
+          {
+            "color": {
+              "red": 0.86,
+              "green": 0.29,
+              "blue": 0.21
+            },
+            "location": 0.0
+          },
+          {
+            "color": {
+              "red": 0.94,
+              "green": 0.54,
+              "blue": 0.2
+            },
+            "location": 0.22
+          },
+          {
+            "color": {
+              "red": 0.96,
+              "green": 0.72,
+              "blue": 0.25
+            },
+            "location": 0.47
+          },
+          {
+            "color": {
+              "red": 0.53,
+              "green": 0.74,
+              "blue": 0.25
+            },
+            "location": 0.73
+          },
+          {
+            "color": {
+              "red": 0.26,
+              "green": 0.54,
+              "blue": 0.83
+            },
+            "location": 1.0
+          }
+        ],
+        "startPoint": {
+          "x": 0.2,
+          "y": 0.85
+        },
+        "endPoint": {
+          "x": 0.9,
+          "y": 0.25
+        }
+      }
+    },
+    {
+      "id": "8x10_color",
+      "name": "Color",
+      "description": "Film a colori grande formato 8x10",
+      "category": "professional",
+      "film_type": "8x10",
+      "available": true,
+      "year_introduced": 2010,
+      "gradient": {
+        "stops": [
+          {
+            "color": {
+              "red": 0.86,
+              "green": 0.29,
+              "blue": 0.21
+            },
+            "location": 0.0
+          },
+          {
+            "color": {
+              "red": 0.94,
+              "green": 0.54,
+              "blue": 0.2
+            },
+            "location": 0.22
+          },
+          {
+            "color": {
+              "red": 0.96,
+              "green": 0.72,
+              "blue": 0.25
+            },
+            "location": 0.47
+          },
+          {
+            "color": {
+              "red": 0.53,
+              "green": 0.74,
+              "blue": 0.25
+            },
+            "location": 0.73
+          },
+          {
+            "color": {
+              "red": 0.26,
+              "green": 0.54,
+              "blue": 0.83
+            },
+            "location": 1.0
+          }
+        ],
+        "startPoint": {
+          "x": 0.2,
+          "y": 0.85
+        },
+        "endPoint": {
+          "x": 0.9,
+          "y": 0.25
+        }
+      }
+    },
+    {
+      "id": "4x5_color",
+      "name": "Color",
+      "description": "Film a colori medio formato 4x5",
+      "category": "professional",
+      "film_type": "4x5",
+      "available": true,
+      "year_introduced": 2010,
+      "gradient": {
+        "stops": [
+          {
+            "color": {
+              "red": 0.86,
+              "green": 0.29,
+              "blue": 0.21
+            },
+            "location": 0.0
+          },
+          {
+            "color": {
+              "red": 0.94,
+              "green": 0.54,
+              "blue": 0.2
+            },
+            "location": 0.22
+          },
+          {
+            "color": {
+              "red": 0.96,
+              "green": 0.72,
+              "blue": 0.25
+            },
+            "location": 0.47
+          },
+          {
+            "color": {
+              "red": 0.53,
+              "green": 0.74,
+              "blue": 0.25
+            },
+            "location": 0.73
+          },
+          {
+            "color": {
+              "red": 0.26,
+              "green": 0.54,
+              "blue": 0.83
+            },
+            "location": 1.0
+          }
+        ],
+        "startPoint": {
+          "x": 0.2,
+          "y": 0.85
+        },
+        "endPoint": {
+          "x": 0.9,
+          "y": 0.25
+        }
+      }
+    },
+    {
+      "id": "itype_color_frames",
+      "name": "Color i-Type Color Frames Film",
+      "description": "Film i-Type con cornici colorate.",
+      "category": "framed",
+      "film_type": "i-Type",
+      "available": true,
+      "year_introduced": 2020,
+      "gradient": {
+        "stops": [
+          { "color": { "red": 0.86, "green": 0.29, "blue": 0.21 }, "location": 0.0 },
+          { "color": { "red": 0.94, "green": 0.54, "blue": 0.2 }, "location": 0.22 },
+          { "color": { "red": 0.96, "green": 0.72, "blue": 0.25 }, "location": 0.47 },
+          { "color": { "red": 0.53, "green": 0.74, "blue": 0.25 }, "location": 0.73 },
+          { "color": { "red": 0.26, "green": 0.54, "blue": 0.83 }, "location": 1.0 }
+        ],
+        "startPoint": { "x": 0.2, "y": 0.85 },
+        "endPoint": { "x": 0.9, "y": 0.25 }
+      }
+    },
+    {
+      "id": "itype_golden_moments",
+      "name": "Color i‑Type Golden Moments Film",
+      "description": "Edizione limitata a tema oro per i-Type.",
+      "category": "special",
+      "film_type": "i-Type",
+      "available": false,
+      "is_limited_edition": true,
+      "year_introduced": 2022,
+      "gradient": {
+        "stops": [
+          { "color": { "red": 1.0, "green": 0.84, "blue": 0.0 }, "location": 0.0 },
+          { "color": { "red": 0.98, "green": 0.87, "blue": 0.3 }, "location": 1.0 }
+        ],
+        "startPoint": { "x": 0.1, "y": 0.9 },
+        "endPoint": { "x": 0.85, "y": 0.15 }
+      }
+    },
+    {
+      "id": "itype_moma",
+      "name": "Polaroid Color i-Type Film MoMA Edition",
+      "description": "Edizione speciale per il MoMA.",
+      "category": "special",
+      "film_type": "i-Type",
+      "available": false,
+      "is_limited_edition": true,
+      "year_introduced": 2022,
+      "gradient": {
+        "stops": [
+          { "color": { "red": 0.5, "green": 0.5, "blue": 0.5 }, "location": 0.0 },
+          { "color": { "red": 0.75, "green": 0.75, "blue": 0.75 }, "location": 1.0 }
+        ],
+        "startPoint": { "x": 0.2, "y": 0.9 },
+        "endPoint": { "x": 0.8, "y": 0.2 }
+      }
+    },
+    {
+      "id": "itype_black_frame",
+      "name": "Color i-Type Black Frame Film",
+      "description": "Film a colori con cornice nera per i-Type.",
+      "category": "framed",
+      "film_type": "i-Type",
+      "available": true,
+      "year_introduced": 2021,
+      "gradient": {
+        "stops": [
+          { "color": { "red": 0.1, "green": 0.1, "blue": 0.1 }, "location": 0.0 },
+          { "color": { "red": 0.4, "green": 0.4, "blue": 0.4 }, "location": 1.0 }
+        ],
+        "startPoint": { "x": 0.3, "y": 0.85 },
+        "endPoint": { "x": 0.9, "y": 0.4 }
+      }
+    },
+    {
+      "id": "itype_black_frame_bw",
+      "name": "Color i-Type Black Frame Film BW",
+      "description": "Film bianco e nero con cornice nera per i-Type.",
+      "category": "framed",
+      "film_type": "i-Type",
+      "available": true,
+      "year_introduced": 2022,
+      "gradient": {
+        "stops": [
+          { "color": { "red": 0.0, "green": 0.0, "blue": 0.0 }, "location": 0.0 },
+          { "color": { "red": 0.7, "green": 0.7, "blue": 0.7 }, "location": 1.0 }
+        ],
+        "startPoint": { "x": 0.3, "y": 0.85 },
+        "endPoint": { "x": 0.8, "y": 0.4 }
+      }
+    },
+    {
+      "id": "itype_round_frame_retinex_double",
+      "name": "Round Frame Retinex Double",
+      "description": "Cornici rotonde Retinex con confezione doppia (edizione limitata artistica).",
+      "category": "special",
+      "film_type": "i-Type",
+      "available": false,
+      "is_limited_edition": true,
+      "year_introduced": 2023,
       "gradient": {
         "type": "elliptical",
         "stops": [
-          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 0.00},
-          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 0.23},
-          {"color": {"red": 0.45, "green": 0.68, "blue": 0.42}, "location": 0.23},
-          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.51},
-          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.51},
-          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.78},
-          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.78}
+          { "color": { "red": 0.26, "green": 0.54, "blue": 0.83 }, "location": 0.00 },
+          { "color": { "red": 0.45, "green": 0.68, "blue": 0.42 }, "location": 0.25 },
+          { "color": { "red": 0.53, "green": 0.74, "blue": 0.25 }, "location": 0.50 },
+          { "color": { "red": 0.96, "green": 0.72, "blue": 0.25 }, "location": 0.75 },
+          { "color": { "red": 0.86, "green": 0.29, "blue": 0.21 }, "location": 1.00 }
         ],
-        "center": {"x": 0.5, "y": 0.5}
+        "center": { "x": 0.5, "y": 0.5 }
       }
     },
     {
-      "id": "black_white",
-      "name": "Black & White",
-      "description": "Film bianco e nero classico",
-      "category": "monochrome",
-      "gradient": {
-        "stops": [
-          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.00},
-          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
-          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.47},
-          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.73},
-          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
-        ],
-        "startPoint": {"x": 0.2, "y": 0.85},
-        "endPoint": {"x": 0.9, "y": 0.25}
-      }
-    },
-    {
-      "id": "black_frame_bw",
-      "name": "Black Frame B&W",
-      "description": "Bianco e nero con cornice nera",
-      "category": "monochrome",
-      "gradient": {
-        "stops": [
-          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.00},
-          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
-          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.47},
-          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.73},
-          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
-        ],
-        "startPoint": {"x": 0.2, "y": 0.85},
-        "endPoint": {"x": 0.9, "y": 0.25}
-      }
-    },
-    {
-      "id": "color_frame",
-      "name": "Color Frame",
-      "description": "Film con cornice colorata",
-      "category": "framed",
-      "gradient": {
-        "stops": [
-          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.00},
-          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
-          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.47},
-          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.73},
-          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
-        ],
-        "startPoint": {"x": 0.2, "y": 0.85},
-        "endPoint": {"x": 0.9, "y": 0.25}
-      }
-    },
-    {
-      "id": "duochrome_blue",
-      "name": "Duochrome (Blue)",
-      "description": "Film monocromatico blu",
-      "category": "duochrome",
-      "gradient": {
-        "stops": [
-          {"color": {"red": 0.29, "green": 0.29, "blue": 0.29}, "location": 0.52},
-          {"color": {"red": 0.13, "green": 0.71, "blue": 0.86}, "location": 0.52}
-        ],
-        "startPoint": {"x": 0.2, "y": 0.85},
-        "endPoint": {"x": 0.9, "y": 0.25}
-      }
-    },
-    {
-      "id": "duochrome_green",
-      "name": "Duochrome (Green)",
-      "description": "Film monocromatico verde",
-      "category": "duochrome",
-      "gradient": {
-        "stops": [
-          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.00},
-          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
-          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.47},
-          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.73},
-          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
-        ],
-        "startPoint": {"x": 0.2, "y": 0.85},
-        "endPoint": {"x": 0.9, "y": 0.25}
-      }
-    },
-    {
-      "id": "duochrome_yellow",
-      "name": "Duochrome (Yellow)",
-      "description": "Film monocromatico giallo",
-      "category": "duochrome",
-      "gradient": {
-        "stops": [
-          {"color": {"red": 0.29, "green": 0.29, "blue": 0.29}, "location": 0.52},
-          {"color": {"red": 0.97, "green": 0.87, "blue": 0.25}, "location": 0.52}
-        ],
-        "startPoint": {"x": 0.2, "y": 0.85},
-        "endPoint": {"x": 0.9, "y": 0.25}
-      }
-    },
-    {
-      "id": "duochrome_red",
-      "name": "Duochrome (Red)",
-      "description": "Film monocromatico rosso",
-      "category": "duochrome",
-      "gradient": {
-        "stops": [
-          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.00},
-          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
-          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.47},
-          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.73},
-          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
-        ],
-        "startPoint": {"x": 0.2, "y": 0.85},
-        "endPoint": {"x": 0.9, "y": 0.25}
-      }
-    },
-    {
-      "id": "duochrome_orange",
-      "name": "Duochrome (Orange)",
-      "description": "Film monocromatico arancione",
-      "category": "duochrome",
-      "gradient": {
-        "stops": [
-          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.00},
-          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
-          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.47},
-          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.73},
-          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
-        ],
-        "startPoint": {"x": 0.2, "y": 0.85},
-        "endPoint": {"x": 0.9, "y": 0.25}
-      }
-    },
-    {
-      "id": "metallic",
-      "name": "Metallic",
-      "description": "Film con effetto metallizzato",
+      "id": "itype_pantone",
+      "name": "Pantone x Polaroid",
+      "description": "Edizione speciale Pantone dell'anno per i-Type.",
       "category": "special",
+      "film_type": "i-Type",
+      "available": false,
+      "is_limited_edition": true,
+      "year_introduced": 2024,
       "gradient": {
         "stops": [
-          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.00},
-          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
-          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.47},
-          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.73},
-          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
+          { "color": { "red": 0.93, "green": 0.40, "blue": 0.23 }, "location": 0.00 },
+          { "color": { "red": 0.96, "green": 0.72, "blue": 0.25 }, "location": 1.00 }
         ],
-        "startPoint": {"x": 0.2, "y": 0.85},
-        "endPoint": {"x": 0.9, "y": 0.25}
+        "startPoint": { "x": 0.2, "y": 0.85 },
+        "endPoint": { "x": 0.9, "y": 0.25 }
       }
     },
     {
-      "id": "gold_frame",
-      "name": "Gold Frame",
-      "description": "Film con cornice dorata",
+      "id": "600_round_frame",
+      "name": "Color 600 Round Frame Film",
+      "description": "Film 600 con cornici rotonde colorate.",
       "category": "framed",
+      "film_type": "600",
+      "available": true,
+      "year_introduced": 2022,
       "gradient": {
         "stops": [
-          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.00},
-          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
-          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.47},
-          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.73},
-          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
+          { "color": { "red": 0.86, "green": 0.29, "blue": 0.21 }, "location": 0.0 },
+          { "color": { "red": 0.94, "green": 0.54, "blue": 0.2 }, "location": 0.22 },
+          { "color": { "red": 0.96, "green": 0.72, "blue": 0.25 }, "location": 0.47 },
+          { "color": { "red": 0.53, "green": 0.74, "blue": 0.25 }, "location": 0.73 },
+          { "color": { "red": 0.26, "green": 0.54, "blue": 0.83 }, "location": 1.0 }
         ],
-        "startPoint": {"x": 0.2, "y": 0.85},
-        "endPoint": {"x": 0.9, "y": 0.25}
+        "startPoint": { "x": 0.2, "y": 0.85 },
+        "endPoint": { "x": 0.9, "y": 0.25 }
       }
     },
     {
-      "id": "silver_frame",
-      "name": "Silver Frame",
-      "description": "Film con cornice argentata",
-      "category": "framed",
+      "id": "600_duochrome_black_green",
+      "name": "Duochrome Film for 600 – Black & Green Edition",
+      "description": "Film duocromatico verde e nero per fotocamere 600.",
+      "category": "duochrome",
+      "film_type": "600",
+      "available": true,
+      "is_limited_edition": true,
+      "year_introduced": 2024,
       "gradient": {
         "stops": [
-          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.00},
-          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
-          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.47},
-          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.73},
-          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
+          { "color": { "red": 0.15, "green": 0.15, "blue": 0.15 }, "location": 0.52 },
+          { "color": { "red": 0.2, "green": 0.8, "blue": 0.3 }, "location": 0.52 }
         ],
-        "startPoint": {"x": 0.2, "y": 0.85},
-        "endPoint": {"x": 0.9, "y": 0.25}
+        "startPoint": { "x": 0.2, "y": 0.85 },
+        "endPoint": { "x": 0.9, "y": 0.25 }
       }
     },
     {
-      "id": "round_frame",
-      "name": "Round Frame",
-      "description": "Film con cornice rotonda",
-      "category": "framed",
+      "id": "600_duochrome_black_yellow",
+      "name": "Duochrome Film for 600 - Black & Yellow Edition",
+      "description": "Film duocromatico giallo e nero per fotocamere 600.",
+      "category": "duochrome",
+      "film_type": "600",
+      "available": false,
+      "is_limited_edition": true,
+      "year_introduced": 2024,
       "gradient": {
         "stops": [
-          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.00},
-          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
-          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.47},
-          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.73},
-          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
+          { "color": { "red": 0.15, "green": 0.15, "blue": 0.15 }, "location": 0.52 },
+          { "color": { "red": 0.97, "green": 0.87, "blue": 0.25 }, "location": 0.52 }
         ],
-        "startPoint": {"x": 0.2, "y": 0.85},
-        "endPoint": {"x": 0.9, "y": 0.25}
+        "startPoint": { "x": 0.2, "y": 0.85 },
+        "endPoint": { "x": 0.9, "y": 0.25 }
       }
     },
     {
-      "id": "retro",
-      "name": "Retro",
-      "description": "Film con stile retrò",
+      "id": "600_duochrome_pink",
+      "name": "Duochrome Film for 600 - Pink Edition",
+      "description": "Film duocromatico rosa e nero per fotocamere 600.",
+      "category": "duochrome",
+      "film_type": "600",
+      "available": false,
+      "is_limited_edition": true,
+      "year_introduced": 2023,
+      "gradient": {
+        "stops": [
+          { "color": { "red": 0.15, "green": 0.15, "blue": 0.15 }, "location": 0.52 },
+          { "color": { "red": 0.95, "green": 0.4, "blue": 0.7 }, "location": 0.52 }
+        ],
+        "startPoint": { "x": 0.2, "y": 0.85 },
+        "endPoint": { "x": 0.9, "y": 0.25 }
+      }
+    },
+    {
+      "id": "600_duochrome_black_blue",
+      "name": "Duochrome Film for 600 - Black & Blue Edition",
+      "description": "Film duocromatico nero e blu per fotocamere 600.",
+      "category": "duochrome",
+      "film_type": "600",
+      "available": false,
+      "is_limited_edition": true,
+      "year_introduced": 2022,
+      "gradient": {
+        "stops": [
+          { "color": { "red": 0.15, "green": 0.15, "blue": 0.15 }, "location": 0.52 },
+          { "color": { "red": 0.13, "green": 0.71, "blue": 0.86 }, "location": 0.52 }
+        ],
+        "startPoint": { "x": 0.2, "y": 0.85 },
+        "endPoint": { "x": 0.9, "y": 0.25 }
+      }
+    },
+    {
+      "id": "600_blue_reclaimed",
+      "name": "Polaroid Blue 600 Film - Reclaimed Edition",
+      "description": "Film blu eco-sostenibile per 600 (edizione limitata).",
       "category": "special",
+      "film_type": "600",
+      "available": false,
+      "is_limited_edition": true,
+      "year_introduced": 2024,
       "gradient": {
         "stops": [
-          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.00},
-          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
-          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.47},
-          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.73},
-          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
+          { "color": { "red": 0.2, "green": 0.6, "blue": 0.3 }, "location": 0.0 },
+          { "color": { "red": 0.4, "green": 0.8, "blue": 0.2 }, "location": 0.5 },
+          { "color": { "red": 0.8, "green": 0.9, "blue": 0.1 }, "location": 1.0 }
         ],
-        "startPoint": {"x": 0.2, "y": 0.85},
-        "endPoint": {"x": 0.9, "y": 0.25}
+        "startPoint": { "x": 0.2, "y": 0.85 },
+        "endPoint": { "x": 0.9, "y": 0.25 }
       }
     },
     {
-      "id": "vintage",
-      "name": "Vintage",
-      "description": "Film con stile vintage",
-      "category": "special",
+      "id": "go_black_frame",
+      "name": "Polaroid Go Color - Black Frame",
+      "description": "Film Go a colori con cornice nera.",
+      "category": "framed",
+      "film_type": "Go",
+      "available": true,
+      "year_introduced": 2023,
       "gradient": {
         "stops": [
-          {"color": {"red": 0.86, "green": 0.29, "blue": 0.21}, "location": 0.00},
-          {"color": {"red": 0.94, "green": 0.54, "blue": 0.2}, "location": 0.22},
-          {"color": {"red": 0.96, "green": 0.72, "blue": 0.25}, "location": 0.47},
-          {"color": {"red": 0.53, "green": 0.74, "blue": 0.25}, "location": 0.73},
-          {"color": {"red": 0.26, "green": 0.54, "blue": 0.83}, "location": 1.00}
+          { "color": { "red": 0.86, "green": 0.29, "blue": 0.21 }, "location": 0.0 },
+          { "color": { "red": 0.94, "green": 0.54, "blue": 0.2 }, "location": 0.22 },
+          { "color": { "red": 0.96, "green": 0.72, "blue": 0.25 }, "location": 0.47 },
+          { "color": { "red": 0.53, "green": 0.74, "blue": 0.25 }, "location": 0.73 },
+          { "color": { "red": 0.26, "green": 0.54, "blue": 0.83 }, "location": 1.0 }
         ],
-        "startPoint": {"x": 0.2, "y": 0.85},
-        "endPoint": {"x": 0.9, "y": 0.25}
+        "startPoint": { "x": 0.2, "y": 0.85 },
+        "endPoint": { "x": 0.9, "y": 0.25 }
+      }
+    },
+    {
+      "id": "go_purple_haze_frame",
+      "name": "Polaroid Go Color Film Purple Haze Frame",
+      "description": "Film Go a colori con cornice viola Purple Haze.",
+      "category": "framed",
+      "film_type": "Go",
+      "available": false,
+      "is_limited_edition": true,
+      "year_introduced": 2024,
+      "gradient": {
+        "stops": [
+          { "color": { "red": 0.7, "green": 0.4, "blue": 0.8 }, "location": 0.0 },
+          { "color": { "red": 0.9, "green": 0.7, "blue": 0.9 }, "location": 0.5 },
+          { "color": { "red": 0.6, "green": 0.4, "blue": 0.8 }, "location": 1.0 }
+        ],
+        "startPoint": { "x": 0.3, "y": 0.8 },
+        "endPoint": { "x": 0.7, "y": 0.3 }
+      }
+    },
+    {
+      "id": "sx70_giambarba",
+      "name": "Paul Giambarba x Polaroid",
+      "description": "Edizione speciale Paul Giambarba per SX-70.",
+      "category": "special",
+      "film_type": "SX-70",
+      "available": false,
+      "is_limited_edition": true,
+      "year_introduced": 2024,
+      "gradient": {
+        "stops": [
+          { "color": { "red": 0.86, "green": 0.29, "blue": 0.21 }, "location": 0.00 },
+          { "color": { "red": 0.94, "green": 0.54, "blue": 0.2 }, "location": 0.22 },
+          { "color": { "red": 0.96, "green": 0.72, "blue": 0.25 }, "location": 0.47 },
+          { "color": { "red": 0.53, "green": 0.74, "blue": 0.25 }, "location": 0.73 },
+          { "color": { "red": 0.26, "green": 0.54, "blue": 0.83 }, "location": 1.00 }
+        ],
+        "startPoint": { "x": 0.2, "y": 0.85 },
+        "endPoint": { "x": 0.9, "y": 0.25 }
+      }
+    },
+    {
+      "id": "sx70_palace",
+      "name": "Palace x Polaroid",
+      "description": "Edizione speciale Palace x Polaroid per SX-70.",
+      "category": "special",
+      "film_type": "SX-70",
+      "available": false,
+      "is_limited_edition": true,
+      "year_introduced": 2022,
+      "gradient": {
+        "stops": [
+          { "color": { "red": 0.2, "green": 0.6, "blue": 0.3 }, "location": 0.0 },
+          { "color": { "red": 0.4, "green": 0.8, "blue": 0.2 }, "location": 0.5 },
+          { "color": { "red": 0.8, "green": 0.9, "blue": 0.1 }, "location": 1.0 }
+        ],
+        "startPoint": { "x": 0.2, "y": 0.85 },
+        "endPoint": { "x": 0.9, "y": 0.25 }
+      }
+    },
+    {
+      "id": "sx70_bowie",
+      "name": "Bowie x Polaroid",
+      "description": "Edizione speciale Bowie per SX-70.",
+      "category": "special",
+      "film_type": "SX-70",
+      "available": false,
+      "is_limited_edition": true,
+      "year_introduced": 2022,
+      "gradient": {
+        "stops": [
+          { "color": { "red": 0.4, "green": 0.2, "blue": 0.8 }, "location": 0.0 },
+          { "color": { "red": 0.7, "green": 0.4, "blue": 0.9 }, "location": 0.5 },
+          { "color": { "red": 0.9, "green": 0.6, "blue": 0.7 }, "location": 1.0 }
+        ],
+        "startPoint": { "x": 0.3, "y": 0.85 },
+        "endPoint": { "x": 0.9, "y": 0.25 }
       }
     }
   ]

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIInterfaceOrientationLandscapeLeft</key>
+	<string></string>
+	<key>UIInterfaceOrientationLandscapeRight</key>
+	<string></string>
+	<key>UIInterfaceOrientationPortrait</key>
+	<string></string>
+	<key>UIInterfaceOrientationPortraitUpsideDown</key>
+	<string></string>
+</dict>
+</plist>

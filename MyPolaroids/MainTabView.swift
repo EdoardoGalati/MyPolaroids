@@ -8,7 +8,7 @@ struct MainTabView: View {
         NavigationView {
             ZStack {
                 // Sfondo per la safe area
-                Color(red: 244/255, green: 244/255, blue: 244/255)
+                AppColors.backgroundPrimary
                     .ignoresSafeArea()
                 
                 TabView(selection: $selectedTab) {
@@ -31,9 +31,9 @@ struct MainTabView: View {
                     // Gradiente sotto la tab bar
                     LinearGradient(
                         gradient: Gradient(colors: [
-                            Color(red: 244/255, green: 244/255, blue: 244/255).opacity(0),
-                            Color(red: 244/255, green: 244/255, blue: 244/255).opacity(1),
-                            Color(red: 244/255, green: 244/255, blue: 244/255)
+                            AppColors.tabBarGradient.opacity(0),
+                            AppColors.tabBarGradient.opacity(1),
+                            AppColors.tabBarGradient
                         ]),
                         startPoint: .top,
                         endPoint: .bottom
@@ -52,16 +52,16 @@ struct MainTabView: View {
                                         selectedTab = 0
                                     }
                                 }) {
-                                    Image(systemName: "camera.fill")
-                                        .font(.system(size: 24))
-                                        .frame(width: 32, height: 32)
-                                        .foregroundColor(selectedTab == 0 ? .black : .gray)
+                                    Image("polaroid.600.fill.symbols")
+                                        .font(.system(size: 32))
+                                        .frame(width: 40, height: 40)
+                                        .foregroundColor(selectedTab == 0 ? AppColors.accentPrimary : AppColors.accentSecondary)
                                 }
                                 
                                 // Pallino sotto la tab attiva
                                 if selectedTab == 0 {
                                     Circle()
-                                        .fill(Color.black)
+                                        .fill(AppColors.accentPrimary)
                                         .frame(width: 4, height: 4)
                                 } else {
                                     Circle()
@@ -77,16 +77,16 @@ struct MainTabView: View {
                                         selectedTab = 1
                                     }
                                 }) {
-                                    Image(systemName: "film.stack")
-                                        .font(.system(size: 24))
-                                        .frame(width: 32, height: 32)
-                                        .foregroundColor(selectedTab == 1 ? .black : .gray)
+                                    Image("polaroid.film.symbols")
+                                        .font(.system(size: 32))
+                                        .frame(width: 40, height: 40)
+                                        .foregroundColor(selectedTab == 1 ? AppColors.accentPrimary : AppColors.accentSecondary)
                                 }
                                 
                                 // Pallino sotto la tab attiva
                                 if selectedTab == 1 {
                                     Circle()
-                                        .fill(Color.black)
+                                        .fill(AppColors.accentPrimary)
                                         .frame(width: 4, height: 4)
                                 } else {
                                     Circle()
@@ -103,7 +103,7 @@ struct MainTabView: View {
             }
         }
         }
-        .background(Color(red: 244/255, green: 244/255, blue: 244/255))
+        .background(AppColors.backgroundPrimary)
         .navigationViewStyle(StackNavigationViewStyle())
         .onAppear {
             // Assicurati che il FilmPackViewModel sia configurato

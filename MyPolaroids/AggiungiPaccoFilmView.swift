@@ -19,7 +19,7 @@ struct AggiungiPaccoFilmView: View {
                 
                 // NavigationLink rimosso - ora usiamo una modale
             }
-            .background(Color(hex: "f4f4f4"))
+            .background(AppColors.backgroundPrimary)
             .navigationTitle("New Film Pack")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -58,7 +58,7 @@ struct AggiungiPaccoFilmView: View {
             }
             .frame(height: 52)
             .padding(.horizontal, 16)
-            .background(Color.white)
+            .background(AppColors.backgroundSecondary)
             .cornerRadius(26)
             .padding(.horizontal, 16)
             .padding(.top, 16)
@@ -114,7 +114,7 @@ struct AggiungiPaccoFilmView: View {
                     .foregroundColor(.secondary)
             }
             .padding()
-            .background(Color.white)
+            .background(AppColors.backgroundSecondary)
             .cornerRadius(16)
         }
         .buttonStyle(PlainButtonStyle())
@@ -193,12 +193,12 @@ struct PersonalizzazionePaccoView: View {
                             .padding(.horizontal, 16)
                             .padding(.vertical, 32)
                             .frame(maxWidth: .infinity)
-                            .background(Color.white)
+                            .background(AppColors.backgroundSecondary)
                             .cornerRadius(16)
                         }
                         .padding(.horizontal, 0)
                         .padding(.vertical, 0.5)
-                        .background(Color(red: 0.96, green: 0.96, blue: 0.96))
+                        .background(AppColors.backgroundPrimary)
                         .cornerRadius(16)
                         
                         // Film Model Selection
@@ -227,12 +227,12 @@ struct PersonalizzazionePaccoView: View {
                             .padding(.horizontal, 16)
                             .padding(.vertical, 16)
                             .frame(maxWidth: .infinity)
-                            .background(Color.white)
+                            .background(AppColors.backgroundSecondary)
                             .cornerRadius(16)
                         }
                         .padding(.horizontal, 0)
                         .padding(.vertical, 0.5)
-                        .background(Color(red: 0.96, green: 0.96, blue: 0.96))
+                        .background(AppColors.backgroundPrimary)
                         .cornerRadius(16)
                         
                         // Date
@@ -242,12 +242,12 @@ struct PersonalizzazionePaccoView: View {
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 16)
                                 .frame(maxWidth: .infinity)
-                                .background(Color.white)
+                                .background(AppColors.backgroundSecondary)
                                 .cornerRadius(16)
                         }
                         .padding(.horizontal, 0)
                         .padding(.vertical, 0.5)
-                        .background(Color(red: 0.96, green: 0.96, blue: 0.96))
+                        .background(AppColors.backgroundPrimary)
                         .cornerRadius(16)
                         
                         // Expiry Date
@@ -256,7 +256,7 @@ struct PersonalizzazionePaccoView: View {
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 16)
                                 .frame(maxWidth: .infinity)
-                                .background(Color.white)
+                                .background(AppColors.backgroundSecondary)
                                 .cornerRadius(16)
                                 .onChange(of: mostraScadenza) { newValue in
                                     if newValue && dataScadenza == nil {
@@ -273,20 +273,20 @@ struct PersonalizzazionePaccoView: View {
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 16)
                                 .frame(maxWidth: .infinity)
-                                .background(Color.white)
+                                .background(AppColors.backgroundSecondary)
                                 .cornerRadius(16)
                             }
                         }
                         .padding(.horizontal, 0)
                         .padding(.vertical, 0.5)
-                        .background(Color(red: 0.96, green: 0.96, blue: 0.96))
+                        .background(AppColors.backgroundPrimary)
                         .cornerRadius(16)
                         
                         Spacer(minLength: 0)
                     }
                     .padding(.top, 0)
                 }
-                .background(Color(red: 0.96, green: 0.96, blue: 0.96))
+                .background(AppColors.backgroundPrimary)
                 .navigationTitle("Customize Film Pack")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {

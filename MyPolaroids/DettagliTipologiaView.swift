@@ -43,9 +43,13 @@ struct DettagliTipologiaView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(red: 0.96, green: 0.96, blue: 0.96)) // #f4f4f4
+        .background(AppColors.backgroundPrimary)
         .navigationTitle("Film Pack Details")
         .navigationBarTitleDisplayMode(.inline)
+        .onReceive(viewModel.$pacchiFilm) { _ in
+            // Forza l'aggiornamento della UI quando cambiano i pacchi film
+            // Questo assicura che la vista rimanga stabile dopo l'aggiunta di nuovi pacchi
+        }
         .sheet(isPresented: $mostraModifica) {
             if let pacco = paccoDaModificare {
                 ModificaPaccoFilmView(pacco: Binding(
@@ -118,7 +122,7 @@ struct DettagliTipologiaView: View {
         }
         .padding(.vertical, 50)
         .frame(maxWidth: .infinity)
-        .background(Color.white)
+        .background(AppColors.backgroundSecondary)
         .cornerRadius(16)
         .padding(.top, 20)
     }
@@ -136,10 +140,15 @@ struct DettagliTipologiaView: View {
                 
                 Spacer()
                 
-                Text("\(tipologia.conteggioTotale)")
-                    .font(.headline)
-                    .fontWeight(.bold)
-                    .foregroundColor(.black)
+                // Numero di film pack in un rettangolo arrotondato
+                                    Text("\(tipologia.conteggioTotale)")
+                        .font(.headline)
+                        .fontWeight(.bold)
+                        .foregroundColor(AppColors.buttonText)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(AppColors.buttonPrimary)
+                        .cornerRadius(8)
             }
             
             if tipologia.conteggioTotale == 0 {
@@ -158,7 +167,7 @@ struct DettagliTipologiaView: View {
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 20)
-        .background(Color.white)
+        .background(AppColors.backgroundSecondary)
         .cornerRadius(16)
     }
     
@@ -180,7 +189,7 @@ struct DettagliTipologiaView: View {
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
             .frame(maxWidth: .infinity)
-            .background(Color.white)
+            .background(AppColors.backgroundSecondary)
             .cornerRadius(16)
             .scaleEffect(pacco.id == nuovoPackId && animationTrigger ? 1.02 : 1.0)
             .background(
@@ -222,11 +231,11 @@ struct DettagliTipologiaView: View {
                         .font(.headline)
                         .fontWeight(.semibold)
                 }
-                .foregroundColor(.white)
+                .foregroundColor(AppColors.buttonText)
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 16)
-                .background(Color.black)
+                .background(AppColors.buttonPrimary)
                 .cornerRadius(16)
             }
         }
@@ -244,30 +253,9 @@ struct DettagliTipologiaView: View {
     
     private func ordinaPacchi(_ pacchi: [FilmPack]) -> [FilmPack] {
         return pacchi.sorted { first, second in
-            let firstPriority = prioritaPacco(first)
-            let secondPriority = prioritaPacco(second)
-            
-            if firstPriority != secondPriority {
-                return firstPriority < secondPriority
-            }
-            
-            return ordinaPerDataScadenza(first, second)
+            // Ordina per data di aggiunta inversa (più recenti prima)
+            return first.dataAcquisto > second.dataAcquisto
         }
-    }
-    
-    private func ordinaPerDataScadenza(_ first: FilmPack, _ second: FilmPack) -> Bool {
-        if let firstDate = first.dataScadenza, let secondDate = second.dataScadenza {
-            return firstDate < secondDate
-        }
-        
-        return first.id.uuidString < second.id.uuidString
-    }
-    
-    private func prioritaPacco(_ pacco: FilmPack) -> Int {
-        if pacco.scattiRimanenti == 0 { return 4 } // Completati
-        if pacco.isScaduto { return 3 } // Scaduti
-        if pacco.isInScadenza { return 2 } // In scadenza
-        return 1 // Disponibili
     }
     
     // MARK: - Add Pack Function
@@ -289,6 +277,8 @@ struct DettagliTipologiaView: View {
         // Aggiungi il nuovo pack in cima alla lista con animazione
         print("🎭 [DettagliTipologiaView] Avvio animazione spring...")
         nuovoPackId = nuovoPacco.id
+        
+        // Aggiungi il pacco e aggiorna la UI
         withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
             viewModel.aggiungiPaccoFilmInCima(nuovoPacco)
             animationTrigger.toggle()

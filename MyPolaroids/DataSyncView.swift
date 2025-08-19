@@ -61,6 +61,37 @@ struct DataSyncView: View {
                     }
                     .padding(.vertical, 4)
                 }
+                
+                Section("Custom Icon Test") {
+                    HStack {
+                        Text("Polaroid 600 Custom Icon:")
+                            .font(.body)
+                        
+                        Spacer()
+                        
+                        Image("polaroid600.fill")
+                            .font(.system(size: 24))
+                            .foregroundColor(.blue)
+                            .frame(width: 32, height: 32)
+                    }
+                    
+                    HStack {
+                        Text("Standard SF Symbol:")
+                            .font(.body)
+                        
+                        Spacer()
+                        
+                        Image(systemName: "camera.fill")
+                            .font(.system(size: 24))
+                            .foregroundColor(.green)
+                            .frame(width: 32, height: 32)
+                    }
+                    
+                    Text("Test your custom icon vs standard SF Symbol")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .padding(.top, 4)
+                }
             }
             .navigationTitle("Debug")
             .navigationBarTitleDisplayMode(.inline)

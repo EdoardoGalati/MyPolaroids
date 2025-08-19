@@ -33,79 +33,85 @@ struct ImpostazioniView: View {
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 16)
-                        .background(Color.white)
+                        .background(AppColors.backgroundSecondary)
                         .cornerRadius(16)
                         
                         // Sezione Ordinamento Fotocamere
-                        VStack(alignment: .leading, spacing: 12) {
+                        HStack {
                             Text("Camera Sorting")
                                 .font(.headline)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.primary)
                             
-                            ForEach(SortingOption.allCases, id: \.self) { option in
-                                HStack {
-                                    Image(systemName: option.icon)
-                                        .foregroundColor(.blue)
-                                        .frame(width: 20)
-                                    
-                                    Text(option.displayName)
-                                        .font(.body)
-                                        .foregroundColor(.primary)
-                                    
-                                    Spacer()
-                                    
-                                    if cameraSortingOption == option.rawValue {
-                                        Image(systemName: "checkmark.circle.fill")
-                                            .foregroundColor(.blue)
+                            Spacer()
+                            
+                            Menu {
+                                ForEach(SortingOption.allCases, id: \.self) { option in
+                                    Button(action: {
+                                        cameraSortingOption = option.rawValue
+                                    }) {
+                                        HStack {
+                                            Image(systemName: option.icon)
+                                            Text(option.displayName)
+                                            if cameraSortingOption == option.rawValue {
+                                                Image(systemName: "checkmark")
+                                            }
+                                        }
                                     }
                                 }
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    cameraSortingOption = option.rawValue
+                            } label: {
+                                HStack {
+                                    Text(SortingOption(rawValue: cameraSortingOption)?.displayName ?? "Select")
+                                        .foregroundColor(AppColors.textPrimary)
+                                    Image(systemName: "chevron.down")
+                                        .foregroundColor(AppColors.textPrimary)
+                                        .font(.caption)
                                 }
-                                .padding(.vertical, 8)
                             }
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 16)
-                        .background(Color.white)
+                        .background(AppColors.backgroundSecondary)
                         .cornerRadius(16)
                         
                         // Sezione Ordinamento Film Pack
-                        VStack(alignment: .leading, spacing: 12) {
+                        HStack {
                             Text("Film Pack Sorting")
                                 .font(.headline)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.primary)
                             
-                            ForEach(SortingOption.allCases, id: \.self) { option in
-                                HStack {
-                                    Image(systemName: option.icon)
-                                        .foregroundColor(.orange)
-                                        .frame(width: 20)
-                                    
-                                    Text(option.displayName)
-                                        .font(.body)
-                                        .foregroundColor(.primary)
-                                    
-                                    Spacer()
-                                    
-                                    if filmPackSortingOption == option.rawValue {
-                                        Image(systemName: "checkmark.circle.fill")
-                                            .foregroundColor(.orange)
+                            Spacer()
+                            
+                            Menu {
+                                ForEach(SortingOption.allCases.filter { option in
+                                    option != .loadedFirst && option != .unloadedFirst
+                                }, id: \.self) { option in
+                                    Button(action: {
+                                        filmPackSortingOption = option.rawValue
+                                    }) {
+                                        HStack {
+                                            Image(systemName: option.icon)
+                                            Text(option.displayName)
+                                            if filmPackSortingOption == option.rawValue {
+                                                Image(systemName: "checkmark")
+                                            }
+                                        }
                                     }
                                 }
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    filmPackSortingOption = option.rawValue
+                            } label: {
+                                HStack {
+                                    Text(SortingOption(rawValue: filmPackSortingOption)?.displayName ?? "Select")
+                                        .foregroundColor(AppColors.textPrimary)
+                                    Image(systemName: "chevron.down")
+                                        .foregroundColor(AppColors.textPrimary)
+                                        .font(.caption)
                                 }
-                                .padding(.vertical, 8)
                             }
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 16)
-                        .background(Color.white)
+                        .background(AppColors.backgroundSecondary)
                         .cornerRadius(16)
                         
                         // Sezione Debug
@@ -134,7 +140,7 @@ struct ImpostazioniView: View {
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 16)
-                        .background(Color.white)
+                        .background(AppColors.backgroundSecondary)
                         .cornerRadius(16)
                         
                         // Sezione Versione
@@ -154,13 +160,13 @@ struct ImpostazioniView: View {
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 16)
-                        .background(Color.white)
+                        .background(AppColors.backgroundSecondary)
                         .cornerRadius(16)
                     }
                     .padding(.vertical, 16)
                 }
             }
-            .background(Color(hex: "f4f4f4"))
+            .background(AppColors.backgroundPrimary)
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

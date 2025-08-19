@@ -46,6 +46,10 @@ struct FilmPackModel: Codable, Identifiable {
     let name: String
     let description: String
     let category: String
+    let film_type: String?
+    let available: Bool?
+    let year_introduced: Int?
+    let is_limited_edition: Bool?
     let gradient: FilmPackGradient?
 }
 

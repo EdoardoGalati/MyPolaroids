@@ -22,19 +22,23 @@ class CameraViewModel: ObservableObject {
         
         switch sortingOption {
         case SortingOption.alphabeticalAZ.rawValue:
-            return fotocamere.sorted { $0.nickname.lowercased() < $1.nickname.lowercased() }
+            return fotocamere.sorted { first, second in
+                return compareStringsNatural(first.nickname, second.nickname)
+            }
         case SortingOption.alphabeticalZA.rawValue:
-            return fotocamere.sorted { $0.nickname.lowercased() > $1.nickname.lowercased() }
+            return fotocamere.sorted { first, second in
+                return !compareStringsNatural(first.nickname, second.nickname) // Inverti per Z-A
+            }
         case SortingOption.dateAdded.rawValue:
-            return fotocamere // Ordine originale di aggiunta
+            return fotocamere.sorted { $0.dataAggiunta < $1.dataAggiunta } // Ordine per data di aggiunta (più vecchia prima)
         case SortingOption.dateAddedReverse.rawValue:
-            return fotocamere.reversed() // Ordine inverso di aggiunta
+            return fotocamere.sorted { $0.dataAggiunta > $1.dataAggiunta } // Ordine per data di aggiunta (più recente prima)
         case SortingOption.loadedFirst.rawValue:
             return fotocamere.sorted { first, second in
                 let firstLoaded = filmPackViewModel?.filmCaricato(in: first) != nil
                 let secondLoaded = filmPackViewModel?.filmCaricato(in: second) != nil
                 if firstLoaded == secondLoaded {
-                    return first.nickname.lowercased() < second.nickname.lowercased()
+                    return compareStringsNatural(first.nickname, second.nickname) // A-Z per default
                 }
                 return firstLoaded && !secondLoaded
             }
@@ -43,7 +47,7 @@ class CameraViewModel: ObservableObject {
                 let firstLoaded = filmPackViewModel?.filmCaricato(in: first) != nil
                 let secondLoaded = filmPackViewModel?.filmCaricato(in: second) != nil
                 if firstLoaded == secondLoaded {
-                    return first.nickname.lowercased() < second.nickname.lowercased()
+                    return compareStringsNatural(first.nickname, second.nickname) // A-Z per default
                 }
                 return !firstLoaded && secondLoaded
             }
@@ -52,21 +56,75 @@ class CameraViewModel: ObservableObject {
         }
     }
     
+    // Funzione helper per confronto naturale delle stringhe (numeri alla fine)
+    private func compareStringsNatural(_ first: String, _ second: String) -> Bool {
+        let firstLower = first.lowercased()
+        let secondLower = second.lowercased()
+        
+        // Se entrambe le stringhe sono uguali, sono uguali
+        if firstLower == secondLower {
+            return false // Non importa l'ordine se sono uguali
+        }
+        
+        // Se entrambe le stringhe iniziano con numeri, ordina numericamente
+        if firstLower.first?.isNumber == true && secondLower.first?.isNumber == true {
+            // Estrai i numeri iniziali
+            let firstNumber = extractLeadingNumber(from: firstLower)
+            let secondNumber = extractLeadingNumber(from: secondLower)
+            
+            if firstNumber != secondNumber {
+                return firstNumber < secondNumber
+            }
+            
+            // Se i numeri sono uguali, confronta le parti rimanenti
+            let firstRemaining = String(firstLower.dropFirst(String(firstNumber).count))
+            let secondRemaining = String(secondLower.dropFirst(String(secondNumber).count))
+            return firstRemaining < secondRemaining
+        }
+        
+        // Se solo la prima inizia con numero, metti la seconda prima (numeri alla fine)
+        if firstLower.first?.isNumber == true && secondLower.first?.isNumber == false {
+            return false // La prima (con numero) va dopo
+        }
+        
+        // Se solo la seconda inizia con numero, metti la prima prima (numeri alla fine)
+        if firstLower.first?.isNumber == false && secondLower.first?.isNumber == true {
+            return true // La prima (senza numero) va prima
+        }
+        
+        // Altrimenti, ordinamento alfabetico standard
+        return firstLower < secondLower
+    }
+    
+    // Funzione helper per estrarre il numero iniziale da una stringa
+    private func extractLeadingNumber(from string: String) -> Int {
+        let numbers = string.prefix { $0.isNumber }
+        return Int(numbers) ?? 0
+    }
+    
     // Aggiunge una nuova fotocamera
     func aggiungiFotocamera(_ fotocamera: Camera) {
-        fotocamere.append(fotocamera)
+        var fotocameraAggiornata = fotocamera
+        // Assicurati che la data di aggiunta sia impostata
+        if fotocameraAggiornata.dataAggiunta == Date.distantPast {
+            fotocameraAggiornata.dataAggiunta = Date()
+        }
+        fotocamere.append(fotocameraAggiornata)
         salvaFotocamere()
         filmPackViewModel?.setFotocamere(fotocamere)
     }
     
     // Crea una nuova fotocamera con i modelli disponibili
     func creaFotocamera(nickname: String, modello: String, coloreIcona: String? = nil) -> Camera {
-        return Camera(
+        var fotocamera = Camera(
             nickname: nickname,
             modello: modello,
             coloreIcona: coloreIcona,
             modelliDisponibili: modelliDisponibili
         )
+        // Assicurati che la data di aggiunta sia impostata correttamente
+        fotocamera.dataAggiunta = Date()
+        return fotocamera
     }
     
     // Rimuove una fotocamera
@@ -111,7 +169,10 @@ class CameraViewModel: ObservableObject {
             // Creo un nuovo array per forzare l'aggiornamento dell'UI
             print("🔧 [CameraViewModel] Creazione nuovo array...")
             var nuovoArray = fotocamere
-            nuovoArray[index] = fotocamera
+            var fotocameraAggiornata = fotocamera
+            // Mantieni la data di aggiunta esistente
+            fotocameraAggiornata.dataAggiunta = fotocamere[index].dataAggiunta
+            nuovoArray[index] = fotocameraAggiornata
             print("🔧 [CameraViewModel] Nuovo array creato, aggiornamento fotocamere...")
             fotocamere = nuovoArray
             print("🔧 [CameraViewModel] Array fotocamere aggiornato!")
@@ -221,7 +282,15 @@ class CameraViewModel: ObservableObject {
     private func caricaFotocamere() {
         if let data = UserDefaults.standard.data(forKey: "fotocamere"),
            let decoded = try? JSONDecoder().decode([Camera].self, from: data) {
-            fotocamere = decoded
+            // Per compatibilità con i dati esistenti, assegna una data di aggiunta se mancante
+            fotocamere = decoded.map { fotocamera in
+                var fotocameraAggiornata = fotocamera
+                // Se la fotocamera non ha una data di aggiunta (dati esistenti), usa la data corrente
+                if fotocameraAggiornata.dataAggiunta == Date.distantPast {
+                    fotocameraAggiornata.dataAggiunta = Date()
+                }
+                return fotocameraAggiornata
+            }
         }
     }
     
@@ -239,7 +308,22 @@ class CameraViewModel: ObservableObject {
         // Ricarica le fotocamere per aggiornare i riferimenti ai pacchi film
         if let data = UserDefaults.standard.data(forKey: "fotocamere"),
            let decoded = try? JSONDecoder().decode([Camera].self, from: data) {
-            fotocamere = decoded
+            // Mantieni le date di aggiunta esistenti per le fotocamere che esistono già
+            fotocamere = decoded.map { fotocameraCaricata in
+                if let existingIndex = fotocamere.firstIndex(where: { $0.id == fotocameraCaricata.id }) {
+                    // Mantieni la data di aggiunta esistente
+                    var fotocameraAggiornata = fotocameraCaricata
+                    fotocameraAggiornata.dataAggiunta = fotocamere[existingIndex].dataAggiunta
+                    return fotocameraAggiornata
+                } else {
+                    // Nuova fotocamera, usa la data di aggiunta dal JSON o la data corrente se mancante
+                    var fotocameraAggiornata = fotocameraCaricata
+                    if fotocameraAggiornata.dataAggiunta == Date.distantPast {
+                        fotocameraAggiornata.dataAggiunta = Date()
+                    }
+                    return fotocameraAggiornata
+                }
+            }
         }
     }
 }

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   uuid = "44E3F932-6256-4EC4-B35B-59B6205F80AC"
+   type = "1"
+   version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "32778FBB-E796-4C79-A5D4-940B4D42AFC0"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "MyPolaroids/FilmPackViewModel.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "614"
+            endingLineNumber = "614"
+            landmarkName = "tipologieRaggruppate"
+            landmarkType = "24">
+            <Locations>
+               <Location
+                  uuid = "32778FBB-E796-4C79-A5D4-940B4D42AFC0 - da4f931a067b5e30"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "MyPolaroids.FilmPackViewModel.tipologieRaggruppate.getter : Swift.Array&lt;MyPolaroids.TipologiaPaccoFilm&gt;"
+                  moduleName = "MyPolaroids.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/FilmPackViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "614"
+                  endingLineNumber = "614">
+               </Location>
+               <Location
+                  uuid = "32778FBB-E796-4C79-A5D4-940B4D42AFC0 - 60f7450430f3cbb3"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (MyPolaroids.TipologiaPaccoFilm, MyPolaroids.TipologiaPaccoFilm) -&gt; Swift.Bool in MyPolaroids.FilmPackViewModel.tipologieRaggruppate.getter : Swift.Array&lt;MyPolaroids.TipologiaPaccoFilm&gt;"
+                  moduleName = "MyPolaroids.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/FilmPackViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "614"
+                  endingLineNumber = "614">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
+</Bucket>

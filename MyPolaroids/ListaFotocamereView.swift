@@ -17,26 +17,26 @@ struct ListaFotocamereView: View {
             HStack {
                 Text("My Cameras")
                     .font(.system(size: 24, weight: .medium))
-                    .foregroundColor(.black)
+                    .foregroundColor(AppColors.textPrimary)
                 
                 Spacer()
                 
                 Button(action: { mostraImpostazioni = true }) {
                     Image(systemName: "gearshape")
                         .font(.title2)
-                        .foregroundColor(.black)
+                        .foregroundColor(AppColors.textPrimary)
                 }
                 
                 Button(action: { mostraAggiungiFotocamera = true }) {
                     Image(systemName: "plus")
                         .font(.title2)
-                        .foregroundColor(.black)
+                        .foregroundColor(AppColors.textPrimary)
                 }
             }
             .padding(.horizontal, 20)
             .padding(.top, 20)
             .padding(.bottom, 24)
-            .background(Color(red: 244/255, green: 244/255, blue: 244/255))
+                            .background(AppColors.backgroundPrimary)
             
             // Lista fotocamere
             ScrollView {
@@ -44,7 +44,7 @@ struct ListaFotocamereView: View {
                 LazyVStack(spacing: 1) {
                     if viewModel.fotocamere.isEmpty {
                         VStack(spacing: 16) {
-                            Image(systemName: "camera.fill")
+                            Image("polaroid.600.fill.symbols")
                                 .font(.system(size: 60))
                                 .foregroundColor(.gray)
                             
@@ -52,7 +52,7 @@ struct ListaFotocamereView: View {
                                 .font(.title2)
                                 .fontWeight(.medium)
                             
-                            Text("Add your first Polaroid camera to start your collection!")
+                            Text("Add your first camera to start.")
                                 .font(.body)
                                 .foregroundColor(.secondary)
                                 .multilineTextAlignment(.center)
@@ -63,10 +63,10 @@ struct ListaFotocamereView: View {
                                     Text("Add First Camera")
                                 }
                                 .font(.headline)
-                                .foregroundColor(.white)
+                                .foregroundColor(AppColors.buttonText)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 16)
-                                .background(Color.black)
+                                .background(AppColors.buttonPrimary)
                                 .cornerRadius(16)
                             }
                             .padding(.horizontal, 20)
@@ -147,10 +147,10 @@ struct ListaFotocamereView: View {
                 // LATO SINISTRO: Icona e informazioni fotocamera
                 HStack(spacing: 8) {
                     // Icona SF Symbol senza sfondo
-                    Image(systemName: fotocamera.icona)
-                        .font(.system(size: 16))
+                    Image(fotocamera.icona)
+                        .font(.system(size: 24))
                         .foregroundColor(Camera.coloreDaNome(fotocamera.coloreIcona))
-                        .frame(width: 24, height: 24)
+                        .frame(width: 32, height: 32)
                     
                     // Nome e modello
                     VStack(alignment: .leading, spacing: 2) {
@@ -196,7 +196,7 @@ struct ListaFotocamereView: View {
                                 Text("\(scattiRimanenti)")
                                     .font(.system(size:14))
                                     .fontWeight(.medium)
-                                    .foregroundColor(.black)
+                                    .foregroundColor(AppColors.textPrimary)
                                 
                                 // Indicatore colori del pacco
                                 FilmPackColorIndicator(tipo: pacco.tipo, modello: pacco.modello, modelliDisponibili: filmPackViewModel.modelliFilm, size:24)
@@ -214,7 +214,7 @@ struct ListaFotocamereView: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical,28)
-            .background(Color.white)
+            .background(AppColors.backgroundSecondary)
             .cornerRadius(16)
             .padding(.vertical, 0.5)
         }

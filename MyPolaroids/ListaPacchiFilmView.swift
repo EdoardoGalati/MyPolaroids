@@ -16,21 +16,38 @@ struct ListaPacchiFilmView: View {
             List {
                 if viewModel.pacchiFilm.isEmpty {
                     VStack(spacing: 16) {
-                        Image(systemName: "film")
+                        Image("polaroid.film.symbols")
                             .font(.system(size: 60))
                             .foregroundColor(.gray)
                         
-                        Text("Nessun pacco film")
+                        Text("No film packs")
                             .font(.title2)
                             .fontWeight(.medium)
                         
-                        Text("Aggiungi il tuo primo pacco film per iniziare l'inventario!")
+                        Text("Add your first film pack to start.")
                             .font(.body)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
+                        
+                        Button(action: { mostraAggiungiPacco = true }) {
+                            HStack {
+                                Image(systemName: "plus.circle.fill")
+                                Text("Add First Film Pack")
+                            }
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(Color.black)
+                            .cornerRadius(16)
+                        }
+                        .padding(.horizontal, 20)
                     }
                     .frame(maxWidth: .infinity)
+                    .frame(maxHeight: .infinity)
+                    .padding(.top, 50)
                     .padding(.vertical, 40)
+                    .padding(.horizontal, 20)
                     .padding(.bottom, 80)
                 } else {
                     // Pacchi in scadenza
@@ -184,7 +201,7 @@ struct PaccoFilmRowView: View {
                 Text("\(pacco.tipo) • \(pacco.modello)")
                     .font(.headline)
                     .fontWeight(.semibold)
-                    .foregroundColor(.black)
+                    .foregroundColor(AppColors.textPrimary)
                 
                 if let giorni = pacco.giorniAllaScadenza {
                     if pacco.isScaduto {
@@ -218,7 +235,7 @@ struct PaccoFilmRowView: View {
                 Text("In use (\(pacco.scattiRimanenti)/8)")
                     .font(.subheadline)
                     .fontWeight(.bold)
-                    .foregroundColor(.white)
+                    .foregroundColor(AppColors.buttonText)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
                     .background(
@@ -230,7 +247,7 @@ struct PaccoFilmRowView: View {
                 Text("\(pacco.scattiRimanenti)")
                     .font(.headline)
                     .fontWeight(.bold)
-                    .foregroundColor(.black)
+                    .foregroundColor(AppColors.textPrimary)
             }
             
             // Chevron per indicare che è modificabile

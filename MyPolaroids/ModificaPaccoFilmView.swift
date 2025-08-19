@@ -72,7 +72,7 @@ struct ModificaPaccoFilmView: View {
                             Text("Associato a:")
                             Spacer()
                             Text(fotocamera.nickname)
-                                .foregroundColor(.green)
+                                .foregroundColor(AppColors.textPrimary)
                         }
                         
                         Button("Disassocia") {

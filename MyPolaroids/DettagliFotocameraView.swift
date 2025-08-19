@@ -29,7 +29,7 @@ struct DettagliFotocameraView: View {
                 unloadedContentSection
             }
         }
-        .background(Color(hex: "f4f4f4"))
+        .background(AppColors.backgroundPrimary)
         .navigationTitle("Camera Details")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -163,15 +163,15 @@ struct DettagliFotocameraView: View {
             Spacer(minLength: 0)
             VStack(spacing: 12) {
                 // Icona fotocamera
-                Image(systemName: fotocamera.icona)
-                    .font(.system(size: 80))
+                Image(fotocamera.icona)
+                    .font(.system(size: 96))
                     .foregroundColor(Camera.coloreDaNome(fotocamera.coloreIcona))
                 // Nome e nickname
                 if fotocamera.nickname.isEmpty || fotocamera.nickname == fotocamera.modello {
                     Text(fotocamera.modello)
                         .font(.title2)
                         .fontWeight(.bold)
-                        .foregroundColor(.black)
+                        .foregroundColor(AppColors.textPrimary)
                 } else {
                     VStack(spacing: 4) {
                         Text(fotocamera.nickname)
@@ -189,7 +189,7 @@ struct DettagliFotocameraView: View {
             Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity)
-        .background(Color.white)
+        .background(AppColors.backgroundSecondary)
         .cornerRadius(16)
     }
     
@@ -212,7 +212,7 @@ struct DettagliFotocameraView: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 16)
-            .background(Color.white)
+            .background(AppColors.backgroundSecondary)
             .cornerRadius(16)
             
             // Anno
@@ -231,7 +231,7 @@ struct DettagliFotocameraView: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 16)
-            .background(Color.white)
+            .background(AppColors.backgroundSecondary)
             .cornerRadius(16)
             
             // Compatibilità
@@ -250,7 +250,7 @@ struct DettagliFotocameraView: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 16)
-            .background(Color.white)
+            .background(AppColors.backgroundSecondary)
             .cornerRadius(16)
             
             // Tipo film e pulsante discard
@@ -290,7 +290,7 @@ struct DettagliFotocameraView: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 16)
-            .background(Color.white)
+            .background(AppColors.backgroundSecondary)
             .cornerRadius(16)
             
             // Foto rimaste
@@ -306,18 +306,18 @@ struct DettagliFotocameraView: View {
                 Text("\(pacco.scattiRimanenti)")
                     .font(.system(size: 16))
                     .fontWeight(.medium)
-                    .foregroundColor(.black)
+                    .foregroundColor(AppColors.textPrimary)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
                     .background(Color.clear)
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                            .stroke(AppColors.separator, lineWidth: 1)
                     )
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 16)
-            .background(Color.white)
+            .background(AppColors.backgroundSecondary)
             .cornerRadius(16)
             
             // Pulsante I Took a Photo
@@ -329,11 +329,11 @@ struct DettagliFotocameraView: View {
                         .font(.headline)
                         .fontWeight(.semibold)
                 }
-                .foregroundColor(.white)
+                .foregroundColor(AppColors.buttonText)
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 16)
-                .background(Color.black)
+                .background(AppColors.buttonPrimary)
                 .cornerRadius(16)
             }
             .padding(.horizontal, 16)
@@ -360,7 +360,7 @@ struct DettagliFotocameraView: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 16)
-            .background(Color.white)
+            .background(AppColors.backgroundSecondary)
             .cornerRadius(16)
             
             // Anno
@@ -379,7 +379,7 @@ struct DettagliFotocameraView: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 16)
-            .background(Color.white)
+            .background(AppColors.backgroundSecondary)
             .cornerRadius(16)
             
             // Compatibilità
@@ -398,7 +398,7 @@ struct DettagliFotocameraView: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 16)
-            .background(Color.white)
+            .background(AppColors.backgroundSecondary)
             .cornerRadius(16)
             
             // Tipo film e pulsante load
@@ -421,16 +421,16 @@ struct DettagliFotocameraView: View {
                     Text("Load")
                         .font(.system(size: 14))
                         .fontWeight(.medium)
-                        .foregroundColor(.white)
+                        .foregroundColor(AppColors.buttonText)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 6)
-                        .background(Color.black)
+                        .background(AppColors.buttonPrimary)
                         .cornerRadius(8)
                 }
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 16)
-            .background(Color.white)
+            .background(AppColors.backgroundSecondary)
             .cornerRadius(16)
             
             // Pulsante I Took a Photo (disabilitato)

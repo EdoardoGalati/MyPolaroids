@@ -44,7 +44,7 @@ struct ModificaFotocameraView: View {
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 16)
-                        .background(Color.white)
+                        .background(AppColors.backgroundSecondary)
                         .cornerRadius(16)
                         
                         // Sezione Modello
@@ -69,7 +69,7 @@ struct ModificaFotocameraView: View {
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 16)
-                        .background(Color.white)
+                        .background(AppColors.backgroundSecondary)
                         .cornerRadius(16)
                         
                         // Sezione Colore Icona
@@ -106,13 +106,13 @@ struct ModificaFotocameraView: View {
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 16)
-                        .background(Color.white)
+                        .background(AppColors.backgroundSecondary)
                         .cornerRadius(16)
                     }
                     .padding(.vertical, 16)
                 }
             }
-            .background(Color(hex: "f4f4f4"))
+            .background(AppColors.backgroundPrimary)
             .navigationTitle("Edit Camera")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -154,14 +154,14 @@ struct ModificaFotocameraView: View {
                 Text(modelloSelezionato)
                     .font(.title2)
                     .fontWeight(.bold)
-                    .foregroundColor(.black)
+                    .foregroundColor(AppColors.textPrimary)
             }
             .frame(maxWidth: .infinity)
             Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 50)
-        .background(Color.white)
+        .background(AppColors.backgroundSecondary)
         .cornerRadius(16)
     }
     
@@ -234,7 +234,7 @@ struct SelezioneModelloView: View {
                     .padding(.vertical, 16)
                 }
             }
-            .background(Color(hex: "f4f4f4"))
+            .background(AppColors.backgroundPrimary)
             .navigationTitle("Select Camera Model")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -258,7 +258,7 @@ struct SelezioneModelloView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .background(Color.white)
+        .background(AppColors.backgroundSecondary)
         .cornerRadius(26)
         .padding(.horizontal, 20)
         .padding(.top, 20)
@@ -268,14 +268,14 @@ struct SelezioneModelloView: View {
     // MARK: - Bottone Modello
     private func bottoneModello(modello: CameraModel) -> some View {
         HStack {
-            Image(systemName: modello.default_icon)
+            Image(modello.default_icon)
                 .font(.title2)
-                .foregroundColor(.black)
+                .foregroundColor(AppColors.textPrimary)
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(modello.name)
                     .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(.black)
+                    .foregroundColor(AppColors.textPrimary)
                 
                 Text("\(modello.brand) • \(String(modello.year_introduced))")
                     .font(.caption)
@@ -287,7 +287,7 @@ struct SelezioneModelloView: View {
             if modelloSelezionato == modello.name {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.title2)
-                    .foregroundColor(.black)
+                    .foregroundColor(AppColors.textPrimary)
             } else {
                 Image(systemName: "chevron.right")
                     .font(.caption)
@@ -296,7 +296,7 @@ struct SelezioneModelloView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 16)
-        .background(Color.white)
+        .background(AppColors.backgroundSecondary)
         .cornerRadius(16)
     }
     
