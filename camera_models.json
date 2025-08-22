@@ -25,6 +25,30 @@
       "film_type": "SX-70"
     },
     {
+      "id": "polaroid_sx70_alpha1_executive",
+      "name": "SX-70 Alpha 1 Executive",
+      "brand": "Polaroid",
+      "model": "SX-70",
+      "specific_model": "Alpha 1 Executive",
+      "capacity": 8,
+      "default_image": "polaroid.sx70.fill.symbols",
+      "default_icon": "polaroid.sx70.fill.symbols",
+      "year_introduced": 1977,
+      "film_type": "SX-70"
+    },
+    {
+      "id": "polaroid_sx70_alpha1_gold",
+      "name": "Alpha 1 24 Kt Gold Mildred Scheel",
+      "brand": "Polaroid",
+      "model": "SX-70",
+      "specific_model": "Alpha 1 24 Kt Gold Mildred Scheel",
+      "capacity": 8,
+      "default_image": "polaroid.sx70.fill.symbols",
+      "default_icon": "polaroid.sx70.fill.symbols",
+      "year_introduced": 1977,
+      "film_type": "SX-70"
+    },
+    {
       "id": "polaroid_sx70_alpha1_model2",
       "name": "SX-70 Alpha 1 Model 2",
       "brand": "Polaroid",
@@ -33,7 +57,19 @@
       "capacity": 8,
       "default_image": "polaroid.sx70.fill.symbols",
       "default_icon": "polaroid.sx70.fill.symbols",
-      "year_introduced": 1978,
+      "year_introduced": 1977,
+      "film_type": "SX-70"
+    },
+    {
+      "id": "polaroid_sx70_executive",
+      "name": "SX-70 Executive",
+      "brand": "Polaroid",
+      "model": "SX-70",
+      "specific_model": "Executive",
+      "capacity": 8,
+      "default_image": "polaroid.sx70.fill.symbols",
+      "default_icon": "polaroid.sx70.fill.symbols",
+      "year_introduced": 1977,
       "film_type": "SX-70"
     },
     {
@@ -61,6 +97,18 @@
       "film_type": "SX-70"
     },
     {
+      "id": "polaroid_sx70_sonar_onestep_gold",
+      "name": "SX-70 Sonar OneStep Gold",
+      "brand": "Polaroid",
+      "model": "SX-70",
+      "specific_model": "Sonar OneStep Gold",
+      "capacity": 8,
+      "default_image": "polaroid.sx70.fill.symbols",
+      "default_icon": "polaroid.sx70.fill.symbols",
+      "year_introduced": 1978,
+      "film_type": "SX-70"
+    },
+    {
       "id": "polaroid_sx70_model2",
       "name": "SX-70 Model 2",
       "brand": "Polaroid",
@@ -69,7 +117,7 @@
       "capacity": 8,
       "default_image": "polaroid.sx70.fill.symbols",
       "default_icon": "polaroid.sx70.fill.symbols",
-      "year_introduced": 1975,
+      "year_introduced": 1974,
       "film_type": "SX-70"
     },
     {
@@ -81,7 +129,31 @@
       "capacity": 8,
       "default_image": "polaroid.sx70.fill.symbols",
       "default_icon": "polaroid.sx70.fill.symbols",
-      "year_introduced": 1977,
+      "year_introduced": 1975,
+      "film_type": "SX-70"
+    },
+    {
+      "id": "polaroid_timezero_sx70_autofocus",
+      "name": "TimeZero SX-70 Autofocus",
+      "brand": "Polaroid",
+      "model": "SX-70",
+      "specific_model": "Timezero",
+      "capacity": 8,
+      "default_image": "polaroid.sx70.fill.symbols",
+      "default_icon": "polaroid.sx70.fill.symbols",
+      "year_introduced": 1981,
+      "film_type": "SX-70"
+    },
+    {
+      "id": "polaroid_timezero_sx70_autofocus_model2",
+      "name": "TimeZero SX-70 Autofocus Model 2",
+      "brand": "Polaroid",
+      "model": "SX-70",
+      "specific_model": "TimeZero Model 2",
+      "capacity": 8,
+      "default_image": "polaroid.sx70.fill.symbols",
+      "default_icon": "polaroid.sx70.fill.symbols",
+      "year_introduced": 1981,
       "film_type": "SX-70"
     },
     {
@@ -118,6 +190,54 @@
       "default_image": "polaroid.600.fill.symbols",
       "default_icon": "polaroid.600.fill.symbols",
       "year_introduced": 1984,
+      "film_type": "600"
+    },
+    {
+      "id": "polaroid_640_lightmixer",
+      "name": "640 Lightmixer",
+      "brand": "Polaroid",
+      "model": "600",
+      "specific_model": "Lightmixer",
+      "capacity": 8,
+      "default_image": "polaroid.600.fill.symbols",
+      "default_icon": "polaroid.600.fill.symbols",
+      "year_introduced": 1981,
+      "film_type": "600"
+    },
+    {
+      "id": "polaroid_635_cl",
+      "name": "635CL",
+      "brand": "Polaroid",
+      "model": "600",
+      "specific_model": "CL",
+      "capacity": 8,
+      "default_image": "polaroid.600.fill.symbols",
+      "default_icon": "polaroid.600.fill.symbols",
+      "year_introduced": 1981,
+      "film_type": "600"
+    },
+    {
+      "id": "polaroid_635",
+      "name": "635",
+      "brand": "Polaroid",
+      "model": "600",
+      "specific_model": "635",
+      "capacity": 8,
+      "default_image": "polaroid.600.fill.symbols",
+      "default_icon": "polaroid.600.fill.symbols",
+      "year_introduced": 1981,
+      "film_type": "600"
+    },
+    {
+      "id": "polaroid_630_lightmixer",
+      "name": "630 Lightmixer",
+      "brand": "Polaroid",
+      "model": "600",
+      "specific_model": "Lightmixer",
+      "capacity": 8,
+      "default_image": "polaroid.600.fill.symbols",
+      "default_icon": "polaroid.600.fill.symbols",
+      "year_introduced": 1981,
       "film_type": "600"
     },
     {
