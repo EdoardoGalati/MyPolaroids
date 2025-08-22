@@ -40,7 +40,6 @@ struct ListaFotocamereView: View {
             
             // Lista fotocamere
             ScrollView {
-                
                 LazyVStack(spacing: 1) {
                     if viewModel.fotocamere.isEmpty {
                         VStack(spacing: 16) {

@@ -7,12 +7,24 @@ class FilmPackViewModel: ObservableObject {
     @Published var tipiFilm: [FilmPackType] = []
     @Published var modelliFilm: [FilmPackModel] = []
     
+    // CloudKit Manager per sincronizzazione iCloud
+    private let cloudKitManager = CloudKitManager()
+    
     var onPacchiFilmChanged: (() -> Void)?
     
     init() {
         caricaModelli()
         caricaPacchiFilm()
         inizializzaOrdineTipologieStabile()
+        
+        // Imposta i callback per la sincronizzazione CloudKit
+        cloudKitManager.onFilmPacksSynced = { [weak self] syncedFilmPacks in
+            DispatchQueue.main.async {
+                print("📦 [FilmPackViewModel] 🔄 Ricevuti \(syncedFilmPacks.count) pacchi film sincronizzati da iCloud")
+                self?.pacchiFilm = syncedFilmPacks
+                print("📦 [FilmPackViewModel] ✅ Lista pacchi film aggiornata con dati da iCloud")
+            }
+        }
     }
     
     // Aggiunge un nuovo pacco film
@@ -234,22 +246,58 @@ class FilmPackViewModel: ObservableObject {
         return finiti
     }
     
-    // Salva i pacchi film in UserDefaults
+    // Salva i pacchi film in UserDefaults e iCloud
     private func salvaPacchiFilm() {
         if let encoded = try? JSONEncoder().encode(pacchiFilm) {
             UserDefaults.standard.set(encoded, forKey: "pacchiFilm")
         }
         // Notifica che i pacchi film sono cambiati
         onPacchiFilmChanged?()
+        
+        // Sincronizza con iCloud in background
+        Task {
+            await sincronizzaPacchiFilmConICloud()
+        }
     }
     
-    // Carica i pacchi film da UserDefaults
+    // Sincronizza i pacchi film con iCloud
+    @MainActor
+    private func sincronizzaPacchiFilmConICloud() async {
+        print("☁️ [FilmPackViewModel] Inizio sincronizzazione pacchi film con iCloud...")
+        
+        do {
+            try await cloudKitManager.syncFilmPacks(pacchiFilm)
+            print("☁️ [FilmPackViewModel] ✅ Sincronizzazione iCloud completata")
+        } catch {
+            print("❌ [FilmPackViewModel] ❌ Errore sincronizzazione iCloud: \(error.localizedDescription)")
+        }
+    }
+    
+    // Carica i pacchi film da UserDefaults e iCloud
     private func caricaPacchiFilm() {
         if let data = UserDefaults.standard.data(forKey: "pacchiFilm"),
            let decoded = try? JSONDecoder().decode([FilmPack].self, from: data) {
             pacchiFilm = decoded
             // Aggiorna l'ordine stabile delle tipologie dopo aver caricato i pacchi
             inizializzaOrdineTipologieStabile()
+        }
+        
+        // Carica anche da iCloud in background
+        Task {
+            await caricaPacchiFilmDaICloud()
+        }
+    }
+    
+    // Carica i pacchi film da iCloud
+    @MainActor
+    private func caricaPacchiFilmDaICloud() async {
+        print("☁️ [FilmPackViewModel] Inizio caricamento pacchi film da iCloud...")
+        
+        do {
+            try await cloudKitManager.syncFilmPacks(pacchiFilm)
+            print("☁️ [FilmPackViewModel] ✅ Caricamento da iCloud completato")
+        } catch {
+            print("❌ [FilmPackViewModel] ❌ Errore caricamento da iCloud: \(error.localizedDescription)")
         }
     }
     

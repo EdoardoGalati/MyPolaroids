@@ -7,6 +7,12 @@ class CameraViewModel: ObservableObject {
     @Published var modelliDisponibili: [CameraModel] = []
     @Published var filmPackViewModel: FilmPackViewModel?
     
+    // CloudKit Manager per sincronizzazione iCloud
+    private let cloudKitManager = CloudKitManager()
+    
+    // Timer per sincronizzazione automatica
+    private var autoSyncTimer: Timer?
+    
     // Contatore per prevenire chiamate ricorsive
     private var aggiornaFotocameraCallCount = 0
     
@@ -14,6 +20,35 @@ class CameraViewModel: ObservableObject {
         caricaModelli()
         caricaFotocamere()
         setupFilmPackViewModel()
+        
+        // Imposta i callback per la sincronizzazione CloudKit
+        cloudKitManager.onCamerasSynced = { [weak self] syncedCameras in
+            DispatchQueue.main.async {
+                print("📱 [CameraViewModel] 🔄 Ricevute \(syncedCameras.count) fotocamere sincronizzate da iCloud")
+                self?.fotocamere = syncedCameras
+                print("📱 [CameraViewModel] ✅ Lista fotocamere aggiornata con dati da iCloud")
+            }
+        }
+        
+        // Avvia sincronizzazione automatica ogni 15 minuti
+        startAutoSync()
+        
+        // Osserva le notifiche dell'app per gestire il timer
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.didEnterBackgroundNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.stopAutoSync()
+        }
+        
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.willEnterForegroundNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.startAutoSync()
+        }
     }
     
     // Proprietà computata per le fotocamere ordinate
@@ -199,7 +234,7 @@ class CameraViewModel: ObservableObject {
         }
     }
     
-    // Salva le fotocamere in UserDefaults
+    // Salva le fotocamere in UserDefaults e iCloud
     private func salvaFotocamere() {
         print("🔧 [CameraViewModel] salvaFotocamere() iniziata")
         print("🔧 [CameraViewModel] Numero fotocamere da salvare: \(fotocamere.count)")
@@ -215,10 +250,53 @@ class CameraViewModel: ObservableObject {
             } else {
                 print("❌ [CameraViewModel] ERRORE: Dati non trovati in UserDefaults dopo il salvataggio!")
             }
+            
+            // Sincronizza con iCloud in background
+            Task {
+                await sincronizzaConICloud()
+            }
         } else {
             print("❌ [CameraViewModel] ERRORE: Encoding JSON fallito!")
         }
     }
+    
+    // Sincronizza le fotocamere con iCloud
+    @MainActor
+    func sincronizzaConICloud() async {
+        print("☁️ [CameraViewModel] Inizio sincronizzazione iCloud...")
+        
+        do {
+            try await cloudKitManager.syncCameras(fotocamere)
+            print("☁️ [CameraViewModel] ✅ Sincronizzazione iCloud completata")
+        } catch {
+            print("❌ [CameraViewModel] ❌ Errore sincronizzazione iCloud: \(error.localizedDescription)")
+        }
+    }
+    
+    // MARK: - Sincronizzazione Automatica
+    
+    private func startAutoSync() {
+        // Sincronizza ogni 15 minuti (900 secondi)
+        autoSyncTimer = Timer.scheduledTimer(withTimeInterval: 900, repeats: true) { [weak self] _ in
+            Task {
+                await self?.sincronizzaConICloud()
+            }
+        }
+        print("📱 [CameraViewModel] 🔄 Timer sincronizzazione automatica avviato (ogni 15 minuti)")
+    }
+    
+    private func stopAutoSync() {
+        autoSyncTimer?.invalidate()
+        autoSyncTimer = nil
+        print("📱 [CameraViewModel] ⏹️ Timer sincronizzazione automatica fermato")
+    }
+    
+    deinit {
+        stopAutoSync()
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    // MARK: - Caricamento Modelli
     
     // Carica i modelli di fotocamera dal JSON
     private func caricaModelli() {
@@ -278,7 +356,7 @@ class CameraViewModel: ObservableObject {
         }
     }
     
-    // Carica le fotocamere da UserDefaults
+    // Carica le fotocamere da UserDefaults e iCloud
     private func caricaFotocamere() {
         if let data = UserDefaults.standard.data(forKey: "fotocamere"),
            let decoded = try? JSONDecoder().decode([Camera].self, from: data) {
@@ -291,6 +369,24 @@ class CameraViewModel: ObservableObject {
                 }
                 return fotocameraAggiornata
             }
+        }
+        
+        // Carica anche da iCloud in background
+        Task {
+            await caricaDaICloud()
+        }
+    }
+    
+    // Carica le fotocamere da iCloud
+    @MainActor
+    private func caricaDaICloud() async {
+        print("☁️ [CameraViewModel] Inizio caricamento da iCloud...")
+        
+        do {
+            try await cloudKitManager.syncCameras(fotocamere)
+            print("☁️ [CameraViewModel] ✅ Caricamento da iCloud completato")
+        } catch {
+            print("❌ [CameraViewModel] ❌ Errore caricamento da iCloud: \(error.localizedDescription)")
         }
     }
     
