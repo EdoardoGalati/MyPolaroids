@@ -1,0 +1,40 @@
+{
+  "camera_models": [
+    {
+      "id": "polaroid_600",
+      "name": "600",
+      "brand": "Polaroid",
+      "model": "600",
+      "specific_model": "Original",
+      "capacity": 8,
+      "default_image": "camera.fill",
+      "default_icon": "camera.fill",
+      "year_introduced": 1981,
+      "film_type": "600/i-Type"
+    },
+    {
+      "id": "polaroid_itype",
+      "name": "i-Type",
+      "brand": "Polaroid",
+      "model": "i-Type",
+      "specific_model": "Modern",
+      "capacity": 8,
+      "default_image": "camera.fill",
+      "default_icon": "camera.fill",
+      "year_introduced": 2017,
+      "film_type": "i-Type"
+    },
+    {
+      "id": "polaroid_sx70",
+      "name": "SX-70",
+      "brand": "Polaroid",
+      "model": "SX-70",
+      "specific_model": "Folding",
+      "capacity": 10,
+      "default_image": "camera.fill",
+      "default_icon": "camera.fill",
+      "year_introduced": 1972,
+      "film_type": "SX-70"
+    }
+  ]
+}

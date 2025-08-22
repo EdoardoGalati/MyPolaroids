@@ -91,6 +91,11 @@ struct Camera: Identifiable, Codable {
         return coloriDisponibili.randomElement() ?? "000"
     }
     
+    // Proprietà computata per il nome visualizzato
+    var displayName: String {
+        return nickname.isEmpty ? modello : nickname
+    }
+    
     // Converte il nome del colore in Color di SwiftUI
     static func coloreDaNome(_ nomeColore: String) -> Color {
         switch nomeColore {

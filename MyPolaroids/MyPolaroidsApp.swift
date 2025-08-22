@@ -7,6 +7,7 @@
 
 import SwiftUI
 import RevenueCat
+import UserNotifications
 
 @main
 struct MyPolaroidsApp: App {
@@ -14,11 +15,24 @@ struct MyPolaroidsApp: App {
     init() {
         // Inizializza RevenueCat
         setupRevenueCat()
+        
+        // Configura le notifiche
+        setupNotifications()
     }
     
     var body: some Scene {
         WindowGroup {
             ContentView()
+        }
+    }
+    
+    private func setupNotifications() {
+        // Richiedi permesso per le notifiche all'avvio
+        Task {
+            let status = await NotificationManager.shared.checkNotificationStatus()
+            if status == .notDetermined {
+                _ = await NotificationManager.shared.requestNotificationPermission()
+            }
         }
     }
     

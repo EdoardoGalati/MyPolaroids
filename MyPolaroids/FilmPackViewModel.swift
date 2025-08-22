@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import UserNotifications
 
 class FilmPackViewModel: ObservableObject {
     @Published var pacchiFilm: [FilmPack] = []
@@ -821,6 +822,9 @@ class FilmPackViewModel: ObservableObject {
         
         // Aggiorna scatti rimanenti
         pacchiFilm[indexPacco].scattiRimanenti -= numero
+        
+        // Programma notifica di sviluppo foto
+        NotificationManager.shared.scheduleDevelopmentReminder(for: pacchiFilm[indexPacco], camera: fotocamera)
         
         // Se film finito, elimina completamente il pacco
         if pacchiFilm[indexPacco].scattiRimanenti == 0 {

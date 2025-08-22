@@ -1,0 +1,22 @@
+Target dependency graph (9 targets)
+Target 'MyPolaroids' in project 'MyPolaroids'
+➜ Explicit dependency on target 'RevenueCat' in project 'RevenueCat'
+➜ Explicit dependency on target 'ReceiptParser' in project 'RevenueCat'
+➜ Explicit dependency on target 'RevenueCatUI' in project 'RevenueCat'
+Target 'RevenueCatUI' in project 'RevenueCat'
+➜ Explicit dependency on target 'RevenueCatUI' in project 'RevenueCat'
+➜ Explicit dependency on target 'RevenueCat_RevenueCatUI' in project 'RevenueCat'
+➜ Explicit dependency on target 'RevenueCat' in project 'RevenueCat'
+Target 'RevenueCatUI' in project 'RevenueCat'
+➜ Explicit dependency on target 'RevenueCat_RevenueCatUI' in project 'RevenueCat'
+➜ Explicit dependency on target 'RevenueCat' in project 'RevenueCat'
+Target 'RevenueCat_RevenueCatUI' in project 'RevenueCat' (no dependencies)
+Target 'ReceiptParser' in project 'RevenueCat'
+➜ Explicit dependency on target 'ReceiptParser' in project 'RevenueCat'
+Target 'ReceiptParser' in project 'RevenueCat' (no dependencies)
+Target 'RevenueCat' in project 'RevenueCat'
+➜ Explicit dependency on target 'RevenueCat' in project 'RevenueCat'
+➜ Explicit dependency on target 'RevenueCat_RevenueCat' in project 'RevenueCat'
+Target 'RevenueCat' in project 'RevenueCat'
+➜ Explicit dependency on target 'RevenueCat_RevenueCat' in project 'RevenueCat'
+Target 'RevenueCat_RevenueCat' in project 'RevenueCat' (no dependencies)

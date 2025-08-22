@@ -10,5 +10,7 @@
 	<string></string>
 	<key>UIInterfaceOrientationPortraitUpsideDown</key>
 	<string></string>
+	<key>NSUserNotificationUsageDescription</key>
+	<string>MyPolaroids uses notifications to remind you when it's time to develop your photos after taking a shot.</string>
 </dict>
 </plist>

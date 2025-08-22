@@ -238,6 +238,109 @@ struct ImpostazioniView: View {
                         .background(AppColors.backgroundSecondary)
                         .cornerRadius(16)
                         
+                        // Sezione Notifiche Sviluppo Foto (Feature Premium)
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    HStack(spacing: 8) {
+                                        Text("Development Reminders")
+                                            .font(.headline)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(.primary)
+                                        
+                                        // Badge Premium
+                                        HStack(spacing: 4) {
+                                            Image(systemName: "crown.fill")
+                                                .font(.caption)
+                                                .foregroundColor(.yellow)
+                                            Text("PREMIUM")
+                                                .font(.caption2)
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.yellow)
+                                        }
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(Color.yellow.opacity(0.2))
+                                        .cornerRadius(4)
+                                    }
+                                    
+                                    Text("Get notified when it's time to develop your photos")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                        .multilineTextAlignment(.leading)
+                                }
+                                
+                                Spacer()
+                                
+                                if isPremiumUser {
+                                    Toggle("", isOn: Binding(
+                                        get: { UserDefaults.standard.bool(forKey: "notificationsEnabled") },
+                                        set: { newValue in
+                                            UserDefaults.standard.set(newValue, forKey: "notificationsEnabled")
+                                            if newValue {
+                                                Task {
+                                                    await requestNotificationPermission()
+                                                }
+                                            }
+                                        }
+                                    ))
+                                    .labelsHidden()
+                                } else {
+                                    Button(action: {
+                                        showingPaywall = true
+                                    }) {
+                                        Image(systemName: "lock.fill")
+                                            .foregroundColor(.gray)
+                                            .font(.title3)
+                                    }
+                                }
+                            }
+                            
+                            if isPremiumUser && UserDefaults.standard.bool(forKey: "notificationsEnabled") {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    HStack {
+                                        Text("Reminder delay (minutes):")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                        
+                                        Spacer()
+                                        
+                                        TextField("15", value: Binding(
+                                            get: { UserDefaults.standard.integer(forKey: "notificationDelayMinutes") },
+                                            set: { newValue in
+                                                let clampedValue = max(1, min(1440, newValue)) // Min 1, Max 1440 (24 ore)
+                                                UserDefaults.standard.set(clampedValue, forKey: "notificationDelayMinutes")
+                                            }
+                                        ), format: .number)
+                                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                                        .frame(width: 80)
+                                        .multilineTextAlignment(.trailing)
+                                    }
+                                }
+                            } else if !isPremiumUser {
+                                Button(action: {
+                                    showingPaywall = true
+                                }) {
+                                    HStack {
+                                        Image(systemName: "crown.fill")
+                                            .font(.caption)
+                                        Text("Unlock Premium")
+                                            .font(.caption)
+                                            .fontWeight(.medium)
+                                    }
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(AppColors.accentPrimary)
+                                    .cornerRadius(8)
+                                }
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 16)
+                        .background(AppColors.backgroundSecondary)
+                        .cornerRadius(16)
+                        
                         // Sezione Donations
                         VStack(alignment: .leading, spacing: 12) {
                             HStack {
@@ -369,6 +472,9 @@ struct ImpostazioniView: View {
                     isPremiumUser = !customerInfo.activeSubscriptions.isEmpty || 
                                    !customerInfo.nonSubscriptionTransactions.isEmpty
                     
+                    // Salva lo stato premium in UserDefaults per il NotificationManager
+                    UserDefaults.standard.set(isPremiumUser, forKey: "isPremiumUser")
+                    
                     print("💎 [ImpostazioniView] Stato premium: \(isPremiumUser ? "PREMIUM" : "FREE")")
                 }
             } catch {
@@ -391,6 +497,9 @@ struct ImpostazioniView: View {
                     isPremiumUser = !customerInfo.activeSubscriptions.isEmpty || 
                                    !customerInfo.nonSubscriptionTransactions.isEmpty
                     
+                    // Salva lo stato premium in UserDefaults per il NotificationManager
+                    UserDefaults.standard.set(isPremiumUser, forKey: "isPremiumUser")
+                    
                     if isPremiumUser {
                         print("✅ [ImpostazioniView] Restore completato - Utente PREMIUM ripristinato!")
                         // Forza aggiornamento UI
@@ -398,7 +507,7 @@ struct ImpostazioniView: View {
                         
                         // Mostra popup di successo
                         restoreAlertTitle = "Restore Successful! 🎉"
-                        restoreAlertMessage = "Your premium access has been restored. You can now use iCloud sync!"
+                        restoreAlertMessage = "Your premium access has been restored. You can now use iCloud sync and development reminders!"
                         showingRestoreAlert = true
                     } else {
                         print("⚠️ [ImpostazioniView] Restore completato - Nessun acquisto trovato")
@@ -418,6 +527,21 @@ struct ImpostazioniView: View {
                     restoreAlertMessage = "An error occurred while restoring purchases. Please try again or contact support."
                     showingRestoreAlert = true
                 }
+            }
+        }
+    }
+    
+    // MARK: - Notification Functions
+    
+    private func requestNotificationPermission() async {
+        let granted = await NotificationManager.shared.requestNotificationPermission()
+        
+        if !granted {
+            await MainActor.run {
+                // Mostra alert per spiegare come abilitare le notifiche
+                restoreAlertTitle = "Notifications Permission Required"
+                restoreAlertMessage = "To receive development reminders, please enable notifications in Settings > MyPolaroids > Notifications"
+                showingRestoreAlert = true
             }
         }
     }

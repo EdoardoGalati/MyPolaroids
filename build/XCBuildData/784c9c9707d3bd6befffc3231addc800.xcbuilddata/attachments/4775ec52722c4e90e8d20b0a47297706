@@ -1,0 +1,4 @@
+module ReceiptParser {
+header "ReceiptParser-Swift.h"
+export *
+}
