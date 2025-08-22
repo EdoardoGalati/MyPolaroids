@@ -32,6 +32,7 @@ struct DettagliFotocameraView: View {
         .background(AppColors.backgroundPrimary)
         .navigationTitle("Camera Details")
         .navigationBarTitleDisplayMode(.inline)
+        .tint(AppColors.navigationButton)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 HStack(spacing: 16) {

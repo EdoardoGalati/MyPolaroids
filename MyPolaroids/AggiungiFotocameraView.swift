@@ -43,6 +43,7 @@ struct AggiungiFotocameraView: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .foregroundColor(AppColors.navigationButton)
                 }
             }
             .navigationDestination(isPresented: $mostraPersonalizzazione) {
@@ -158,6 +159,7 @@ struct PersonalizzazioneView: View {
                     salvaFotocamera()
                 }
                 .fontWeight(.semibold)
+                .foregroundColor(AppColors.navigationButton)
             }
         }
     }

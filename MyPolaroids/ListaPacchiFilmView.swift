@@ -79,7 +79,9 @@ struct ListaPacchiFilmView: View {
                     }
                     
                     // Pacchi associati
-                    let pacchiAssociati = viewModel.pacchiFilmOrdinate.filter { $0.fotocameraAssociata != nil && !$0.isFinito }
+                    let pacchiAssociati = viewModel.pacchiFilmOrdinate.filter { pacco in
+                        pacco.fotocameraAssociata != nil && !pacco.isFinito
+                    }
                     if !pacchiAssociati.isEmpty {
                         Section("📷 In Uso") {
                             ForEach(pacchiAssociati) { pacco in
@@ -141,7 +143,7 @@ struct ListaPacchiFilmView: View {
                 }
             }
             .sheet(isPresented: $mostraAggiungiPacco) {
-                AggiungiPaccoFilmView(viewModel: viewModel)
+                AggiungiPaccoFilmView(viewModel: viewModel, fotocamera: nil)
             }
             .sheet(isPresented: $mostraModificaPacco) {
                 if let pacco = paccoDaModificare {

@@ -127,4 +127,16 @@ struct AppColors {
             }
         })
     }
+    
+    // MARK: - Navigation Button Colors
+    static var navigationButton: Color {
+        Color(UIColor { traitCollection in
+            switch traitCollection.userInterfaceStyle {
+            case .dark:
+                return UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1.0)
+            default:
+                return UIColor(red: 0/255, green: 0/255, blue: 0/255, alpha: 1.0)
+            }
+        })
+    }
 }

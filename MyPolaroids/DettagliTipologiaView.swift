@@ -46,6 +46,7 @@ struct DettagliTipologiaView: View {
         .background(AppColors.backgroundPrimary)
         .navigationTitle("Film Pack Details")
         .navigationBarTitleDisplayMode(.inline)
+        .tint(AppColors.navigationButton)
         .onReceive(viewModel.$pacchiFilm) { _ in
             // Forza l'aggiornamento della UI quando cambiano i pacchi film
             // Questo assicura che la vista rimanga stabile dopo l'aggiunta di nuovi pacchi
@@ -92,9 +93,9 @@ struct DettagliTipologiaView: View {
                         $0.tipo == tipoPacco && $0.modello == modelliPacco 
                     }
                     
-                    // Se non ci sono più pacchi di questo tipo, torna alla home
+                    // Se non ci sono più pacchi di questo tipo, torna alla home dei film pack
                     if pacchiRimanenti.isEmpty {
-                        selectedTab = 0
+                        selectedTab = 1
                     }
                 }
             }

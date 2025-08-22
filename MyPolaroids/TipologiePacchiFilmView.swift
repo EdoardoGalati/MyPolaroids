@@ -96,7 +96,7 @@ struct TipologiePacchiFilmView: View {
             }
             .navigationBarHidden(true) // Nasconde la navigation bar predefinita
             .sheet(isPresented: $mostraAggiungi) {
-                AggiungiPaccoFilmView(viewModel: viewModel)
+                AggiungiPaccoFilmView(viewModel: viewModel, fotocamera: nil)
             }
             .sheet(isPresented: $mostraImpostazioni) {
                 ImpostazioniView()

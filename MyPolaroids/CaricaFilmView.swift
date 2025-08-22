@@ -72,7 +72,7 @@ struct CaricaFilmView: View {
             if first.tipo == second.tipo {
                 return first.modello < second.modello
             }
-            return first.tipo < second.modello
+            return first.tipo < second.tipo
         }
     }
     
@@ -135,6 +135,8 @@ struct CaricaFilmView: View {
                                         }
                                     }
                             }
+                            
+
                         }
                         .padding(.vertical, 16)
                     }
@@ -148,6 +150,24 @@ struct CaricaFilmView: View {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
                         dismiss()
+                    }
+                    .foregroundColor(AppColors.navigationButton)
+                    .font(.body)
+                }
+                
+                if !filmCompatibiliAggregati.isEmpty {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button(action: {
+                            mostraAggiungiFilm = true
+                        }) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "plus")
+                                    .foregroundColor(AppColors.accentPrimary)
+                                Text("Add Film")
+                            }
+                            .foregroundColor(AppColors.navigationButton)
+                        }
+                        .font(.body)
                     }
                 }
             }
@@ -176,7 +196,7 @@ struct CaricaFilmView: View {
                 }
             }
             .sheet(isPresented: $mostraAggiungiFilm) {
-                AggiungiPaccoFilmView(viewModel: viewModel)
+                AggiungiPaccoFilmView(viewModel: viewModel, fotocamera: fotocamera)
             }
             .onReceive(viewModel.$pacchiFilm) { _ in
                 // Pulisce la cache quando cambiano i pacchi film

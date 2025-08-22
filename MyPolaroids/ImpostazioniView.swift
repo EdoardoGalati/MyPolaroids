@@ -8,6 +8,8 @@ struct ImpostazioniView: View {
     @AppStorage("cameraSortingOption") private var cameraSortingOption = SortingOption.dateAdded.rawValue
     @AppStorage("filmPackSortingOption") private var filmPackSortingOption = SortingOption.dateAdded.rawValue
     @State private var showingDebugModal = false
+    @State private var showingPaywall = false
+    @State private var versionTapCount = 0
     
     var body: some View {
         NavigationView {
@@ -116,40 +118,11 @@ struct ImpostazioniView: View {
                         .background(AppColors.backgroundSecondary)
                         .cornerRadius(16)
                         
-                        // Sezione Debug
-                        VStack(alignment: .leading, spacing: 12) {
-                            HStack {
-                                Text("Debug")
-                                    .font(.headline)
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.primary)
-                                
-                                Spacer()
-                                
-                                Image(systemName: "chevron.right")
-                                    .foregroundColor(.gray)
-                                    .font(.caption)
-                            }
-                            
-                            Text("Manage online data synchronization and local cache.")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .multilineTextAlignment(.leading)
-                        }
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            showingDebugModal = true
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 16)
-                        .background(AppColors.backgroundSecondary)
-                        .cornerRadius(16)
-                        
                         // Sezione Donations
                         VStack(alignment: .leading, spacing: 12) {
                             HStack {
                                 Image(systemName: "heart.fill")
-                                    .foregroundColor(.black)
+                                    .foregroundColor(AppColors.accentPrimary)
                                     .font(.title2)
                                 
                                 VStack(alignment: .leading, spacing: 4) {
@@ -172,19 +145,13 @@ struct ImpostazioniView: View {
                             }
                         }
                         .contentShape(Rectangle())
+                        .onTapGesture {
+                            showingPaywall = true
+                        }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 16)
                         .background(AppColors.backgroundSecondary)
                         .cornerRadius(16)
-                        .presentPaywallIfNeeded(
-                            requiredEntitlementIdentifier: "donations",
-                            purchaseCompleted: { customerInfo in
-                                print("✅ Purchase completed: \(customerInfo.entitlements)")
-                            },
-                            restoreCompleted: { customerInfo in
-                                print("✅ Purchases restored: \(customerInfo.entitlements)")
-                            }
-                        )
                         
                         // Sezione Versione
                         VStack(alignment: .leading, spacing: 12) {
@@ -196,9 +163,17 @@ struct ImpostazioniView: View {
                                 
                                 Spacer()
                                 
-                                Text("Alpha")
+                                Text("1.1")
                                     .font(.body)
                                     .foregroundColor(.secondary)
+                            }
+                        }
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            versionTapCount += 1
+                            if versionTapCount >= 3 {
+                                showingDebugModal = true
+                                versionTapCount = 0
                             }
                         }
                         .padding(.horizontal, 16)
@@ -218,12 +193,16 @@ struct ImpostazioniView: View {
                         dismiss()
                     }
                     .fontWeight(.semibold)
+                    .foregroundColor(AppColors.navigationButton)
                 }
             }
         }
         .presentationDetents([.large])
         .sheet(isPresented: $showingDebugModal) {
             DataSyncView()
+        }
+        .sheet(isPresented: $showingPaywall) {
+            PaywallView()
         }
     }
 }

@@ -101,6 +101,7 @@ struct DataSyncView: View {
                         dismiss()
                     }
                     .fontWeight(.semibold)
+                    .foregroundColor(AppColors.navigationButton)
                 }
             }
             .alert("Information", isPresented: $showingAlert) {

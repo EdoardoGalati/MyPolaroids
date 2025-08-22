@@ -120,6 +120,7 @@ struct ModificaFotocameraView: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .foregroundColor(AppColors.navigationButton)
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -127,6 +128,7 @@ struct ModificaFotocameraView: View {
                         salvaModifiche()
                     }
                     .fontWeight(.semibold)
+                    .foregroundColor(AppColors.navigationButton)
                 }
             }
         }
@@ -242,6 +244,7 @@ struct SelezioneModelloView: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .foregroundColor(AppColors.navigationButton)
                 }
             }
         }

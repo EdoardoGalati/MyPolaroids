@@ -3,6 +3,7 @@ import SwiftUI
 struct AggiungiPaccoFilmView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var viewModel: FilmPackViewModel
+    let fotocamera: Camera?
     
     @State private var tipoSelezionato = ""
     @State private var modelloSelezionatoStep1 = "Color"
@@ -27,6 +28,7 @@ struct AggiungiPaccoFilmView: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .foregroundColor(AppColors.navigationButton)
                 }
             }
             .navigationDestination(isPresented: $mostraPersonalizzazione) {
@@ -125,10 +127,17 @@ struct AggiungiPaccoFilmView: View {
     
     // MARK: - Computed Properties
     private var tipiFilmFiltrati: [String] {
+        let tipiBase = viewModel.tipiDisponibili
+        
+        // Se è specificata una fotocamera, filtra solo i tipi compatibili
+        let tipiCompatibili = fotocamera != nil ? tipiBase.filter { tipo in
+            viewModel.isCompatibile(tipo, con: fotocamera!)
+        } : tipiBase
+        
         if searchText.isEmpty {
-            return viewModel.tipiDisponibili
+            return tipiCompatibili
         } else {
-            return viewModel.tipiDisponibili.filter { $0.localizedCaseInsensitiveContains(searchText) }
+            return tipiCompatibili.filter { $0.localizedCaseInsensitiveContains(searchText) }
         }
     }
     
@@ -295,6 +304,7 @@ struct PersonalizzazionePaccoView: View {
                             salvaPaccoFilm()
                         }
                         .fontWeight(.semibold)
+                        .foregroundColor(AppColors.navigationButton)
                     }
                 }
                                  .onAppear {
@@ -332,5 +342,5 @@ struct PersonalizzazionePaccoView: View {
 
 
 #Preview {
-    AggiungiPaccoFilmView(viewModel: FilmPackViewModel())
+    AggiungiPaccoFilmView(viewModel: FilmPackViewModel(), fotocamera: nil)
 }

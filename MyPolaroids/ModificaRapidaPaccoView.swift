@@ -158,12 +158,14 @@ struct ModificaRapidaPaccoView: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .foregroundColor(AppColors.navigationButton)
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Save") {
                         salvaModifiche()
                     }
+                    .foregroundColor(AppColors.navigationButton)
                 }
             }
             .alert("Delete Pack", isPresented: $mostraDeleteAlert) {
@@ -218,9 +220,9 @@ struct ModificaRapidaPaccoView: View {
             $0.tipo == tipoPacco && $0.modello == modelliPacco 
         }
         
-        // Se non ci sono più pacchi di questo tipo, torna alla home
+        // Se non ci sono più pacchi di questo tipo, torna alla home dei film pack
         if pacchiRimanenti.isEmpty {
-            selectedTab = 0
+            selectedTab = 1
         }
         
         dismiss()
