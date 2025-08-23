@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct MainTabView: View {
-    @StateObject private var cameraViewModel = CameraViewModel()
+    @EnvironmentObject var cameraViewModel: CameraViewModel
     @State private var selectedTab = 0
     
     var body: some View {
@@ -116,4 +116,5 @@ struct MainTabView: View {
 
 #Preview {
     MainTabView()
+        .environmentObject(CameraViewModel())
 }

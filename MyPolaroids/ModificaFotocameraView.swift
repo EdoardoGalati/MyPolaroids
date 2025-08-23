@@ -9,6 +9,8 @@ struct ModificaFotocameraView: View {
     @State private var modelloSelezionato: String
     @State private var coloreSelezionato: String
     @State private var mostraSelezioneModello: Bool = false
+    @State private var colorePersonalizzato: Color = .blue
+
     
     init(fotocamera: Binding<Camera>, viewModel: CameraViewModel) {
         self._fotocamera = fotocamera
@@ -18,6 +20,13 @@ struct ModificaFotocameraView: View {
         self._nickname = State(initialValue: fotocamera.wrappedValue.nickname.isEmpty ? "" : fotocamera.wrappedValue.nickname)
         self._modelloSelezionato = State(initialValue: fotocamera.wrappedValue.modello)
         self._coloreSelezionato = State(initialValue: fotocamera.wrappedValue.coloreIcona)
+        
+        // Inizializza il colore personalizzato se la fotocamera ne ha già uno
+        if fotocamera.wrappedValue.coloreIcona == Camera.colorPickerIdentifier {
+            self._colorePersonalizzato = State(initialValue: Camera.ottieniColorePersonalizzato(per: fotocamera.wrappedValue.id) ?? .blue)
+        } else {
+            self._colorePersonalizzato = State(initialValue: .blue)
+        }
     }
     
     var body: some View {
@@ -102,6 +111,31 @@ struct ModificaFotocameraView: View {
                                     }
                                     .buttonStyle(PlainButtonStyle())
                                 }
+                                
+                                // Color Picker Personalizzato
+                                ColorPicker("", selection: $colorePersonalizzato, supportsOpacity: false)
+                                    .onChange(of: colorePersonalizzato) { newColor in
+                                        // Salva il nuovo colore e seleziona il color picker
+                                        Camera.salvaColorePersonalizzato(newColor, per: fotocamera.id)
+                                        coloreSelezionato = Camera.colorPickerIdentifier
+                                        
+                                        // Debug: verifica che il colore sia stato salvato
+                                        print("🎨 [EDIT] Colore personalizzato salvato: \(newColor)")
+                                        print("🎨 [EDIT] ID fotocamera: \(fotocamera.id)")
+                                        if let savedColor = Camera.ottieniColorePersonalizzato(per: fotocamera.id) {
+                                            print("🎨 [EDIT] Colore verificato in UserDefaults: \(savedColor)")
+                                        } else {
+                                            print("❌ [EDIT] ERRORE: Colore non trovato in UserDefaults!")
+                                        }
+                                    }
+                                .labelsHidden()
+                                .scaleEffect(1.2)
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.primary, lineWidth: coloreSelezionato == Camera.colorPickerIdentifier ? 3 : 0)
+                                )
+                                .scaleEffect(coloreSelezionato == Camera.colorPickerIdentifier ? 1.1 : 1.0)
+                                .animation(.easeInOut(duration: 0.2), value: coloreSelezionato)
                             }
                         }
                         .padding(.horizontal, 16)
@@ -148,9 +182,13 @@ struct ModificaFotocameraView: View {
                 // Icona fotocamera
                 let iconaModello = viewModel.modelliDisponibili.first(where: { $0.name == modelloSelezionato })?.default_icon ?? "camera.fill"
                 
-                Image(systemName: iconaModello)
+                Image(iconaModello)
                     .font(.system(size: 80))
-                    .foregroundColor(Camera.coloreDaNome(coloreSelezionato))
+                    .foregroundColor(
+                        coloreSelezionato == Camera.colorPickerIdentifier 
+                        ? colorePersonalizzato
+                        : Camera.coloreDaNome(coloreSelezionato, fotocameraId: fotocamera.id)
+                    )
                 
                 // Nome modello
                 Text(modelloSelezionato)
@@ -185,7 +223,26 @@ struct ModificaFotocameraView: View {
         var fotocameraAggiornata = fotocamera
         fotocameraAggiornata.nickname = nickname.isEmpty ? "" : nickname
         fotocameraAggiornata.modello = modelloSelezionato
-        fotocameraAggiornata.coloreIcona = coloreSelezionato
+        // Gestisci il colore personalizzato
+        if coloreSelezionato == Camera.colorPickerIdentifier {
+            // Se è il color picker personalizzato, mantieni l'identificatore
+            fotocameraAggiornata.coloreIcona = Camera.colorPickerIdentifier
+            // Assicurati che il colore personalizzato sia salvato
+            Camera.salvaColorePersonalizzato(colorePersonalizzato, per: fotocamera.id)
+            
+            // Debug: verifica finale del colore personalizzato
+            print("🎨 [EDIT] Colore personalizzato salvato nella fotocamera:")
+            print("   - coloreIcona: \(fotocameraAggiornata.coloreIcona)")
+            print("   - colorePersonalizzato: \(colorePersonalizzato)")
+            if let savedColor = Camera.ottieniColorePersonalizzato(per: fotocamera.id) {
+                print("   - Colore verificato in UserDefaults: \(savedColor)")
+            } else {
+                print("   - ❌ ERRORE: Colore non trovato in UserDefaults!")
+            }
+        } else {
+            // Altrimenti usa il colore normale
+            fotocameraAggiornata.coloreIcona = coloreSelezionato
+        }
         fotocameraAggiornata.brand = Camera.brandDefault(modello: modelloSelezionato, modelliDisponibili: viewModel.modelliDisponibili)
         fotocameraAggiornata.annoProduzione = Camera.annoProduzioneDefault(modello: modelloSelezionato, modelliDisponibili: viewModel.modelliDisponibili)
         
@@ -205,6 +262,7 @@ struct ModificaFotocameraView: View {
         print("🔧 [EDIT] ===== FINE SALVAMODIFICHE =====")
     }
 }
+
 
 // MARK: - Vista Selezione Modello
 struct SelezioneModelloView: View {

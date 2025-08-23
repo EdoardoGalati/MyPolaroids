@@ -1,0 +1,200 @@
+{
+  "" : {
+    "const-values" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/MyPolaroids-master.swiftconstvalues",
+    "dependencies" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/MyPolaroids-master.d",
+    "diagnostics" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/MyPolaroids-master.dia",
+    "emit-module-dependencies" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/MyPolaroids-master-emit-module.d",
+    "emit-module-diagnostics" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/MyPolaroids-master-emit-module.dia",
+    "swift-dependencies" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/MyPolaroids-master.swiftdeps"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/AggiungiFotocameraView.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/AggiungiFotocameraView.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/AggiungiFotocameraView.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/AggiungiFotocameraView.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/AggiungiPaccoFilmView.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/AggiungiPaccoFilmView.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/AggiungiPaccoFilmView.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/AggiungiPaccoFilmView.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/AppColors.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/AppColors.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/AppColors.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/AppColors.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/Camera.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/Camera.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/Camera.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/Camera.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/CameraModel.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/CameraModel.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/CameraModel.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/CameraModel.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/CameraViewModel.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/CameraViewModel.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/CameraViewModel.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/CameraViewModel.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/CaricaFilmView.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/CaricaFilmView.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/CaricaFilmView.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/CaricaFilmView.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/CloudKitConfig.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/CloudKitConfig.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/CloudKitConfig.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/CloudKitConfig.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/CloudKitManager.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/CloudKitManager.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/CloudKitManager.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/CloudKitManager.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/ColorWheelView.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ColorWheelView.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ColorWheelView.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ColorWheelView.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/ConsumoScattiView.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ConsumoScattiView.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ConsumoScattiView.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ConsumoScattiView.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/ContentView.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ContentView.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ContentView.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ContentView.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/DataConfig.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/DataConfig.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/DataConfig.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/DataConfig.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/DataDownloader.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/DataDownloader.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/DataDownloader.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/DataDownloader.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/DataSyncView.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/DataSyncView.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/DataSyncView.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/DataSyncView.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/DettagliFotocameraView.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/DettagliFotocameraView.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/DettagliFotocameraView.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/DettagliFotocameraView.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/DettagliTipologiaView.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/DettagliTipologiaView.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/DettagliTipologiaView.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/DettagliTipologiaView.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/FilmPack.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/FilmPack.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/FilmPack.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/FilmPack.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/FilmPackColors.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/FilmPackColors.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/FilmPackColors.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/FilmPackColors.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/FilmPackModel.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/FilmPackModel.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/FilmPackModel.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/FilmPackModel.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/FilmPackViewModel.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/FilmPackViewModel.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/FilmPackViewModel.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/FilmPackViewModel.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/ICloudSyncView.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ICloudSyncView.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ICloudSyncView.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ICloudSyncView.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/ImpostazioniView.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ImpostazioniView.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ImpostazioniView.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ImpostazioniView.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/JSONTestHelper.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/JSONTestHelper.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/JSONTestHelper.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/JSONTestHelper.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/ListaFotocamereView.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ListaFotocamereView.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ListaFotocamereView.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ListaFotocamereView.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/ListaPacchiFilmView.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ListaPacchiFilmView.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ListaPacchiFilmView.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ListaPacchiFilmView.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/MainTabView.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/MainTabView.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/MainTabView.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/MainTabView.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/ModelNameHelper.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ModelNameHelper.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ModelNameHelper.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ModelNameHelper.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/ModificaFotocameraView.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ModificaFotocameraView.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ModificaFotocameraView.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ModificaFotocameraView.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/ModificaPaccoFilmView.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ModificaPaccoFilmView.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ModificaPaccoFilmView.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ModificaPaccoFilmView.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/ModificaRapidaPaccoView.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ModificaRapidaPaccoView.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ModificaRapidaPaccoView.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/ModificaRapidaPaccoView.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/MyPolaroidsApp.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/MyPolaroidsApp.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/MyPolaroidsApp.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/MyPolaroidsApp.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/NotificationManager.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/NotificationManager.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/NotificationManager.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/NotificationManager.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/PermissionManager.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/PermissionManager.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/PermissionManager.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/PermissionManager.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/SortingOptions.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/SortingOptions.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/SortingOptions.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/SortingOptions.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/TipologiaPaccoFilm.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/TipologiaPaccoFilm.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/TipologiaPaccoFilm.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/TipologiaPaccoFilm.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/MyPolaroids/TipologiePacchiFilmView.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/TipologiePacchiFilmView.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/TipologiePacchiFilmView.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/TipologiePacchiFilmView.o"
+  },
+  "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "index-unit-output-path" : "/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/edoardogalati/Documents/Xcode/MyPolaroids/build/MyPolaroids.build/Release-iphonesimulator/MyPolaroids.build/Objects-normal/x86_64/GeneratedAssetSymbols.o"
+  }
+}

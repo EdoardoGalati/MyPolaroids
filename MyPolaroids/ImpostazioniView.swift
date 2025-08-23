@@ -16,6 +16,7 @@ struct ImpostazioniView: View {
     @State private var showingRestoreAlert = false
     @State private var restoreAlertTitle = ""
     @State private var restoreAlertMessage = ""
+    @State private var showingCustomAppIconsView = false
     
     var body: some View {
         NavigationView {
@@ -341,6 +342,98 @@ struct ImpostazioniView: View {
                         .background(AppColors.backgroundSecondary)
                         .cornerRadius(16)
                         
+                        // Custom App Icons Section (Premium Feature)
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    HStack(spacing: 8) {
+                                        Text("Custom App Icons")
+                                            .font(.headline)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(.primary)
+                                        
+                                        // Premium Badge
+                                        HStack(spacing: 4) {
+                                            Image(systemName: "crown.fill")
+                                                .font(.caption)
+                                                .foregroundColor(.yellow)
+                                            Text("PREMIUM")
+                                                .font(.caption2)
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.yellow)
+                                        }
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(Color.yellow.opacity(0.2))
+                                        .cornerRadius(4)
+                                    }
+                                    
+                                    Text("Personalize your app appearance with exclusive icons")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                        .multilineTextAlignment(.leading)
+                                }
+                                
+                                Spacer()
+                                
+                                if isPremiumUser {
+                                    Button(action: {
+                                        showingCustomAppIconsView = true
+                                    }) {
+                                        Image(systemName: "paintbrush.fill")
+                                            .foregroundColor(AppColors.accentPrimary)
+                                            .font(.title3)
+                                    }
+                                } else {
+                                    Button(action: {
+                                        showingPaywall = true
+                                    }) {
+                                        Image(systemName: "lock.fill")
+                                            .foregroundColor(.gray)
+                                            .font(.title3)
+                                    }
+                                }
+                            }
+                            
+                            if isPremiumUser {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    HStack {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundColor(.green)
+                                            .font(.caption)
+                                        Text("Access to 17+ exclusive icons")
+                                            .font(.caption)
+                                            .fontWeight(.medium)
+                                            .foregroundColor(.secondary)
+                                    }
+                                    
+                                    HStack {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundColor(.green)
+                                            .font(.caption)
+                                        Text("Light/dark mode support")
+                                            .font(.caption)
+                                            .fontWeight(.medium)
+                                            .foregroundColor(.secondary)
+                                    }
+                                    
+                                    HStack {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundColor(.green)
+                                            .font(.caption)
+                                        Text("Easy icon switching")
+                                            .font(.caption)
+                                            .fontWeight(.medium)
+                                            .foregroundColor(.secondary)
+                                    }
+                                }
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 16)
+                        .background(AppColors.backgroundSecondary)
+                        .cornerRadius(16)
+                        
                         // Sezione Donations
                         VStack(alignment: .leading, spacing: 12) {
                             HStack {
@@ -354,10 +447,16 @@ struct ImpostazioniView: View {
                                         .fontWeight(.semibold)
                                         .foregroundColor(.primary)
                                     
-                                    Text("Support the project")
+                                    Text("Support the project and unlock premium features")
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                         .multilineTextAlignment(.leading)
+                                    
+                                    Text("☁️ iCloud Sync across all devices\n🔔 Development Reminders for photos")
+                                        .font(.caption2)
+                                        .foregroundColor(.secondary)
+                                        .multilineTextAlignment(.leading)
+                                        .padding(.top, 2)
                                 }
                                 
                                 Spacer()
@@ -451,6 +550,9 @@ struct ImpostazioniView: View {
         }
         .sheet(isPresented: $showingPaywall) {
             PaywallView()
+        }
+        .sheet(isPresented: $showingCustomAppIconsView) {
+            CustomAppIconsView()
         }
         .alert(restoreAlertTitle, isPresented: $showingRestoreAlert) {
             Button("OK") {

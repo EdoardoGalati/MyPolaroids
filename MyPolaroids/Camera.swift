@@ -86,9 +86,26 @@ struct Camera: Identifiable, Codable {
         "000", "D60027", "FF8200", "FFB503", "78BE1F", "198CD9"
     ]
     
+    // Costante per il color picker personalizzato
+    static let colorPickerIdentifier = "CUSTOM"
+    
     // Genera un colore casuale per l'icona
     static func coloreIconaRandom() -> String {
         return coloriDisponibili.randomElement() ?? "000"
+    }
+    
+    // Salva un colore personalizzato per una fotocamera specifica
+    static func salvaColorePersonalizzato(_ colore: Color, per fotocameraId: UUID) {
+        let hexString = colore.toHex()
+        UserDefaults.standard.set(hexString, forKey: "customCameraColor_\(fotocameraId.uuidString)")
+    }
+    
+    // Ottieni il colore personalizzato per una fotocamera specifica
+    static func ottieniColorePersonalizzato(per fotocameraId: UUID) -> Color? {
+        if let hexString = UserDefaults.standard.string(forKey: "customCameraColor_\(fotocameraId.uuidString)") {
+            return Color(hex: hexString)
+        }
+        return nil
     }
     
     // Proprietà computata per il nome visualizzato
@@ -97,7 +114,7 @@ struct Camera: Identifiable, Codable {
     }
     
     // Converte il nome del colore in Color di SwiftUI
-    static func coloreDaNome(_ nomeColore: String) -> Color {
+    static func coloreDaNome(_ nomeColore: String, fotocameraId: UUID? = nil) -> Color {
         switch nomeColore {
         case "000": 
             // In dark mode, il nero diventa bianco per il contrasto
@@ -114,7 +131,19 @@ struct Camera: Identifiable, Codable {
         case "FFB503": return Color(hex: "FFB503") // Giallo
         case "78BE1F": return Color(hex: "78BE1F") // Verde
         case "198CD9": return Color(hex: "198CD9") // Blu
+        case colorPickerIdentifier: 
+            // Per il color picker personalizzato, usa il colore salvato in UserDefaults
+            if let fotocameraId = fotocameraId,
+               let customColorHex = UserDefaults.standard.string(forKey: "customCameraColor_\(fotocameraId.uuidString)") {
+                return Color(hex: customColorHex)
+            }
+            // Fallback al blu se non c'è un colore personalizzato
+            return Color(hex: "198CD9")
         default: 
+            // Se è un hex valido, prova a convertirlo
+            if nomeColore.count == 6 && nomeColore.allSatisfy({ $0.isHexDigit }) {
+                return Color(hex: nomeColore)
+            }
             // In dark mode, il nero di default diventa bianco per il contrasto
             return Color(UIColor { traitCollection in
                 switch traitCollection.userInterfaceStyle {
@@ -153,5 +182,22 @@ extension Color {
             blue:  Double(b) / 255,
             opacity: Double(a) / 255
         )
+    }
+    
+    // Converte Color in hex string
+    func toHex() -> String {
+        let uiColor = UIColor(self)
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+        
+        uiColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        
+        let r = Int(red * 255)
+        let g = Int(green * 255)
+        let b = Int(blue * 255)
+        
+        return String(format: "%02X%02X%02X", r, g, b)
     }
 }

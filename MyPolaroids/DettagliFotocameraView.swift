@@ -164,10 +164,25 @@ struct DettagliFotocameraView: View {
             Spacer(minLength: 0)
             VStack(spacing: 12) {
                 // Icona fotocamera
-                Image(fotocamera.icona)
+                                Image(fotocamera.icona)
                     .font(.system(size: 96))
-                    .foregroundColor(Camera.coloreDaNome(fotocamera.coloreIcona))
-                // Nome e nickname
+                    .foregroundColor(Camera.coloreDaNome(fotocamera.coloreIcona, fotocameraId: fotocamera.id))
+                    .onAppear {
+                        // Debug: verifica del colore della fotocamera
+                        print("🎨 [DETTAGLI] Fotocamera aperta:")
+                        print("   - ID: \(fotocamera.id)")
+                        print("   - coloreIcona: '\(fotocamera.coloreIcona)'")
+                        if fotocamera.coloreIcona == Camera.colorPickerIdentifier {
+                            if let customColor = Camera.ottieniColorePersonalizzato(per: fotocamera.id) {
+                                print("   - ✅ Colore personalizzato trovato: \(customColor)")
+                            } else {
+                                print("   - ❌ ERRORE: Colore personalizzato non trovato!")
+                            }
+                        } else {
+                            print("   - Colore predefinito: \(fotocamera.coloreIcona)")
+                        }
+                    }
+                    // Nome e nickname
                 if fotocamera.nickname.isEmpty || fotocamera.nickname == fotocamera.modello {
                     Text(fotocamera.modello)
                         .font(.title2)

@@ -2,6 +2,141 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>AppIcon</string>
+			</array>
+		</dict>
+		
+		<key>CFBundleAlternateIcons</key>
+		<dict>
+			<key>1000</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>1000-Light</string>
+				</array>
+			</dict>
+			<key>1200</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>1200-Light</string>
+				</array>
+			</dict>
+			<key>600</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>600-Light</string>
+				</array>
+			</dict>
+			<key>amigo</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>amigo-Light</string>
+				</array>
+			</dict>
+			<key>flip</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>flip-Light</string>
+				</array>
+			</dict>
+			<key>go</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>go-Light</string>
+				</array>
+			</dict>
+			<key>i1</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>i1-Light</string>
+				</array>
+			</dict>
+			<key>i2</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>i2-Light</string>
+				</array>
+			</dict>
+			<key>joycom</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>joycom-Light</string>
+				</array>
+			</dict>
+			<key>macro</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>macro-Light</string>
+				</array>
+			</dict>
+			<key>now</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>now-Light</string>
+				</array>
+			</dict>
+			<key>old</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>old-Light</string>
+				</array>
+			</dict>
+			<key>one600</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>one600-Light</string>
+				</array>
+			</dict>
+			<key>procam</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>Procam-Light</string>
+				</array>
+			</dict>
+			<key>slr</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>slr-Light</string>
+				</array>
+			</dict>
+			<key>spectra</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>spectra-Light</string>
+				</array>
+			</dict>
+			<key>sx70</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>sx70-Light</string>
+				</array>
+			</dict>
+		</dict>
+	</dict>
+	<key>NSUserNotificationUsageDescription</key>
+	<string>MyPolaroids uses notifications to remind you when it's time to develop your photos after taking a shot.</string>
 	<key>UIInterfaceOrientationLandscapeLeft</key>
 	<string></string>
 	<key>UIInterfaceOrientationLandscapeRight</key>
@@ -10,7 +145,5 @@
 	<string></string>
 	<key>UIInterfaceOrientationPortraitUpsideDown</key>
 	<string></string>
-	<key>NSUserNotificationUsageDescription</key>
-	<string>MyPolaroids uses notifications to remind you when it's time to develop your photos after taking a shot.</string>
 </dict>
 </plist>

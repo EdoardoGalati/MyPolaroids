@@ -10,6 +10,7 @@ struct ListaFotocamereView: View {
     @State private var mostraImpostazioni = false
     @State private var animationTrigger = false
     @State private var nuovaCameraId: UUID?
+    @State private var refreshTrigger = false
     
     var body: some View {
         VStack(spacing: 0) {
@@ -97,6 +98,28 @@ struct ListaFotocamereView: View {
                 .padding(.bottom, 80)
                 .animation(.spring(response: 0.6, dampingFraction: 0.8), value: animationTrigger)
             }
+                        .id(refreshTrigger) // Forza il refresh quando cambia
+        }
+        .onAppear {
+            // Debug: verifica che la vista si aggiorni
+            print("🏠 [HOME] ListaFotocamereView onAppear")
+            print("🏠 [HOME] Numero fotocamere: \(viewModel.fotocamere.count)")
+            print("🏠 [HOME] Fotocamere con colori personalizzati:")
+            for fotocamera in viewModel.fotocamere {
+                if fotocamera.coloreIcona == Camera.colorPickerIdentifier {
+                    print("   - \(fotocamera.nickname): \(fotocamera.coloreIcona)")
+                    if let customColor = Camera.ottieniColorePersonalizzato(per: fotocamera.id) {
+                        print("     ✅ Colore personalizzato: \(customColor)")
+                    } else {
+                        print("     ❌ Colore personalizzato non trovato!")
+                    }
+                }
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+            // Forza il refresh quando l'app torna attiva
+            print("🏠 [HOME] App tornata attiva, forzo refresh")
+            refreshTrigger.toggle() // Questo forzerà il refresh della vista
         }
         .onTapGesture {
             print("🟡 TAP su VStack principale")
@@ -148,8 +171,21 @@ struct ListaFotocamereView: View {
                     // Icona SF Symbol senza sfondo
                     Image(fotocamera.icona)
                         .font(.system(size: 24))
-                        .foregroundColor(Camera.coloreDaNome(fotocamera.coloreIcona))
+                        .foregroundColor(Camera.coloreDaNome(fotocamera.coloreIcona, fotocameraId: fotocamera.id))
                         .frame(width: 32, height: 32)
+                        .onAppear {
+                            // Debug: verifica del colore della fotocamera nella lista
+                            if fotocamera.coloreIcona == Camera.colorPickerIdentifier {
+                                print("🎨 [LISTA] Fotocamera con colore personalizzato:")
+                                print("   - ID: \(fotocamera.id)")
+                                print("   - coloreIcona: '\(fotocamera.coloreIcona)'")
+                                if let customColor = Camera.ottieniColorePersonalizzato(per: fotocamera.id) {
+                                    print("   - ✅ Colore personalizzato trovato: \(customColor)")
+                                } else {
+                                    print("   - ❌ ERRORE: Colore personalizzato non trovato!")
+                                }
+                            }
+                        }
                     
                     // Nome e modello
                     VStack(alignment: .leading, spacing: 2) {

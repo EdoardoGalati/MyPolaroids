@@ -8,8 +8,11 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject private var cameraViewModel = CameraViewModel()
+    
     var body: some View {
         MainTabView()
+            .environmentObject(cameraViewModel)
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
                 NotificationManager.shared.handleAppDidBecomeActive()
             }
@@ -21,4 +24,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+        .environmentObject(CameraViewModel())
 }

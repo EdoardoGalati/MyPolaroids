@@ -125,6 +125,7 @@ struct PersonalizzazioneView: View {
     
     @State private var nickname: String = ""
     @State private var coloreSelezionato: String = "000"
+
     
     private let coloriDisponibili = ["000", "D60027", "FF8200", "FFB503", "78BE1F", "198CD9"]
     
@@ -162,6 +163,7 @@ struct PersonalizzazioneView: View {
                 .foregroundColor(AppColors.navigationButton)
             }
         }
+
     }
     
     // MARK: - Header con Icona
@@ -172,7 +174,11 @@ struct PersonalizzazioneView: View {
                 // Icona fotocamera
                 Image(modello.default_icon)
                     .font(.system(size: 80))
-                    .foregroundColor(Camera.coloreDaNome(coloreSelezionato))
+                    .foregroundColor(
+                        coloreSelezionato == Camera.colorPickerIdentifier 
+                        ? Camera.ottieniColorePersonalizzato(per: UUID(uuidString: "00000000-0000-0000-0000-000000000000") ?? UUID()) ?? .blue
+                        : Camera.coloreDaNome(coloreSelezionato, fotocameraId: nil)
+                    )
                 
                 // Nome modello
                 Text(modello.name)
@@ -238,6 +244,34 @@ struct PersonalizzazioneView: View {
                                 )
                         }
                     }
+                    
+                    // Color Picker Personalizzato
+                    ColorPicker("", selection: Binding(
+                        get: {
+                            // Se è selezionato il color picker, mostra il colore salvato o blu di default
+                            if coloreSelezionato == Camera.colorPickerIdentifier {
+                                // Per le nuove fotocamere, usa un ID temporaneo basato sul modello
+                                let tempId = UUID(uuidString: "00000000-0000-0000-0000-000000000000") ?? UUID()
+                                return Camera.ottieniColorePersonalizzato(per: tempId) ?? .blue
+                            }
+                            return .blue
+                        },
+                        set: { newColor in
+                            // Salva il nuovo colore e seleziona il color picker
+                            // Per le nuove fotocamere, usa un ID temporaneo basato sul modello
+                            let tempId = UUID(uuidString: "00000000-0000-0000-0000-000000000000") ?? UUID()
+                            Camera.salvaColorePersonalizzato(newColor, per: tempId)
+                            coloreSelezionato = Camera.colorPickerIdentifier
+                        }
+                    ), supportsOpacity: false)
+                    .labelsHidden()
+                    .scaleEffect(1.2)
+                    .overlay(
+                        Circle()
+                            .stroke(AppColors.accentPrimary, lineWidth: coloreSelezionato == Camera.colorPickerIdentifier ? 2 : 0)
+                    )
+                    .scaleEffect(coloreSelezionato == Camera.colorPickerIdentifier ? 1.1 : 1.0)
+                    .animation(.easeInOut(duration: 0.2), value: coloreSelezionato)
                 }
             }
         }
@@ -295,13 +329,33 @@ struct PersonalizzazioneView: View {
         print("🔧 [PersonalizzazioneView] Nickname: '\(nickname)'")
         print("🔧 [PersonalizzazioneView] Colore: '\(coloreSelezionato)'")
         
+        // Gestisci il colore personalizzato
+        let coloreFinale: String
+        if coloreSelezionato == Camera.colorPickerIdentifier {
+            // Se è il color picker personalizzato, usa l'identificatore
+            coloreFinale = Camera.colorPickerIdentifier
+        } else {
+            // Altrimenti usa il colore normale
+            coloreFinale = coloreSelezionato
+        }
+        
         // Crea la fotocamera
         let fotocamera = Camera(
             nickname: nickname.isEmpty ? "" : nickname,
             modello: modello.name,
-            coloreIcona: coloreSelezionato,
+            coloreIcona: coloreFinale,
             modelliDisponibili: viewModel.modelliDisponibili
         )
+        
+        // Se è un colore personalizzato, trasferiscilo dalla chiave temporanea alla fotocamera finale
+        if coloreSelezionato == Camera.colorPickerIdentifier {
+            let tempId = UUID(uuidString: "00000000-0000-0000-0000-000000000000") ?? UUID()
+            if let customColor = Camera.ottieniColorePersonalizzato(per: tempId) {
+                Camera.salvaColorePersonalizzato(customColor, per: fotocamera.id)
+                // Rimuovi la chiave temporanea
+                UserDefaults.standard.removeObject(forKey: "customCameraColor_\(tempId.uuidString)")
+            }
+        }
         
         print("🔧 [PersonalizzazioneView] Fotocamera creata con ID: \(fotocamera.id)")
         
