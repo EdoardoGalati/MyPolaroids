@@ -562,7 +562,7 @@
       "default_image": "polaroid.now.fill.symbols",
       "default_icon": "polaroid.now.fill.symbols",
       "year_introduced": 2017,
-      "film_type": "i-Type"
+      "film_type": "600/i-Type"
     },
     {
       "id": "polaroid_onestep2_viewfinder",
@@ -574,7 +574,7 @@
       "default_image": "polaroid.now.fill.symbols",
       "default_icon": "polaroid.now.fill.symbols",
       "year_introduced": 2017,
-      "film_type": "i-Type"
+      "film_type": "600/i-Type"
     },
     {
       "id": "polaroid_onestep_plus",
@@ -586,7 +586,7 @@
       "default_image": "polaroid.now.fill.symbols",
       "default_icon": "polaroid.now.fill.symbols",
       "year_introduced": 2018,
-      "film_type": "i-Type"
+      "film_type": "600/i-Type"
     },
     {
       "id": "polaroid_now_gen1",
@@ -598,7 +598,7 @@
       "default_image": "polaroid.now.fill.symbols",
       "default_icon": "polaroid.now.fill.symbols",
       "year_introduced": 2020,
-      "film_type": "i-Type"
+      "film_type": "600/i-Type"
     },
     {
       "id": "polaroid_now_gen2",
@@ -610,7 +610,7 @@
       "default_image": "polaroid.now.fill.symbols",
       "default_icon": "polaroid.now.fill.symbols",
       "year_introduced": 2023,
-      "film_type": "i-Type"
+      "film_type": "600/i-Type"
     },
     {
       "id": "polaroid_now_gen3",
@@ -622,7 +622,7 @@
       "default_image": "polaroid.now.fill.symbols",
       "default_icon": "polaroid.now.fill.symbols",
       "year_introduced": 2025,
-      "film_type": "i-Type"
+      "film_type": "600/i-Type"
     },
     {
       "id": "polaroid_now_plus_gen1",
@@ -634,7 +634,7 @@
       "default_image": "polaroid.now.fill.symbols",
       "default_icon": "polaroid.now.fill.symbols",
       "year_introduced": 2021,
-      "film_type": "i-Type"
+      "film_type": "600/i-Type"
     },
     {
       "id": "polaroid_now_plus_gen2",
@@ -646,7 +646,7 @@
       "default_image": "polaroid.now.fill.symbols",
       "default_icon": "polaroid.now.fill.symbols",
       "year_introduced": 2023,
-      "film_type": "i-Type"
+      "film_type": "600/i-Type"
     },
     {
       "id": "polaroid_now_plus_gen3",
@@ -658,7 +658,7 @@
       "default_image": "polaroid.now.fill.symbols",
       "default_icon": "polaroid.now.fill.symbols",
       "year_introduced": 2025,
-      "film_type": "i-Type"
+      "film_type": "600/i-Type"
     },
     {
       "id": "polaroid_go_gen1",
@@ -898,7 +898,7 @@
       "default_image": "polaroid.600.fill.symbols",
       "default_icon": "polaroid.600.fill.symbols",
       "year_introduced": 1996,
-      "film_type": "600/i-Type"
+      "film_type": "600"
     },
     {
       "id": "polaroid_636_double_exposure",
@@ -910,7 +910,7 @@
       "default_image": "polaroid.600.fill.symbols",
       "default_icon": "polaroid.600.fill.symbols",
       "year_introduced": 1995,
-      "film_type": "600/i-Type"
+      "film_type": "600"
     }
   ]
 }
