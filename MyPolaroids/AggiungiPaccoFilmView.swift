@@ -1,346 +1,240 @@
 import SwiftUI
 
+/// Sheet that adds a film pack in two steps: pick the format, then customise the pack.
 struct AggiungiPaccoFilmView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var viewModel: FilmPackViewModel
     let fotocamera: Camera?
-    
-    @State private var tipoSelezionato = ""
-    @State private var modelloSelezionatoStep1 = "Color"
-    @State private var dataAcquisto = Date()
-    @State private var dataScadenza: Date? = nil
+
     @State private var searchText = ""
-    @State private var mostraPersonalizzazione = false
-    
+
+    /// Formats, restricted to the ones compatible with `fotocamera` when one is given.
+    private var tipiFiltrati: [FilmPackType] {
+        var tipi = viewModel.tipiFilm
+        if let fotocamera {
+            tipi = tipi.filter { viewModel.isCompatibile($0.name, con: fotocamera) }
+        }
+        if !searchText.isEmpty {
+            tipi = tipi.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+        }
+        return tipi
+    }
+
     var body: some View {
         NavigationStack {
-            VStack(spacing: 1) {
-                // STEP 1: Selezione Film
-                stepSelezioneFilm
-                
-                // NavigationLink rimosso - ora usiamo una modale
-            }
-            .background(AppColors.backgroundPrimary)
-            .navigationTitle("New Film Pack")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                    .foregroundColor(AppColors.navigationButton)
-                }
-            }
-            .navigationDestination(isPresented: $mostraPersonalizzazione) {
-                PersonalizzazionePaccoView(
-                    tipo: tipoSelezionato,
-                    viewModel: viewModel,
-                    onSave: {
-                        mostraPersonalizzazione = false
-                        dismiss()
-                    }
-                )
-            }
-        }
-        .onAppear {
-            print("🔍 [AggiungiPaccoFilmView] Vista principale è apparsa")
-        }
-    }
-    
-    // MARK: - STEP 1: Selezione Film
-    private var stepSelezioneFilm: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            // Barra di ricerca in cima senza background
-            HStack {
-                Image(systemName: "magnifyingglass")
-                    .foregroundColor(.secondary)
-                
-                TextField("Search film types...", text: $searchText)
-                    .textFieldStyle(PlainTextFieldStyle())
-            }
-            .frame(height: 52)
-            .padding(.horizontal, 16)
-            .background(AppColors.backgroundSecondary)
-            .cornerRadius(26)
-            .padding(.horizontal, 16)
-            .padding(.top, 16)
-            .padding(.bottom, 16)
-            
-            // Lista tipi di film
-            VStack(alignment: .leading, spacing: 0) {
-                ScrollView {
-                    LazyVStack(spacing: 1) {
-                        ForEach(tipiFilmFiltrati, id: \.self) { tipo in
-                            bottoneTipoFilm(tipo: tipo)
+            Group {
+                if tipiFiltrati.isEmpty {
+                    EmptyState(
+                        title: "No formats",
+                        message: searchText.isEmpty
+                            ? "No film formats are available right now."
+                            : "No formats match “\(searchText)”.",
+                        image: "polaroid.film.symbols",
+                        isAsset: true
+                    )
+                } else {
+                    List {
+                        ForEach(tipiFiltrati) { tipo in
+                            NavigationLink(value: tipo.name) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(tipo.name)
+                                        .font(.headline)
+                                    Text(tipo.default_capacity == 1 ? "1 shot" : "\(tipo.default_capacity) shots")
+                                        .font(.footnote)
+                                        .foregroundStyle(.secondary)
+                                }
+                                .padding(.vertical, 2)
+                            }
                         }
                     }
+                    .listStyle(.plain)
                 }
             }
-            .background(Color.clear)
-        }
-    }
-    
-    // MARK: - Bottone Tipo Film
-    private func bottoneTipoFilm(tipo: String) -> some View {
-        Button(action: {
-            print("🔍 [AggiungiPaccoFilmView] Tap su tipo: \(tipo)")
-            tipoSelezionato = tipo
-            print("🔍 [AggiungiPaccoFilmView] tipoSelezionato: \(tipoSelezionato)")
-            
-            // Seleziona sempre il primo modello disponibile come default
-            let modelli = viewModel.modelliPerTipo(tipo)
-            print("🔍 [AggiungiPaccoFilmView] Modelli disponibili per \(tipo): \(modelli)")
-            
-            if modelli.count > 0 {
-                modelloSelezionatoStep1 = modelli[0]
-                print("🔍 [AggiungiPaccoFilmView] Modello default selezionato: '\(modelloSelezionatoStep1)' per tipo '\(tipo)'")
-            } else {
-                print("⚠️ [AggiungiPaccoFilmView] Nessun modello disponibile per tipo '\(tipo)'")
-            }
-            
-            mostraPersonalizzazione = true
-        }) {
-            HStack(spacing: 16) {
-                // Info film
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(tipo)
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(.primary)
+            .searchable(text: $searchText, prompt: "Search formats")
+            .navigationTitle("Add Film")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationDestination(for: String.self) { tipo in
+                PersonalizzazionePaccoView(tipo: tipo, viewModel: viewModel) {
+                    dismiss()
                 }
-                
-                Spacer()
-                
-                // Chevron
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(.secondary)
             }
-            .padding()
-            .background(AppColors.backgroundSecondary)
-            .cornerRadius(16)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(role: .close) {
+                        dismiss()
+                    }
+                }
+            }
         }
-        .buttonStyle(PlainButtonStyle())
-        .onAppear {
-            print("🔍 [AggiungiPaccoFilmView] Bottone per tipo '\(tipo)' è apparso")
-        }
+        .tint(.primary)
     }
-    
-    // MARK: - Computed Properties
-    private var tipiFilmFiltrati: [String] {
-        let tipiBase = viewModel.tipiDisponibili
-        
-        // Se è specificata una fotocamera, filtra solo i tipi compatibili
-        let tipiCompatibili = fotocamera != nil ? tipiBase.filter { tipo in
-            viewModel.isCompatibile(tipo, con: fotocamera!)
-        } : tipiBase
-        
-        if searchText.isEmpty {
-            return tipiCompatibili
-        } else {
-            return tipiCompatibili.filter { $0.localizedCaseInsensitiveContains(searchText) }
-        }
-    }
-    
-    private var modelliDisponibili: [String] {
-        // Se è stato selezionato un tipo, mostra i modelli disponibili per quel tipo
-        if !tipoSelezionato.isEmpty {
-            return viewModel.modelliPerTipo(tipoSelezionato)
-        }
-        // Altrimenti mostra i modelli base
-        return ["Color", "Black & White", "Color Frame", "Black Frame B&W"]
-    }
-    
-    // La funzione salvaPaccoFilm è stata spostata in PersonalizzazionePaccoView
 }
 
-// MARK: - Personalizzazione Pacco View
+// MARK: - Step 2
+
+/// Customises and saves one pack of the chosen format.
 struct PersonalizzazionePaccoView: View {
-    @Environment(\.dismiss) private var dismiss
     let tipo: String
     @ObservedObject var viewModel: FilmPackViewModel
     let onSave: () -> Void
-    
-    @State private var modelliDisponibili: [String] = []
-    @State private var modelloSelezionato: String = ""
+
+    @State private var modelloSelezionato = ""
+    @State private var scattiTotali = 8
     @State private var dataAcquisto = Date()
     @State private var dataScadenza: Date?
     @State private var mostraScadenza = false
-    
+    @State private var fotocameraSelezionata: UUID?
+    @State private var note = ""
+    @State private var inizializzato = false
+    @State private var salvato = false
+
+    private var modelli: [String] {
+        viewModel.modelliPerTipo(tipo)
+    }
+
+    private var fotocamereCompatibili: [Camera] {
+        viewModel.fotocamere.filter { viewModel.isCompatibile(tipo, con: $0) }
+    }
+
+    private func gradiente(per modello: String) -> FilmPackGradient? {
+        FilmPackColors.gradientePerTipo(tipo, modello: modello, modelliDisponibili: viewModel.modelliFilm)
+    }
+
     var body: some View {
-        VStack(spacing: 0) {
-            if viewModel.modelliFilm.isEmpty {
-                VStack {
-                    Spacer()
-                    ProgressView("Caricamento modelli...")
-                    Spacer()
-                }
-            } else {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 1) {
-                        // Info film selezionato
-                        VStack(spacing: 1) {
-                            VStack(spacing: 20) {
-                                // Indicatore colore del tipo di film con gradienti reali
-                                FilmPackColorIndicator(
-                                    tipo: tipo,
-                                    modello: modelloSelezionato,
-                                    modelliDisponibili: viewModel.modelliFilm,
-                                    size: 40
-                                )
-                                
-                                VStack(alignment: .center, spacing: 8) {
-                                    Text(tipo)
-                                        .font(.title2)
-                                        .fontWeight(.bold)
-                                        .foregroundColor(.primary)
-                                    
-                                    Text(modelloSelezionato)
-                                        .font(.headline)
-                                        .foregroundColor(.secondary)
-                                }
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 32)
-                            .frame(maxWidth: .infinity)
-                            .background(AppColors.backgroundSecondary)
-                            .cornerRadius(16)
-                        }
-                        .padding(.horizontal, 0)
-                        .padding(.vertical, 0.5)
-                        .background(AppColors.backgroundPrimary)
-                        .cornerRadius(16)
-                        
-                        // Film Model Selection
-                        VStack(spacing: 1) {
-                            HStack {
-                                Text("Film Model")
-                                    .font(.body)
-                                    .foregroundColor(.primary)
-                                Spacer()
-                                Menu {
-                                    ForEach(modelliDisponibili, id: \.self) { modello in
-                                        Button(modello) {
-                                            modelloSelezionato = modello
-                                        }
-                                    }
-                                } label: {
-                                    HStack {
-                                        Text(modelloSelezionato)
-                                            .foregroundColor(.primary)
-                                        Image(systemName: "chevron.down")
-                                            .font(.system(size: 12))
-                                            .foregroundColor(.secondary)
-                                    }
-                                }
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 16)
-                            .frame(maxWidth: .infinity)
-                            .background(AppColors.backgroundSecondary)
-                            .cornerRadius(16)
-                        }
-                        .padding(.horizontal, 0)
-                        .padding(.vertical, 0.5)
-                        .background(AppColors.backgroundPrimary)
-                        .cornerRadius(16)
-                        
-                        // Date
-                        VStack(spacing: 1) {
-                            DatePicker("Purchase date", selection: $dataAcquisto, displayedComponents: .date)
-                                .datePickerStyle(CompactDatePickerStyle())
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 16)
-                                .frame(maxWidth: .infinity)
-                                .background(AppColors.backgroundSecondary)
-                                .cornerRadius(16)
-                        }
-                        .padding(.horizontal, 0)
-                        .padding(.vertical, 0.5)
-                        .background(AppColors.backgroundPrimary)
-                        .cornerRadius(16)
-                        
-                        // Expiry Date
-                        VStack(spacing: 1) {
-                            Toggle("Set expiration date", isOn: $mostraScadenza)
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 16)
-                                .frame(maxWidth: .infinity)
-                                .background(AppColors.backgroundSecondary)
-                                .cornerRadius(16)
-                                .onChange(of: mostraScadenza) { newValue in
-                                    if newValue && dataScadenza == nil {
-                                        // Se attivo il toggle e non c'è data, imposta oggi come default
-                                        dataScadenza = Date()
-                                    }
-                                }
-                            
-                            if mostraScadenza {
-                                DatePicker("Expiration date", selection: Binding(
-                                    get: { dataScadenza ?? Date() },
-                                    set: { dataScadenza = $0 }
-                                ), displayedComponents: .date)
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 16)
-                                .frame(maxWidth: .infinity)
-                                .background(AppColors.backgroundSecondary)
-                                .cornerRadius(16)
-                            }
-                        }
-                        .padding(.horizontal, 0)
-                        .padding(.vertical, 0.5)
-                        .background(AppColors.backgroundPrimary)
-                        .cornerRadius(16)
-                        
-                        Spacer(minLength: 0)
-                    }
-                    .padding(.top, 0)
-                }
-                .background(AppColors.backgroundPrimary)
-                .navigationTitle("Customize Film Pack")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button("Save") {
-                            salvaPaccoFilm()
-                        }
-                        .fontWeight(.semibold)
-                        .foregroundColor(AppColors.navigationButton)
+        Form {
+            Section {
+                HStack(spacing: 12) {
+                    ColorWheelView(gradient: gradiente(per: modelloSelezionato), size: 44)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(tipo)
+                            .font(.headline)
+                        Text(modelloSelezionato.isEmpty ? "Choose a variant" : modelloSelezionato)
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
                     }
                 }
-                                 .onAppear {
-                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
-                         modelliDisponibili = viewModel.modelliPerTipo(tipo)
-                         modelloSelezionato = modelliDisponibili.first ?? ""
-                         print("🔍 [PersonalizzazionePaccoView] modelliDisponibili: \(modelliDisponibili)")
-                         print("🔍 [PersonalizzazionePaccoView] modelloSelezionato: \(modelloSelezionato)")
-                     }
-                     print("🔍 [PersonalizzazionePaccoView] Vista modale è apparsa")
-                     print("🔍 [PersonalizzazionePaccoView] tipo: \(tipo)")
-                 }
+                .padding(.vertical, 4)
+            }
+
+            Section("Variant") {
+                if modelli.isEmpty {
+                    Text("No variants available")
+                        .foregroundStyle(.secondary)
+                }
+                ForEach(modelli, id: \.self) { modello in
+                    Button {
+                        modelloSelezionato = modello
+                    } label: {
+                        HStack(spacing: 12) {
+                            ColorWheelView(gradient: gradiente(per: modello), size: 28)
+                            Text(modello)
+                                .foregroundStyle(.primary)
+                            Spacer()
+                            if modello == modelloSelezionato {
+                                Image(systemName: "checkmark")
+                                    .fontWeight(.semibold)
+                            }
+                        }
+                    }
+                    .accessibilityAddTraits(modello == modelloSelezionato ? .isSelected : [])
+                }
+            }
+
+            Section("Shots") {
+                Stepper(value: $scattiTotali, in: 1...99) {
+                    HStack {
+                        Text("Total")
+                        Spacer()
+                        Text("\(scattiTotali)")
+                            .foregroundStyle(.secondary)
+                            .monospacedDigit()
+                            .contentTransition(.numericText())
+                    }
+                }
+            }
+
+            Section("Dates") {
+                DatePicker("Purchase date", selection: $dataAcquisto, displayedComponents: .date)
+
+                Toggle("Has expiry date", isOn: $mostraScadenza)
+
+                if mostraScadenza {
+                    DatePicker(
+                        "Expiry date",
+                        selection: Binding(
+                            get: { dataScadenza ?? FilmPack.calcolaScadenzaDefault(dataAcquisto: dataAcquisto) },
+                            set: { dataScadenza = $0 }
+                        ),
+                        displayedComponents: .date
+                    )
+                }
+            }
+
+            if !fotocamereCompatibili.isEmpty {
+                Section("Camera") {
+                    Picker("Load into", selection: $fotocameraSelezionata) {
+                        Text("None").tag(nil as UUID?)
+                        ForEach(fotocamereCompatibili) { camera in
+                            Text(camera.displayName).tag(camera.id as UUID?)
+                        }
+                    }
+                }
+            }
+
+            Section("Notes") {
+                TextField("Notes", text: $note, axis: .vertical)
             }
         }
+        .navigationTitle(tipo)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Add") {
+                    salva()
+                }
+                .disabled(modelloSelezionato.isEmpty)
+            }
+        }
+        .onAppear {
+            guard !inizializzato else { return }
+            inizializzato = true
+            scattiTotali = viewModel.capacitaDefaultPerTipo(tipo)
+            modelloSelezionato = modelli.first ?? ""
+        }
+        .onChange(of: viewModel.modelliFilm.count) {
+            // Models may finish downloading while this screen is open.
+            if modelloSelezionato.isEmpty || !modelli.contains(modelloSelezionato) {
+                modelloSelezionato = modelli.first ?? ""
+            }
+        }
+        .onChange(of: mostraScadenza) { _, attiva in
+            if attiva && dataScadenza == nil {
+                dataScadenza = FilmPack.calcolaScadenzaDefault(dataAcquisto: dataAcquisto)
+            }
+        }
+        .sensoryFeedback(.success, trigger: salvato)
     }
-    
-    private func salvaPaccoFilm() {
-        let scatti = viewModel.capacitaDefaultPerTipo(tipo)
-        
+
+    private func salva() {
+        let noteRipulite = note.trimmingCharacters(in: .whitespacesAndNewlines)
         let pacco = FilmPack(
             tipo: tipo,
             modello: modelloSelezionato,
             colore: nil,
-            scattiTotali: scatti,
+            scattiTotali: scattiTotali,
             dataAcquisto: dataAcquisto,
             dataScadenza: mostraScadenza ? dataScadenza : nil,
-            note: nil
+            note: noteRipulite.isEmpty ? nil : noteRipulite
         )
-        
+
         viewModel.aggiungiPaccoFilm(pacco)
+
+        if let id = fotocameraSelezionata,
+           let camera = viewModel.fotocamere.first(where: { $0.id == id }) {
+            viewModel.caricaFilm(pacco, in: camera)
+        }
+
+        salvato.toggle()
         onSave()
     }
-}
-
-
-
-#Preview {
-    AggiungiPaccoFilmView(viewModel: FilmPackViewModel(), fotocamera: nil)
 }

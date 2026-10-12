@@ -5,103 +5,49 @@ struct DataSyncView: View {
     @StateObject private var dataDownloader = DataDownloader.shared
     @State private var showingAlert = false
     @State private var alertMessage = ""
-    
+    @State private var cameraModelsCount = 0
+    @State private var filmTypesCount = 0
+    @State private var filmModelsCount = 0
+    @State private var cacheExpiryDate: Date?
+
     var body: some View {
-        NavigationView {
-            List {
-                Section("Sync Status") {
-                    HStack {
-                        Image(systemName: dataDownloader.isLoading ? "arrow.clockwise" : "checkmark.circle")
-                            .foregroundColor(dataDownloader.isLoading ? .orange : .green)
-                            .rotationEffect(.degrees(dataDownloader.isLoading ? 360 : 0))
-                            .animation(dataDownloader.isLoading ? .linear(duration: 1).repeatForever(autoreverses: false) : .default, value: dataDownloader.isLoading)
-                        
-                        VStack(alignment: .leading) {
-                            Text(dataDownloader.isLoading ? "Syncing..." : "Synced")
-                                .font(.headline)
-                            if let lastUpdate = dataDownloader.lastUpdateDate {
-                                Text("Last update: \(lastUpdate.formatted(date: .abbreviated, time: .shortened))")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+        NavigationStack {
+            Form {
+                Section("Catalog") {
+                    LabeledContent("Camera models", value: "\(cameraModelsCount)")
+                    LabeledContent("Film types", value: "\(filmTypesCount)")
+                    LabeledContent("Film models", value: "\(filmModelsCount)")
+                    LabeledContent("Last update", value: formatted(dataDownloader.lastUpdateDate))
+                    LabeledContent("Cache expiry", value: formatted(cacheExpiryDate))
+                }
+
+                Section {
+                    Button {
+                        syncData()
+                    } label: {
+                        HStack {
+                            Text("Refresh now")
+                            Spacer()
+                            if dataDownloader.isLoading {
+                                ProgressView()
                             }
                         }
-                        
-                        Spacer()
-                    }
-                }
-                
-                Section("Actions") {
-                    Button(action: syncData) {
-                        HStack {
-                            Image(systemName: "arrow.clockwise")
-                            Text("Sync Now")
-                        }
                     }
                     .disabled(dataDownloader.isLoading)
-                    
-                    Button(action: clearCache) {
-                        HStack {
-                            Image(systemName: "trash")
-                            Text("Clear Cache")
-                        }
-                        .foregroundColor(.red)
+
+                    Button("Clear cache", role: .destructive) {
+                        clearCache()
                     }
                     .disabled(dataDownloader.isLoading)
-                }
-                
-                Section("Information") {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Data is automatically downloaded when the app opens and saved locally for offline operation.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        
-                        Text("Cache is updated every time you manually sync.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(.vertical, 4)
-                }
-                
-                Section("Custom Icon Test") {
-                    HStack {
-                        Text("Polaroid 600 Custom Icon:")
-                            .font(.body)
-                        
-                        Spacer()
-                        
-                        Image("polaroid600.fill")
-                            .font(.system(size: 24))
-                            .foregroundColor(.blue)
-                            .frame(width: 32, height: 32)
-                    }
-                    
-                    HStack {
-                        Text("Standard SF Symbol:")
-                            .font(.body)
-                        
-                        Spacer()
-                        
-                        Image(systemName: "camera.fill")
-                            .font(.system(size: 24))
-                            .foregroundColor(.green)
-                            .frame(width: 32, height: 32)
-                    }
-                    
-                    Text("Test your custom icon vs standard SF Symbol")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .padding(.top, 4)
+                } footer: {
+                    Text("The catalog is downloaded when the app opens and kept locally for offline use.")
                 }
             }
-            .navigationTitle("Debug")
+            .navigationTitle("Data")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
-                        dismiss()
-                    }
-                    .fontWeight(.semibold)
-                    .foregroundColor(AppColors.navigationButton)
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(role: .close) { dismiss() }
                 }
             }
             .alert("Information", isPresented: $showingAlert) {
@@ -110,36 +56,61 @@ struct DataSyncView: View {
                 Text(alertMessage)
             }
         }
+        .tint(.primary)
         .presentationDetents([.large])
+        .onAppear(perform: reloadCounts)
     }
-    
+
+    private func formatted(_ date: Date?) -> String {
+        guard let date else { return "–" }
+        return date.formatted(date: .abbreviated, time: .shortened)
+    }
+
+    private func reloadCounts() {
+        cameraModelsCount = dataDownloader.loadFromCache(
+            forKey: DataConfig.UserDefaultsKeys.cameraModelsCache,
+            type: [CameraModel].self
+        )?.count ?? 0
+        filmTypesCount = dataDownloader.loadFromCache(
+            forKey: DataConfig.UserDefaultsKeys.filmPackTypesCache,
+            type: [FilmPackType].self
+        )?.count ?? 0
+        filmModelsCount = dataDownloader.loadFromCache(
+            forKey: DataConfig.UserDefaultsKeys.filmPackModelsCache,
+            type: [FilmPackModel].self
+        )?.count ?? 0
+        cacheExpiryDate = UserDefaults.standard.object(forKey: DataConfig.UserDefaultsKeys.cacheExpirationDate) as? Date
+    }
+
     private func syncData() {
         Task {
             do {
-                // Sincronizza entrambi i tipi di dati
                 async let cameras = dataDownloader.downloadCameraModels()
                 async let filmPacks = dataDownloader.downloadFilmPackModels()
-                
+
                 let (_, _) = try await (cameras, filmPacks)
-                
+
                 await MainActor.run {
+                    reloadCounts()
                     alertMessage = "Data synced successfully!"
                     showingAlert = true
                 }
             } catch {
                 await MainActor.run {
+                    reloadCounts()
                     alertMessage = "Error during sync: \(error.localizedDescription)"
                     showingAlert = true
                 }
             }
         }
     }
-    
-            private func clearCache() {
-            dataDownloader.clearCache()
-            alertMessage = "Cache cleared successfully!"
-            showingAlert = true
-        }
+
+    private func clearCache() {
+        dataDownloader.clearCache()
+        reloadCounts()
+        alertMessage = "Cache cleared successfully!"
+        showingAlert = true
+    }
 }
 
 #Preview {

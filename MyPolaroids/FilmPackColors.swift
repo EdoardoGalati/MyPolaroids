@@ -27,18 +27,37 @@ struct FilmPackColors {
     }
     
     // Configurazione gradienti per ogni tipo di pacco
+    /// Returns the gradient of a film model by name. Names are normalised so that
+    /// packs saved under older catalog names ("Black & White", "Color Black Frame",
+    /// "Color i-Type Black Frame Film") still match the current ones ("B&W", "Black Frame").
     static func gradientePerTipo(_ tipo: String, modello: String, modelliDisponibili: [FilmPackModel] = []) -> FilmPackGradient? {
-        // Cerca il gradiente direttamente per nome del modello (più semplice e diretto)
-        if let modelloFilm = modelliDisponibili.first(where: { $0.name.lowercased() == modello.lowercased() }) {
-            return modelloFilm.gradient
+        let sameType = modelliDisponibili.filter { $0.film_type == nil || $0.film_type == tipo }
+        let pool = sameType.isEmpty ? modelliDisponibili : sameType
+        let wanted = normalised(modello)
+        if let exact = pool.first(where: { $0.name.lowercased() == modello.lowercased() }) {
+            return exact.gradient
         }
-        
-        // Se non troviamo il modello, restituiamo nil
-        print("⚠️ Modello non trovato: '\(modello)'")
-        print("📋 Modelli disponibili: \(modelliDisponibili.map { $0.name })")
+        if let loose = pool.first(where: { normalised($0.name) == wanted })
+            ?? modelliDisponibili.first(where: { normalised($0.name) == wanted }) {
+            return loose.gradient
+        }
         return nil
     }
-    
+
+    private static func normalised(_ name: String) -> String {
+        var s = name.lowercased()
+        for token in ["polaroid", "film", "edition", "double pack", "i-type", "sx-70", "600", "go", "8x10", "4x5", "spectra"] {
+            s = s.replacingOccurrences(of: token, with: " ")
+        }
+        s = s.replacingOccurrences(of: "black & white", with: "bw")
+        s = s.replacingOccurrences(of: "black and white", with: "bw")
+        s = s.replacingOccurrences(of: "b&w", with: "bw")
+        s = s.replacingOccurrences(of: "colour", with: "color")
+        let parts = s.split(whereSeparator: { !$0.isLetter && !$0.isNumber }).map(String.init)
+        // "color" alone is the standard film; otherwise drop the "color" prefix of variants.
+        if parts == ["color"] { return "color" }
+        return parts.filter { $0 != "color" }.joined(separator: " ")
+    }
 
 }
 
@@ -60,10 +79,6 @@ struct FilmPackColorIndicator: View {
         let gradient = FilmPackColors.gradientePerTipo(tipo, modello: modello, modelliDisponibili: modelliDisponibili)
         
         // Debug: stampa informazioni per capire cosa sta succedendo
-        let _ = print("🔍 FilmPackColorIndicator - Tipo: \(tipo), Modello: \(modello)")
-        let _ = print("🔍 Modelli disponibili count: \(modelliDisponibili.count)")
-        let _ = print("🔍 Modelli disponibili IDs: \(modelliDisponibili.map { $0.id })")
-        let _ = print("🔍 Gradiente trovato: \(gradient != nil)")
         
         ColorWheelView(gradient: gradient, size: size)
     }

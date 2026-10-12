@@ -14,49 +14,72 @@ struct DettagliFotocameraView: View {
     @State private var mostraFilmFinito = false
     @State private var refreshTrigger = false
     @State private var mostraScartaPacco = false
-    
+
+    private var paccoCaricato: FilmPack? {
+        viewModel.filmPackViewModel?.filmCaricato(in: fotocamera)
+    }
+
+    private var formati: [String] {
+        (fotocamera.filmType ?? "")
+            .split(separator: "/")
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty }
+    }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 1) {
-            // Header con icona e informazioni base
-            headerSection
-            
-            // Contenuto principale in base allo stato
-            if let pacco = viewModel.filmPackViewModel?.filmCaricato(in: fotocamera) {
-                // Camera LOADED
-                loadedContentSection(pacco: pacco)
-            } else {
-                // Camera UNLOADED
-                unloadedContentSection
-            }
-        }
-        .background(AppColors.backgroundPrimary)
-        .navigationTitle("Camera Details")
-        .navigationBarTitleDisplayMode(.inline)
-        .tint(AppColors.navigationButton)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                HStack(spacing: 16) {
-                    Button(action: { mostraModifica = true }) {
-                        Image(systemName: "pencil")
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(.primary)
-                    }
-                    
-                    Button(action: { mostraDeleteAlert = true }) {
-                        Image(systemName: "trash")
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(.red)
-                    }
+        ScrollView {
+            VStack(spacing: 24) {
+                heroSection
+
+                if let pacco = paccoCaricato {
+                    loadedFilmCard(pacco: pacco)
+                } else {
+                    unloadedFilmCard
                 }
+
+                infoCard
+            }
+            .padding(DS.margin)
+        }
+        .groupedScreenBackground()
+        .navigationTitle(fotocamera.displayName)
+        .navigationBarTitleDisplayMode(.inline)
+        .tint(.primary)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Menu {
+                    Button {
+                        mostraModifica = true
+                    } label: {
+                        Label("Edit", systemImage: "pencil")
+                    }
+
+                    if paccoCaricato != nil {
+                        Button(role: .destructive) {
+                            mostraScartaPacco = true
+                        } label: {
+                            Label("Discard Film Pack", systemImage: "xmark.rectangle")
+                        }
+                    }
+
+                    Divider()
+
+                    Button(role: .destructive) {
+                        mostraDeleteAlert = true
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis")
+                }
+                .accessibilityLabel("More")
             }
         }
-        .presentationDetents([.medium])
         .sheet(isPresented: $mostraModifica) {
             ModificaFotocameraView(
                 fotocamera: Binding(
                     get: { fotocamera },
                     set: { newValue in
-                        // Aggiorna la fotocamera nell'array del viewModel
                         if let index = viewModel.fotocamere.firstIndex(where: { $0.id == fotocamera.id }) {
                             viewModel.fotocamere[index] = newValue
                         }
@@ -67,7 +90,7 @@ struct DettagliFotocameraView: View {
         }
         .sheet(isPresented: $mostraCaricaFilm) {
             CaricaFilmView(
-                fotocamera: fotocamera, 
+                fotocamera: fotocamera,
                 viewModel: viewModel.filmPackViewModel!
             )
             .onDisappear {
@@ -76,7 +99,7 @@ struct DettagliFotocameraView: View {
         }
         .sheet(isPresented: $mostraConsumoScatti) {
             ConsumoScattiView(
-                fotocamera: fotocamera, 
+                fotocamera: fotocamera,
                 viewModel: viewModel.filmPackViewModel!,
                 selectedTab: $selectedTab
             )
@@ -96,32 +119,15 @@ struct DettagliFotocameraView: View {
             }
             Button("Cancel", role: .cancel) { }
         } message: {
-            Text("Are you sure you want to delete '\(fotocamera.nickname)'? This action cannot be undone.")
+            Text("Are you sure you want to delete '\(fotocamera.displayName)'? This action cannot be undone.")
         }
         .alert("Remove Film", isPresented: $mostraRimuoviFilm) {
             Button("Cancel", role: .cancel) { }
             Button("Remove", role: .destructive) {
-                // Controlla se questo è l'ultimo film del tipo
-                if let pacco = viewModel.filmPackViewModel?.filmCaricato(in: fotocamera) {
-                    let tipoPacco = pacco.tipo
-                    let modelliPacco = pacco.modello
-                    
-                    // Rimuovi il film
-                    viewModel.filmPackViewModel?.rimuoviFilmDaFotocamera(fotocamera)
-                    
-                    // Controlla se ci sono ancora pacchi dello stesso tipo e modello
-                    let pacchiRimanenti = viewModel.filmPackViewModel?.pacchiFilm.filter { 
-                        $0.tipo == tipoPacco && $0.modello == modelliPacco 
-                    } ?? []
-                    
-                    // Se non ci sono più pacchi di questo tipo, torna alla home
-                    if pacchiRimanenti.isEmpty {
-                        selectedTab = 0
-                    }
-                }
+                rimuoviFilm()
             }
         } message: {
-            Text("Do you want to remove the film from '\(fotocamera.nickname)'?")
+            Text("Do you want to remove the film from '\(fotocamera.displayName)'?")
         }
         .alert("Film Completed", isPresented: $mostraFilmFinito) {
             Button("Load New Film") {
@@ -134,367 +140,164 @@ struct DettagliFotocameraView: View {
         .alert("Discard Film Pack", isPresented: $mostraScartaPacco) {
             Button("Cancel", role: .cancel) { }
             Button("Discard", role: .destructive) {
-                // Controlla se questo è l'ultimo film del tipo
-                if let pacco = viewModel.filmPackViewModel?.filmCaricato(in: fotocamera) {
-                    let tipoPacco = pacco.tipo
-                    let modelliPacco = pacco.modello
-                    
-                    // Rimuovi il film
-                    viewModel.filmPackViewModel?.rimuoviFilmDaFotocamera(fotocamera)
-                    
-                    // Controlla se ci sono ancora pacchi dello stesso tipo e modello
-                    let pacchiRimanenti = viewModel.filmPackViewModel?.pacchiFilm.filter { 
-                        $0.tipo == tipoPacco && $0.modello == modelliPacco 
-                    } ?? []
-                    
-                    // Se non ci sono più pacchi di questo tipo, torna alla home
-                    if pacchiRimanenti.isEmpty {
-                        selectedTab = 0
-                    }
-                }
+                rimuoviFilm()
             }
         } message: {
-            Text("Do you want to discard the film pack from '\(fotocamera.nickname)'?")
+            Text("Do you want to discard the film pack from '\(fotocamera.displayName)'?")
         }
     }
-    
-    // MARK: - Header Section
-    private var headerSection: some View {
-        VStack {
-            Spacer(minLength: 0)
-            VStack(spacing: 12) {
-                // Icona fotocamera
-                Image(fotocamera.icona)
-                    .font(.system(size: 96))
-                    .foregroundColor(Camera.coloreDaNome(fotocamera.coloreIcona))
-                // Nome e nickname
-                if fotocamera.nickname.isEmpty || fotocamera.nickname == fotocamera.modello {
-                    Text(fotocamera.modello)
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundColor(AppColors.textPrimary)
-                } else {
-                    VStack(spacing: 4) {
-                        Text(fotocamera.nickname)
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .foregroundColor(.primary)
-                        Text(fotocamera.modello)
-                            .font(.headline)
-                            .foregroundColor(.secondary)
+
+    // MARK: - Hero
+
+    private var heroSection: some View {
+        VStack(spacing: 12) {
+            CameraTile(symbol: fotocamera.icona, colorHex: fotocamera.coloreIcona, size: 120)
+
+            VStack(spacing: 4) {
+                Text(fotocamera.modello)
+                    .font(.title2)
+                    .fontDesign(.rounded)
+                    .fontWeight(.bold)
+                    .multilineTextAlignment(.center)
+
+                Text("\(fotocamera.brand) · \(String(fotocamera.annoProduzione))")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
+            if !formati.isEmpty {
+                HStack(spacing: 6) {
+                    ForEach(formati, id: \.self) { formato in
+                        Chip(text: formato)
                     }
                 }
             }
-            .frame(maxWidth: .infinity)
-            .frame(height: 100)
-            Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity)
-        .background(AppColors.backgroundSecondary)
-        .cornerRadius(16)
+        .padding(.top, 8)
     }
-    
-    // MARK: - Content Section (Loaded)
-    private func loadedContentSection(pacco: FilmPack) -> some View {
-        VStack(spacing: 1) {
-            // Brand
-            HStack {
-                Text("Brand:")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-                
-                Spacer()
-                
-                Text(fotocamera.brand)
-                    .font(.headline)
-                    .fontWeight(.medium)
-                    .foregroundColor(.primary)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
-            .background(AppColors.backgroundSecondary)
-            .cornerRadius(16)
-            
-            // Anno
-            HStack {
-                Text("Year:")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-                
-                Spacer()
-                
-                Text(String(fotocamera.annoProduzione))
-                    .font(.headline)
-                    .fontWeight(.medium)
-                    .foregroundColor(.primary)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
-            .background(AppColors.backgroundSecondary)
-            .cornerRadius(16)
-            
-            // Compatibilità
-            HStack {
-                Text("Compatibility:")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-                
-                Spacer()
-                
-                Text(fotocamera.filmType ?? "Unknown")
-                    .font(.headline)
-                    .fontWeight(.medium)
-                    .foregroundColor(.primary)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
-            .background(AppColors.backgroundSecondary)
-            .cornerRadius(16)
-            
-            // Tipo film e pulsante discard
-            HStack {
-                HStack(spacing: 12) {
-                    Text("Status:")
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.primary)
-                    
-                    Text("\(pacco.tipo) • \(pacco.modello)")
-                        .font(.headline)
-                        .fontWeight(.medium)
-                        .foregroundColor(.primary)
-                    
-                    // Pallino del colore del film
-                    FilmPackColorIndicator(
-                        tipo: pacco.tipo,
+
+    // MARK: - Film card (loaded)
+
+    private func loadedFilmCard(pacco: FilmPack) -> some View {
+        Card(title: "Film") {
+            HStack(spacing: 12) {
+                ColorWheelView(
+                    gradient: FilmPackColors.gradientePerTipo(
+                        pacco.tipo,
                         modello: pacco.modello,
-                        modelliDisponibili: viewModel.filmPackViewModel?.modelliFilm ?? [],
-                        size: 20
-                    )
-                }
-                
-                Spacer()
-                
-                Button(action: { mostraScartaPacco = true }) {
-                    Text("Discard")
-                        .font(.system(size: 14))
-                        .fontWeight(.medium)
-                        .foregroundColor(.red)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(Color.red.opacity(0.1))
-                        .cornerRadius(8)
-                }
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
-            .background(AppColors.backgroundSecondary)
-            .cornerRadius(16)
-            
-            // Foto rimaste
-            HStack {
-                Text("Photos Left:")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-                
-                Spacer()
-                
-                // Numero scatti rimanenti in rettangolo stile home
-                Text("\(pacco.scattiRimanenti)")
-                    .font(.system(size: 16))
-                    .fontWeight(.medium)
-                    .foregroundColor(AppColors.textPrimary)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color.clear)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(AppColors.separator, lineWidth: 1)
-                    )
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
-            .background(AppColors.backgroundSecondary)
-            .cornerRadius(16)
-            
-            // Pulsante I Took a Photo
-            Button(action: { scattaFoto() }) {
-                HStack {
-                    Image(systemName: "camera.fill")
-                        .font(.system(size: 18))
-                    Text("I Took a Photo")
+                        modelliDisponibili: viewModel.filmPackViewModel?.modelliFilm ?? []
+                    ),
+                    size: 36
+                )
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(pacco.modello)
                         .font(.headline)
-                        .fontWeight(.semibold)
+                    Text(pacco.tipo)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
-                .foregroundColor(AppColors.buttonText)
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 16)
-                .background(AppColors.buttonPrimary)
-                .cornerRadius(16)
+
+                Spacer(minLength: 0)
+
+                if pacco.isScaduto {
+                    Chip(text: "Expired", systemImage: "clock", prominent: true)
+                }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
+
+            ShotFrames(remaining: pacco.scattiRimanenti, total: pacco.scattiTotali, frameSize: 18)
+                .padding(.vertical, 4)
+
+            Text("\(pacco.scattiRimanenti) shot\(pacco.scattiRimanenti == 1 ? "" : "s") left")
+                .font(.subheadline)
+                .contentTransition(.numericText())
+
+            if let scadenza = pacco.dataScadenza {
+                Text(pacco.isScaduto ? "Expired on \(scadenza.shortDisplay)" : "Expires \(scadenza.shortDisplay)")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+
+            VStack(spacing: 12) {
+                Button("Take Shots") {
+                    scattaFoto()
+                }
+                .buttonStyle(.primaryBox)
+                .disabled(pacco.scattiRimanenti == 0)
+
+                Button("Unload Film") {
+                    mostraRimuoviFilm = true
+                }
+                .buttonStyle(.secondaryBox)
+            }
+            .padding(.top, 4)
         }
     }
-    
-    // MARK: - Content Section (Unloaded)
-    private var unloadedContentSection: some View {
-        VStack(spacing: 1) {
-            // Brand
-            HStack {
-                Text("Brand:")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-                
-                Spacer()
-                
-                Text(fotocamera.brand)
-                    .font(.headline)
-                    .fontWeight(.medium)
-                    .foregroundColor(.primary)
+
+    // MARK: - Film card (unloaded)
+
+    private var unloadedFilmCard: some View {
+        Card(title: "Film") {
+            Text("No film loaded")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            Button("Load Film") {
+                mostraCaricaFilm = true
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
-            .background(AppColors.backgroundSecondary)
-            .cornerRadius(16)
-            
-            // Anno
-            HStack {
-                Text("Year:")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-                
-                Spacer()
-                
-                Text(String(fotocamera.annoProduzione))
-                    .font(.headline)
-                    .fontWeight(.medium)
-                    .foregroundColor(.primary)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
-            .background(AppColors.backgroundSecondary)
-            .cornerRadius(16)
-            
-            // Compatibilità
-            HStack {
-                Text("Compatibility:")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-                
-                Spacer()
-                
-                Text(fotocamera.filmType ?? "Unknown")
-                    .font(.headline)
-                    .fontWeight(.medium)
-                    .foregroundColor(.primary)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
-            .background(AppColors.backgroundSecondary)
-            .cornerRadius(16)
-            
-            // Tipo film e pulsante load
-            HStack {
-                HStack(spacing: 8) {
-                    Text("Status:")
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.primary)
-                    
-                    Text("No film loaded")
-                        .font(.headline)
-                        .fontWeight(.medium)
-                        .foregroundColor(.secondary)
-                }
-                
-                Spacer()
-                
-                Button(action: { mostraCaricaFilm = true }) {
-                    Text("Load")
-                        .font(.system(size: 14))
-                        .fontWeight(.medium)
-                        .foregroundColor(AppColors.buttonText)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(AppColors.buttonPrimary)
-                        .cornerRadius(8)
-                }
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
-            .background(AppColors.backgroundSecondary)
-            .cornerRadius(16)
-            
-            // Pulsante I Took a Photo (disabilitato)
-            Button(action: {}) {
-                HStack {
-                    Image(systemName: "camera.fill")
-                        .font(.system(size: 18))
-                    Text("I Took a Photo")
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                }
-                .foregroundColor(.gray)
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 16)
-                .background(Color.gray.opacity(0.2))
-                .cornerRadius(16)
-            }
-            .disabled(true)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
+            .buttonStyle(.primaryBox)
+            .padding(.top, 4)
         }
     }
-    
+
+    // MARK: - Info card
+
+    private var infoCard: some View {
+        Card(title: "Details") {
+            InfoRow(label: "Model", value: fotocamera.modello)
+            InfoRow(label: "Brand", value: fotocamera.brand)
+            InfoRow(label: "Year", value: String(fotocamera.annoProduzione))
+            InfoRow(label: "Film format", value: fotocamera.filmType ?? "Unknown")
+            InfoRow(label: "Added", value: fotocamera.dataAggiunta.shortDisplay)
+        }
+    }
+
     // MARK: - Actions
+
     private func scattaFoto() {
-        guard let pacco = viewModel.filmPackViewModel?.filmCaricato(in: fotocamera),
-              pacco.scattiRimanenti > 0 else { return }
-        // Mostra alert di conferma (ConsumoScattiView)
+        guard let pacco = paccoCaricato, pacco.scattiRimanenti > 0 else { return }
         mostraConsumoScatti = true
     }
-    
+
     private func rimuoviFilm() {
-        // Controlla se questo è l'ultimo film del tipo
-        if let pacco = viewModel.filmPackViewModel?.filmCaricato(in: fotocamera) {
-            let tipoPacco = pacco.tipo
-            let modelliPacco = pacco.modello
-            
-            // Rimuovi il film
-            viewModel.filmPackViewModel?.rimuoviFilmDaFotocamera(fotocamera)
-            
-            // Controlla se ci sono ancora pacchi dello stesso tipo e modello
-            let pacchiRimanenti = viewModel.filmPackViewModel?.pacchiFilm.filter { 
-                $0.tipo == tipoPacco && $0.modello == modelliPacco 
-            } ?? []
-            
-            // Se non ci sono più pacchi di questo tipo, torna alla home
-            if pacchiRimanenti.isEmpty {
-                selectedTab = 0
-            }
+        guard let pacco = paccoCaricato else { return }
+        let tipoPacco = pacco.tipo
+        let modelliPacco = pacco.modello
+
+        viewModel.filmPackViewModel?.rimuoviFilmDaFotocamera(fotocamera)
+
+        // If no packs of this type and model remain, go back to the Cameras tab.
+        let pacchiRimanenti = viewModel.filmPackViewModel?.pacchiFilm.filter {
+            $0.tipo == tipoPacco && $0.modello == modelliPacco
+        } ?? []
+
+        if pacchiRimanenti.isEmpty {
+            selectedTab = 0
         }
     }
 }
 
 #Preview {
-    DettagliFotocameraView(
-        fotocamera: Camera(
-            nickname: "My Camera",
-            modello: "Polaroid 600",
-            coloreIcona: "000"
-        ),
-        viewModel: CameraViewModel(),
-        selectedTab: .constant(0)
-    )
+    NavigationStack {
+        DettagliFotocameraView(
+            fotocamera: Camera(
+                nickname: "My Camera",
+                modello: "Polaroid 600",
+                coloreIcona: "000"
+            ),
+            viewModel: CameraViewModel(),
+            selectedTab: .constant(0)
+        )
+    }
 }
-

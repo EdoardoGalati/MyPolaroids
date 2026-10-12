@@ -3,322 +3,168 @@ import SwiftUI
 struct AggiungiFotocameraView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var viewModel: CameraViewModel
-    
-    @State private var nickname: String = ""
-    @State private var coloreSelezionato: String = "000"
+
     @State private var searchText = ""
-    @State private var mostraPersonalizzazione = false
-    @State private var modelloSelezionato: CameraModel?
-    
-    // Colori disponibili per le icone
-    private let coloriDisponibili = ["000", "D60027", "FF8200", "FFB503", "78BE1F", "198CD9"]
-    
+    @State private var path: [String] = []
+
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) {
-                // Barra di ricerca
-                searchBar
-                
-                // Lista fotocamere
-                ScrollView {
-                    LazyVStack(spacing: 1) {
-                        ForEach(fotocamereFiltrate, id: \.id) { modello in
-                            Button(action: {
-                                modelloSelezionato = modello
-                                mostraPersonalizzazione = true
-                            }) {
-                                bottoneFotocamera(modello: modello)
+        NavigationStack(path: $path) {
+            List {
+                ForEach(sections, id: \.filmType) { section in
+                    Section(section.filmType) {
+                        ForEach(section.models, id: \.id) { modello in
+                            NavigationLink(value: modello.id) {
+                                modelRow(modello)
                             }
-                            .buttonStyle(PlainButtonStyle())
                         }
                     }
-                    .padding(.vertical, 16)
                 }
             }
-            .background(AppColors.backgroundPrimary)
+            .overlay {
+                if sections.isEmpty, !searchText.isEmpty {
+                    ContentUnavailableView.search(text: searchText)
+                }
+            }
+            .searchable(text: $searchText, prompt: "Search cameras")
             .navigationTitle("Add Camera")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                    .foregroundColor(AppColors.navigationButton)
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(role: .close) { dismiss() }
                 }
             }
-            .navigationDestination(isPresented: $mostraPersonalizzazione) {
-                if let modello = modelloSelezionato {
+            .navigationDestination(for: String.self) { modelID in
+                if let modello = viewModel.modelliDisponibili.first(where: { $0.id == modelID }) {
                     PersonalizzazioneView(
                         modello: modello,
                         viewModel: viewModel,
-                        onSave: {
-                            // Torna alla vista principale dopo aver salvato
-                            mostraPersonalizzazione = false
-                            dismiss()
-                        }
+                        onSave: { dismiss() }
                     )
                 }
             }
         }
+        .tint(.primary)
     }
-    
-    // MARK: - Barra di Ricerca
-    private var searchBar: some View {
-        HStack {
-            Image(systemName: "magnifyingglass")
-                .foregroundColor(.gray)
-            
-            TextField("Search cameras...", text: $searchText)
-                .textFieldStyle(PlainTextFieldStyle())
+
+    // MARK: - Row
+
+    private func modelRow(_ modello: CameraModel) -> some View {
+        HStack(spacing: 12) {
+            CameraTile(symbol: modello.default_icon, colorHex: "000", size: 44)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(modello.name)
+                    .font(.headline)
+                Text("\(modello.brand) · \(String(modello.year_introduced)) · \(modello.capacity) \(modello.capacity == 1 ? "shot" : "shots")")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .background(AppColors.backgroundSecondary)
-        .cornerRadius(26)
-        .padding(.horizontal, 20)
-        .padding(.top, 20)
-        .padding(.bottom, 16)
+        .padding(.vertical, 2)
     }
-    
-    // MARK: - Bottone Fotocamera
-    private func bottoneFotocamera(modello: CameraModel) -> some View {
-        HStack {
-            Image(modello.default_icon)
-                .font(.title2)
-                .foregroundColor(AppColors.textPrimary)
-            
-            Text(modello.name)
-                .font(.system(size: 16, weight: .medium))
-                .foregroundColor(AppColors.textPrimary)
-            
-            Spacer()
-            
-            Image(systemName: "chevron.right")
-                .font(.caption)
-                .foregroundColor(.gray)
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 16)
-        .background(AppColors.backgroundSecondary)
-        .cornerRadius(16)
-    }
-    
-    // MARK: - Computed Properties
+
+    // MARK: - Data
+
     private var fotocamereFiltrate: [CameraModel] {
         if searchText.isEmpty {
             return viewModel.modelliDisponibili
-        } else {
-            return viewModel.modelliDisponibili.filter { 
-                $0.name.localizedCaseInsensitiveContains(searchText) ||
-                $0.model.localizedCaseInsensitiveContains(searchText)
-            }
+        }
+        return viewModel.modelliDisponibili.filter {
+            $0.name.localizedCaseInsensitiveContains(searchText) ||
+            $0.model.localizedCaseInsensitiveContains(searchText)
+        }
+    }
+
+    private var sections: [(filmType: String, models: [CameraModel])] {
+        AddCameraSections.grouped(fotocamereFiltrate)
+    }
+}
+
+// MARK: - Grouping by film type
+
+private enum AddCameraSections {
+    static let priority = ["i-Type", "600", "SX-70", "Go", "Spectra"]
+
+    static func rank(_ filmType: String) -> Int {
+        if let index = priority.firstIndex(of: filmType) { return index * 2 }
+        if let index = priority.firstIndex(where: { filmType.localizedCaseInsensitiveContains($0) }) {
+            return index * 2 + 1
+        }
+        return priority.count * 2
+    }
+
+    static func grouped(_ models: [CameraModel]) -> [(filmType: String, models: [CameraModel])] {
+        let groups = Dictionary(grouping: models, by: { $0.film_type })
+        let keys = groups.keys.sorted { a, b in
+            let ra = rank(a), rb = rank(b)
+            if ra != rb { return ra < rb }
+            return a.localizedStandardCompare(b) == .orderedAscending
+        }
+        return keys.map { key in
+            (filmType: key, models: (groups[key] ?? []).sorted { $0.year_introduced > $1.year_introduced })
         }
     }
 }
 
-// MARK: - Vista Personalizzazione
+// MARK: - Step 2: customise
+
 struct PersonalizzazioneView: View {
-    @Environment(\.dismiss) private var dismiss
     let modello: CameraModel
     let viewModel: CameraViewModel
     let onSave: () -> Void
-    
+
     @State private var nickname: String = ""
     @State private var coloreSelezionato: String = "000"
-    
-    private let coloriDisponibili = ["000", "D60027", "FF8200", "FFB503", "78BE1F", "198CD9"]
-    
+    @State private var didAdd = false
+
     var body: some View {
-        VStack(spacing: 0) {
-            ScrollView {
-                VStack(spacing: 1) {
-                    // Header con icona e nome
-                    headerConIcona
-                    
-                    // Nickname
-                    sezioneNickname
-                    
-                    // Icon Color
-                    sezioneIconColor
-                    
-                    // Brand
-                    sezioneBrand
-                    
-                    // Anno
-                    sezioneAnno
+        Form {
+            Section {
+                VStack(spacing: 12) {
+                    CameraTile(symbol: modello.default_icon, colorHex: coloreSelezionato, size: 120)
+                        .animation(.snappy(duration: 0.2), value: coloreSelezionato)
+                    Text(modello.name)
+                        .font(.headline)
+                    Text("\(modello.brand) · \(String(modello.year_introduced))")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
                 }
-                .padding(.vertical, 16)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 8)
+                .listRowBackground(Color.clear)
+            }
+
+            Section("Name") {
+                TextField(modello.name, text: $nickname)
+            }
+
+            Section("Color") {
+                CameraColorPicker(selection: $coloreSelezionato)
             }
         }
-        .background(AppColors.backgroundPrimary)
         .navigationTitle("Customize")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button("Save") {
-                    salvaFotocamera()
-                }
-                .fontWeight(.semibold)
-                .foregroundColor(AppColors.navigationButton)
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Add") { salvaFotocamera() }
             }
         }
+        .sensoryFeedback(.success, trigger: didAdd)
+        .tint(.primary)
     }
-    
-    // MARK: - Header con Icona
-    private var headerConIcona: some View {
-        VStack {
-            Spacer(minLength: 0)
-            VStack(spacing: 12) {
-                // Icona fotocamera
-                Image(modello.default_icon)
-                    .font(.system(size: 80))
-                    .foregroundColor(Camera.coloreDaNome(coloreSelezionato))
-                
-                // Nome modello
-                Text(modello.name)
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundColor(AppColors.textPrimary)
-            }
-            .frame(maxWidth: .infinity)
-            Spacer(minLength: 0)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 50)
-        .background(AppColors.backgroundSecondary)
-        .cornerRadius(16)
-    }
-    
-    private var sezioneNickname: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("Nickname")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-                
-                Spacer()
-                
-                TextField("Your camera's nickname (optional)", text: $nickname)
-                    .textFieldStyle(PlainTextFieldStyle())
-                    .multilineTextAlignment(.trailing)
-            }
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 16)
-        .background(AppColors.backgroundSecondary)
-        .cornerRadius(16)
-    }
-    
-    private var sezioneIconColor: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("Icon Color")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-                
-                Spacer()
-                
-                HStack(spacing: 8) {
-                    ForEach(coloriDisponibili, id: \.self) { colore in
-                        Button(action: {
-                            coloreSelezionato = colore
-                        }) {
-                            ColorWheelView(gradient: FilmPackGradient(
-                                stops: [GradientStop(color: FilmPackColors.hexToRGB(colore), location: 0.0)],
-                                type: nil,
-                                startPoint: GradientPoint(x: 0.0, y: 0.0),
-                                endPoint: GradientPoint(x: 1.0, y: 1.0),
-                                center: nil
-                            ), size: 32)
-                                .overlay(
-                                    Circle()
-                                        .stroke(AppColors.accentPrimary, lineWidth: coloreSelezionato == colore ? 2 : 0)
-                                )
-                        }
-                    }
-                }
-            }
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 16)
-        .background(AppColors.backgroundSecondary)
-        .cornerRadius(16)
-    }
-    
-    private var sezioneBrand: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("Brand")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-                
-                Spacer()
-                
-                Text(modello.brand)
-                    .font(.body)
-                    .foregroundColor(.gray)
-            }
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 16)
-        .background(AppColors.backgroundSecondary)
-        .cornerRadius(16)
-    }
-    
-    private var sezioneAnno: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("Year")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-                
-                Spacer()
-                
-                Text(String(modello.year_introduced))
-                    .font(.body)
-                    .foregroundColor(.gray)
-            }
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 16)
-        .background(AppColors.backgroundSecondary)
-        .cornerRadius(16)
-    }
-    
+
     private func salvaFotocamera() {
-        print("🔧 [PersonalizzazioneView] ===== INIZIO SALVAFOTOCAMERA =====")
-        print("🔧 [PersonalizzazioneView] Modello: \(modello.name)")
-        print("🔧 [PersonalizzazioneView] Nickname: '\(nickname)'")
-        print("🔧 [PersonalizzazioneView] Colore: '\(coloreSelezionato)'")
-        
-        // Crea la fotocamera
         let fotocamera = Camera(
             nickname: nickname.isEmpty ? "" : nickname,
             modello: modello.name,
             coloreIcona: coloreSelezionato,
             modelliDisponibili: viewModel.modelliDisponibili
         )
-        
-        print("🔧 [PersonalizzazioneView] Fotocamera creata con ID: \(fotocamera.id)")
-        
-        // Aggiungi la fotocamera
         viewModel.aggiungiFotocamera(fotocamera)
-        
-        print("🔧 [PersonalizzazioneView] viewModel.aggiungiFotocamera() completata")
-        
-        // Torna alla vista principale usando onSave callback
-        print("🔧 [PersonalizzazioneView] Chiamata onSave()")
+        didAdd = true
         onSave()
-        
-        print("🔧 [PersonalizzazioneView] ===== FINE SALVAFOTOCAMERA =====")
     }
 }
 
-// MARK: - Preview
 #Preview {
     AggiungiFotocameraView(viewModel: CameraViewModel())
 }

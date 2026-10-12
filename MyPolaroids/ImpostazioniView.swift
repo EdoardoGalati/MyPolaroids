@@ -4,9 +4,14 @@ import RevenueCatUI
 
 struct ImpostazioniView: View {
     @Environment(\.dismiss) private var dismiss
+
     @AppStorage("ignoreCompatibility") private var ignoreCompatibility = false
     @AppStorage("cameraSortingOption") private var cameraSortingOption = SortingOption.dateAdded.rawValue
     @AppStorage("filmPackSortingOption") private var filmPackSortingOption = SortingOption.dateAdded.rawValue
+    @AppStorage("cloudKitEnabled") private var cloudKitEnabled = false
+    @AppStorage("notificationsEnabled") private var notificationsEnabled = false
+    @AppStorage("notificationDelayMinutes") private var notificationDelayMinutes = 15
+
     @State private var showingDebugModal = false
     @State private var showingPaywall = false
     @State private var versionTapCount = 0
@@ -16,441 +21,81 @@ struct ImpostazioniView: View {
     @State private var showingRestoreAlert = false
     @State private var restoreAlertTitle = ""
     @State private var restoreAlertMessage = ""
-    @Environment(\.colorScheme) private var colorScheme
-    
-    var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                ScrollView {
-                    VStack(spacing: 1) {
-                        // Sezione Compatibilità
-                        VStack(alignment: .leading, spacing: 12) {
-                            HStack {
-                                Text("Ignore Camera-Film Compatibility")
-                                    .font(.headline)
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.primary)
-                                
-                                Spacer()
-                                
-                                Toggle("", isOn: $ignoreCompatibility)
-                                    .labelsHidden()
-                            }
-                            
-                            Text("When enabled, you can load any film type in any camera, bypassing compatibility checks.")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .multilineTextAlignment(.leading)
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 16)
-                        .background(AppColors.backgroundSecondary)
-                        .cornerRadius(16)
-                        
-                        // Sezione Ordinamento Fotocamere
-                        HStack {
-                            Text("Camera Sorting")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.primary)
-                            
-                            Spacer()
-                            
-                            Menu {
-                                ForEach(SortingOption.allCases, id: \.self) { option in
-                                    Button(action: {
-                                        cameraSortingOption = option.rawValue
-                                    }) {
-                                        HStack {
-                                            Image(systemName: option.icon)
-                                            Text(option.displayName)
-                                            if cameraSortingOption == option.rawValue {
-                                                Image(systemName: "checkmark")
-                                            }
-                                        }
-                                    }
-                                }
-                            } label: {
-                                HStack {
-                                    Text(SortingOption(rawValue: cameraSortingOption)?.displayName ?? "Select")
-                                        .foregroundColor(AppColors.textPrimary)
-                                    Image(systemName: "chevron.down")
-                                        .foregroundColor(AppColors.textPrimary)
-                                        .font(.caption)
-                                }
-                            }
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 16)
-                        .background(AppColors.backgroundSecondary)
-                        .cornerRadius(16)
-                        
-                        // Sezione Ordinamento Film Pack
-                        HStack {
-                            Text("Film Pack Sorting")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.primary)
-                            
-                            Spacer()
-                            
-                            Menu {
-                                ForEach(SortingOption.allCases.filter { option in
-                                    option != .loadedFirst && option != .unloadedFirst
-                                }, id: \.self) { option in
-                                    Button(action: {
-                                        filmPackSortingOption = option.rawValue
-                                    }) {
-                                        HStack {
-                                            Image(systemName: option.icon)
-                                            Text(option.displayName)
-                                            if filmPackSortingOption == option.rawValue {
-                                                Image(systemName: "checkmark")
-                                            }
-                                        }
-                                    }
-                                }
-                            } label: {
-                                HStack {
-                                    Text(SortingOption(rawValue: filmPackSortingOption)?.displayName ?? "Select")
-                                        .foregroundColor(AppColors.textPrimary)
-                                    Image(systemName: "chevron.down")
-                                        .foregroundColor(AppColors.textPrimary)
-                                        .font(.caption)
-                                }
-                            }
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 16)
-                        .background(AppColors.backgroundSecondary)
-                        .cornerRadius(16)
-                        
-                        // Sezione iCloud Sync (sotto Film Pack Sorting) - Feature Premium
-                        VStack(alignment: .leading, spacing: 12) {
-                            HStack {
-                                Text("iCloud Sync")
-                                    .font(.headline)
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.primary)
-                                
-                                // Badge Premium
-                                HStack(spacing: 4) {
-                                    Image(systemName: "crown.fill")
-                                        .font(.caption)
-                                        .foregroundColor(.yellow)
-                                    Text("PREMIUM")
-                                        .font(.caption2)
-                                        .fontWeight(.bold)
-                                        .foregroundColor(.yellow)
-                                }
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(Color.yellow.opacity(0.2))
-                                .cornerRadius(4)
-                                
-                                Spacer()
-                                
-                                if isPremiumUser {
-                                    Toggle("", isOn: Binding(
-                                        get: { UserDefaults.standard.bool(forKey: "cloudKitEnabled") },
-                                        set: { newValue in
-                                            UserDefaults.standard.set(newValue, forKey: "cloudKitEnabled")
-                                            // Notifica CloudKitManager del cambio
-                                            NotificationCenter.default.post(name: NSNotification.Name("CloudKitToggleChanged"), object: nil)
-                                        }
-                                    ))
-                                    .labelsHidden()
-                                } else {
-                                    Button(action: {
-                                        showingPaywall = true
-                                    }) {
-                                        Image(systemName: "lock.fill")
-                                            .foregroundColor(.gray)
-                                            .font(.title3)
-                                    }
-                                }
-                            }
-                            
-                            if isPremiumUser {
-                                Text("When enabled, your cameras and film packs will automatically sync across all your devices every 15 minutes.")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                    .multilineTextAlignment(.leading)
-                                
-                                // Pulsante Sync Now (visibile solo se iCloud è abilitato)
-                                if UserDefaults.standard.bool(forKey: "cloudKitEnabled") {
-                                    Button(action: {
-                                        // Avvia sincronizzazione manuale
-                                        Task {
-                                            await syncNow()
-                                        }
-                                    }) {
-                                        HStack {
-                                            Image(systemName: "arrow.clockwise")
-                                                .font(.caption)
-                                            Text("Sync Now")
-                                                .font(.caption)
-                                                .fontWeight(.medium)
-                                        }
-                                        .foregroundColor(.blue)
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 6)
-                                        .background(Color.blue.opacity(0.1))
-                                        .cornerRadius(8)
-                                    }
-                                    .disabled(syncInProgress)
-                                    
-                                    if syncInProgress {
-                                        HStack {
-                                            ProgressView()
-                                                .scaleEffect(0.8)
-                                            Text("Syncing...")
-                                                .font(.caption)
-                                                .foregroundColor(.secondary)
-                                        }
-                                    }
-                                }
-                            } else {
-                                Text("Unlock iCloud sync to automatically sync your cameras and film packs across all your devices every 15 minutes.")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                    .multilineTextAlignment(.leading)
-                                
-                                Button(action: {
-                                    showingPaywall = true
-                                }) {
-                                    HStack {
-                                        Image(systemName: "crown.fill")
-                                            .font(.caption)
-                                        Text("Unlock Premium")
-                                            .font(.caption)
-                                            .fontWeight(.medium)
-                                    }
-                                    .foregroundColor(colorScheme == .light ? .white : .black)
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 6)
-                                    .background(colorScheme == .light ? .black : .white)
-                                    .cornerRadius(8)
-                                }
-                            }
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 16)
-                        .background(AppColors.backgroundSecondary)
-                        .cornerRadius(16)
-                        
-                        // Sezione Notifiche Sviluppo Foto (Feature Premium)
-                        VStack(alignment: .leading, spacing: 12) {
-                            HStack {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    HStack(spacing: 8) {
-                                                                            Text("Photo Ready Notifications")
-                                        .font(.headline)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.primary)
-                                        
-                                        // Badge Premium
-                                        HStack(spacing: 4) {
-                                            Image(systemName: "crown.fill")
-                                                .font(.caption)
-                                                .foregroundColor(.yellow)
-                                            Text("PREMIUM")
-                                                .font(.caption2)
-                                                .fontWeight(.bold)
-                                                .foregroundColor(.yellow)
-                                        }
-                                        .padding(.horizontal, 6)
-                                        .padding(.vertical, 2)
-                                        .background(Color.yellow.opacity(0.2))
-                                        .cornerRadius(4)
-                                    }
-                                    
-                                    Text("Get notified when your photo is ready to be scanned")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                        .multilineTextAlignment(.leading)
-                                }
-                                
-                                Spacer()
-                                
-                                if isPremiumUser {
-                                    Toggle("", isOn: Binding(
-                                        get: { UserDefaults.standard.bool(forKey: "notificationsEnabled") },
-                                        set: { newValue in
-                                            UserDefaults.standard.set(newValue, forKey: "notificationsEnabled")
-                                            if newValue {
-                                                Task {
-                                                    await requestNotificationPermission()
-                                                }
-                                            }
-                                        }
-                                    ))
-                                    .labelsHidden()
-                                } else {
-                                    Button(action: {
-                                        showingPaywall = true
-                                    }) {
-                                        Image(systemName: "lock.fill")
-                                            .foregroundColor(.gray)
-                                            .font(.title3)
-                                    }
-                                }
-                            }
-                            
-                            if isPremiumUser && UserDefaults.standard.bool(forKey: "notificationsEnabled") {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    HStack {
-                                        Text("Notification delay (minutes):")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                        
-                                        Spacer()
-                                        
-                                        TextField("15", value: Binding(
-                                            get: { UserDefaults.standard.integer(forKey: "notificationDelayMinutes") },
-                                            set: { newValue in
-                                                let clampedValue = max(1, min(1440, newValue)) // Min 1, Max 1440 (24 ore)
-                                                UserDefaults.standard.set(clampedValue, forKey: "notificationDelayMinutes")
-                                            }
-                                        ), format: .number)
-                                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                                        .frame(width: 80)
-                                        .multilineTextAlignment(.trailing)
-                                    }
-                                }
-                            } else if !isPremiumUser {
-                                Button(action: {
-                                    showingPaywall = true
-                                }) {
-                                    HStack {
-                                        Image(systemName: "crown.fill")
-                                            .font(.caption)
-                                        Text("Unlock Premium")
-                                            .font(.caption)
-                                            .fontWeight(.medium)
-                                    }
-                                    .foregroundColor(colorScheme == .light ? .white : .black)
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 6)
-                                    .background(colorScheme == .light ? .black : .white)
-                                    .cornerRadius(8)
-                                }
-                            }
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 16)
-                        .background(AppColors.backgroundSecondary)
-                        .cornerRadius(16)
-                        
-                        // Sezione Donations
-                        VStack(alignment: .leading, spacing: 12) {
-                            HStack {
-                                Image(systemName: "heart.fill")
-                                    .foregroundColor(AppColors.accentPrimary)
-                                    .font(.title2)
-                                
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text("Donations")
-                                        .font(.headline)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.primary)
-                                    
-                                    Text("Support the project and unlock premium features")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                        .multilineTextAlignment(.leading)
-                                    
-                                    Text("☁️ iCloud Sync across all devices\n🔔 Development Reminders for photos")
-                                        .font(.caption2)
-                                        .foregroundColor(.secondary)
-                                        .multilineTextAlignment(.leading)
-                                        .padding(.top, 2)
-                                }
-                                
-                                Spacer()
-                                
-                                Image(systemName: "chevron.right")
-                                    .foregroundColor(.gray)
-                                    .font(.caption)
-                            }
-                            
-                            // Pulsante Restore Purchases sempre visibile
-                            Button(action: {
-                                restorePurchases()
-                            }) {
-                                HStack {
-                                    Image(systemName: "arrow.clockwise.circle")
-                                        .font(.caption)
-                                    Text("Restore Purchases")
-                                        .font(.caption)
-                                        .fontWeight(.medium)
-                                }
-                                .foregroundColor(.blue)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(Color.blue.opacity(0.1))
-                                .cornerRadius(8)
-                            }
-                        }
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            showingPaywall = true
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 16)
-                        .background(AppColors.backgroundSecondary)
-                        .cornerRadius(16)
-                        
-                        // Sezione Versione
-                        VStack(alignment: .leading, spacing: 12) {
-                            HStack {
-                                Text("Version")
-                                    .font(.headline)
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.primary)
-                                
-                                Spacer()
-                                
-                                Text("1.2")
-                                    .font(.body)
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            versionTapCount += 1
-                            if versionTapCount >= 3 {
-                                showingDebugModal = true
-                                versionTapCount = 0
-                            }
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 16)
-                        .background(AppColors.backgroundSecondary)
-                        .cornerRadius(16)
-                    }
-                    .padding(.vertical, 16)
+
+    private let delayOptions = [1, 5, 10, 15, 20, 30]
+
+    private var filmSortingOptions: [SortingOption] {
+        SortingOption.allCases.filter { $0 != .loadedFirst && $0 != .unloadedFirst }
+    }
+
+    /// The preset delays, plus the stored value if it was set to something else.
+    private var delayChoices: [Int] {
+        delayOptions.contains(notificationDelayMinutes)
+            ? delayOptions
+            : (delayOptions + [notificationDelayMinutes]).sorted()
+    }
+
+    private var lastSyncDate: Date? {
+        UserDefaults.standard.object(forKey: "last_icloud_sync_date") as? Date
+    }
+
+    private var appVersion: String {
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "–"
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "–"
+        return "\(version) (\(build))"
+    }
+
+    /// Writes the iCloud flag and tells every CloudKitManager instance about the change.
+    private var cloudKitBinding: Binding<Bool> {
+        Binding(
+            get: { cloudKitEnabled },
+            set: { newValue in
+                cloudKitEnabled = newValue
+                NotificationCenter.default.post(name: NSNotification.Name("CloudKitToggleChanged"), object: nil)
+            }
+        )
+    }
+
+    private var notificationsBinding: Binding<Bool> {
+        Binding(
+            get: { notificationsEnabled },
+            set: { newValue in
+                notificationsEnabled = newValue
+                if newValue {
+                    Task { await requestNotificationPermission() }
                 }
             }
-            .background(AppColors.backgroundPrimary)
+        )
+    }
+
+    private var delayBinding: Binding<Int> {
+        Binding(
+            get: { notificationDelayMinutes },
+            set: { notificationDelayMinutes = max(1, min(1440, $0)) }
+        )
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                camerasSection
+                premiumSection
+                aboutSection
+            }
             .navigationTitle("Settings")
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarTitleDisplayMode(.large)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
-                        dismiss()
-                    }
-                    .fontWeight(.semibold)
-                    .foregroundColor(AppColors.navigationButton)
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(role: .close) { dismiss() }
                 }
             }
         }
+        .tint(.primary)
         .presentationDetents([.large])
         .onAppear {
             checkPremiumStatus()
         }
-        .onChange(of: refreshTrigger) { _ in
-            // Forza ricontrollo dello stato premium quando refreshTrigger cambia
+        .onChange(of: refreshTrigger) { _, _ in
             checkPremiumStatus()
         }
         .sheet(isPresented: $showingDebugModal) {
@@ -460,76 +105,205 @@ struct ImpostazioniView: View {
             PaywallView()
         }
         .alert(restoreAlertTitle, isPresented: $showingRestoreAlert) {
-            Button("OK") {
-                // L'alert si chiude automaticamente
-            }
+            Button("OK") { }
         } message: {
             Text(restoreAlertMessage)
         }
     }
-    
+
+    // MARK: - Sections
+
+    private var camerasSection: some View {
+        Section {
+            Picker(selection: $cameraSortingOption) {
+                ForEach(SortingOption.allCases, id: \.rawValue) { option in
+                    Label(option.displayName, systemImage: option.icon)
+                        .tag(option.rawValue)
+                }
+            } label: {
+                SettingsLabel(title: "Camera sorting", systemImage: "camera", color: .blue)
+            }
+
+            Picker(selection: $filmPackSortingOption) {
+                ForEach(filmSortingOptions, id: \.rawValue) { option in
+                    Label(option.displayName, systemImage: option.icon)
+                        .tag(option.rawValue)
+                }
+            } label: {
+                SettingsLabel(title: "Film sorting", systemImage: "square.stack", color: .indigo)
+            }
+
+            Toggle(isOn: $ignoreCompatibility) {
+                SettingsLabel(title: "Ignore compatibility", systemImage: "checkmark.shield", color: .orange)
+            }
+        } header: {
+            Text("Cameras")
+        } footer: {
+            Text("When enabled, you can load any film type in any camera, bypassing compatibility checks.")
+        }
+    }
+
+    private var premiumSection: some View {
+        Section {
+            if isPremiumUser {
+                Toggle(isOn: cloudKitBinding) {
+                    SettingsLabel(title: "iCloud Sync", systemImage: "icloud", color: .blue)
+                }
+
+                if cloudKitEnabled {
+                    Button {
+                        Task { await syncNow() }
+                    } label: {
+                        HStack {
+                            SettingsLabel(title: "Sync now", systemImage: "arrow.clockwise", color: .green)
+                            Spacer()
+                            if syncInProgress {
+                                ProgressView()
+                            }
+                        }
+                    }
+                    .disabled(syncInProgress)
+                }
+
+                Toggle(isOn: notificationsBinding) {
+                    SettingsLabel(title: "Photo Ready Notifications", systemImage: "bell", color: .red)
+                }
+
+                if notificationsEnabled {
+                    Picker(selection: delayBinding) {
+                        ForEach(delayChoices, id: \.self) { minutes in
+                            Text("\(minutes) min").tag(minutes)
+                        }
+                    } label: {
+                        SettingsLabel(title: "Delay", systemImage: "timer", color: .purple)
+                    }
+                }
+            } else {
+                lockedRow(title: "iCloud Sync", systemImage: "icloud", color: .blue)
+                lockedRow(title: "Photo Ready Notifications", systemImage: "bell", color: .red)
+            }
+
+            Button {
+                showingPaywall = true
+            } label: {
+                HStack {
+                    SettingsLabel(title: "Support the project", systemImage: "heart", color: .pink)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(.tertiary)
+                }
+            }
+
+            Button("Restore Purchases") {
+                restorePurchases()
+            }
+        } header: {
+            HStack(spacing: 8) {
+                Text("Premium")
+                if isPremiumUser {
+                    Chip(text: "Premium", prominent: true)
+                        .textCase(nil)
+                }
+            }
+        } footer: {
+            Text(premiumFooter)
+        }
+    }
+
+    private var premiumFooter: String {
+        if isPremiumUser {
+            var text = "Your cameras and film packs sync across all your devices every 15 minutes."
+            if let lastSyncDate {
+                text += " Last sync: \(lastSyncDate.formatted(date: .abbreviated, time: .shortened))."
+            }
+            if notificationsEnabled {
+                text += " You will be notified when a photo is ready to be scanned."
+            }
+            return text
+        }
+        return "Support the project to unlock iCloud sync across all your devices and photo ready notifications."
+    }
+
+    private func lockedRow(title: String, systemImage: String, color: Color) -> some View {
+        Button {
+            showingPaywall = true
+        } label: {
+            HStack {
+                SettingsLabel(title: title, systemImage: systemImage, color: color)
+                Spacer()
+                Image(systemName: "lock.fill")
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    private var aboutSection: some View {
+        Section("About") {
+            HStack {
+                SettingsLabel(title: "Version", systemImage: "info", color: .gray)
+                Spacer()
+                Text(appVersion)
+                    .foregroundStyle(.secondary)
+            }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                versionTapCount += 1
+                if versionTapCount >= 3 {
+                    showingDebugModal = true
+                    versionTapCount = 0
+                }
+            }
+        }
+    }
+
     // MARK: - Premium Functions
-    
+
     private func checkPremiumStatus() {
         Task {
             do {
                 let customerInfo = try await Purchases.shared.customerInfo()
                 await MainActor.run {
-                    // Controlla se l'utente ha fatto almeno una donazione
-                    isPremiumUser = !customerInfo.activeSubscriptions.isEmpty || 
+                    // Premium means at least one donation or an active subscription.
+                    isPremiumUser = !customerInfo.activeSubscriptions.isEmpty ||
                                    !customerInfo.nonSubscriptions.isEmpty
-                    
-                    // Salva lo stato premium in UserDefaults per il NotificationManager
+
+                    // NotificationManager reads this flag.
                     UserDefaults.standard.set(isPremiumUser, forKey: "isPremiumUser")
-                    
-                    print("💎 [ImpostazioniView] Stato premium: \(isPremiumUser ? "PREMIUM" : "FREE")")
                 }
             } catch {
-                print("❌ [ImpostazioniView] Errore controllo stato premium: \(error)")
                 await MainActor.run {
                     isPremiumUser = false
                 }
             }
         }
     }
-    
+
     private func restorePurchases() {
         Task {
             do {
-                print("🔄 [ImpostazioniView] Inizio restore purchases...")
                 let customerInfo = try await Purchases.shared.restorePurchases()
-                
+
                 await MainActor.run {
-                    // Controlla se il restore ha rivelato acquisti
-                    isPremiumUser = !customerInfo.activeSubscriptions.isEmpty || 
+                    isPremiumUser = !customerInfo.activeSubscriptions.isEmpty ||
                                    !customerInfo.nonSubscriptions.isEmpty
-                    
-                    // Salva lo stato premium in UserDefaults per il NotificationManager
+
                     UserDefaults.standard.set(isPremiumUser, forKey: "isPremiumUser")
-                    
+
                     if isPremiumUser {
-                        print("✅ [ImpostazioniView] Restore completato - Utente PREMIUM ripristinato!")
-                        // Forza aggiornamento UI
                         refreshTrigger.toggle()
-                        
-                        // Mostra popup di successo
-                        restoreAlertTitle = "Restore Successful! 🎉"
+
+                        restoreAlertTitle = "Restore Successful"
                         restoreAlertMessage = "Your premium access has been restored. You can now use iCloud sync and photo ready notifications!"
                         showingRestoreAlert = true
                     } else {
-                        print("⚠️ [ImpostazioniView] Restore completato - Nessun acquisto trovato")
-                        
-                        // Mostra popup di nessun acquisto trovato
                         restoreAlertTitle = "No Purchases Found"
                         restoreAlertMessage = "We couldn't find any previous purchases to restore. Please make a donation to unlock premium features."
                         showingRestoreAlert = true
                     }
                 }
             } catch {
-                print("❌ [ImpostazioniView] Errore restore purchases: \(error)")
-                
                 await MainActor.run {
-                    // Mostra popup di errore
                     restoreAlertTitle = "Restore Failed"
                     restoreAlertMessage = "An error occurred while restoring purchases. Please try again or contact support."
                     showingRestoreAlert = true
@@ -537,38 +311,35 @@ struct ImpostazioniView: View {
             }
         }
     }
-    
+
     // MARK: - Notification Functions
-    
+
     private func requestNotificationPermission() async {
         let granted = await NotificationManager.shared.requestNotificationPermission()
-        
+
         if !granted {
             await MainActor.run {
-                // Mostra alert per spiegare come abilitare le notifiche
                 restoreAlertTitle = "Notifications Permission Required"
-                restoreAlertMessage = "To receive photo ready notifications, please enable notifications in Settings > MyPolaroids > Notifications"
+                restoreAlertMessage = "To receive photo ready notifications, please enable notifications in Settings > Instant Box > Notifications"
                 showingRestoreAlert = true
             }
         }
     }
-    
+
     // MARK: - Sync Functions
-    
+
     private func syncNow() async {
         syncInProgress = true
-        
-        // Crea un CloudKitManager temporaneo per la sincronizzazione
+
+        // Temporary manager just for the manual sync.
         let cloudKitManager = CloudKitManager()
-        
+
         do {
-            // Esegui sincronizzazione completa
             try await cloudKitManager.performFullSync()
-            print("☁️ [ImpostazioniView] ✅ Sincronizzazione manuale completata")
         } catch {
-            print("☁️ [ImpostazioniView] ❌ Errore sincronizzazione manuale: \(error)")
+            // CloudKitManager exposes the failure through syncError; nothing extra to show here.
         }
-        
+
         await MainActor.run {
             syncInProgress = false
         }

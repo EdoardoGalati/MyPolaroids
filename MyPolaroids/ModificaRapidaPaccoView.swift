@@ -1,171 +1,124 @@
 import SwiftUI
 
+/// Half-height sheet to adjust the remaining shots and the expiry date of one pack.
 struct ModificaRapidaPaccoView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var viewModel: FilmPackViewModel
     @Binding var pacco: FilmPack
     @Binding var selectedTab: Int
-    
+
+    @State private var scattiRimanenti: Int
     @State private var dataScadenza: Date?
     @State private var mostraScadenza: Bool
     @State private var mostraDeleteAlert = false
-    
+    @State private var salvato = false
+
     init(pacco: Binding<FilmPack>, viewModel: FilmPackViewModel, selectedTab: Binding<Int>) {
         self._pacco = pacco
         self.viewModel = viewModel
         self._selectedTab = selectedTab
+        self._scattiRimanenti = State(initialValue: max(pacco.wrappedValue.scattiRimanenti, 0))
         self._dataScadenza = State(initialValue: pacco.wrappedValue.dataScadenza)
         self._mostraScadenza = State(initialValue: pacco.wrappedValue.dataScadenza != nil)
     }
-    
+
+    private var gradiente: FilmPackGradient? {
+        FilmPackColors.gradientePerTipo(pacco.tipo, modello: pacco.modello, modelliDisponibili: viewModel.modelliFilm)
+    }
+
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
-                VStack(spacing: 12) {
-                    // Pack Information Section
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Pack Information")
-                            .font(.headline)
-                            .fontWeight(.bold)
-                            .foregroundColor(.primary)
-                            .padding(.horizontal, 20)
-                        
-                        VStack(spacing: 1) {
-                            HStack {
-                                Text("Type:")
-                                    .font(.body)
-                                    .foregroundColor(.primary)
-                                Spacer()
-                                Text(pacco.tipo)
-                                    .font(.body)
-                                    .foregroundColor(.secondary)
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 16)
-                            .frame(maxWidth: .infinity)
-                            .background(AppColors.backgroundSecondary)
-                            .cornerRadius(16)
-                            
-                            HStack {
-                                Text("Model:")
-                                    .font(.body)
-                                    .foregroundColor(.primary)
-                                Spacer()
-                                Text(pacco.modello)
-                                    .font(.body)
-                                    .foregroundColor(.secondary)
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 16)
-                            .frame(maxWidth: .infinity)
-                            .background(AppColors.backgroundSecondary)
-                            .cornerRadius(16)
-                            
-                            HStack {
-                                Text("Remaining shots:")
-                                    .font(.body)
-                                    .foregroundColor(.primary)
-                                Spacer()
-                                Text("\(pacco.scattiRimanenti)/\(pacco.scattiTotali)")
-                                    .font(.body)
-                                    .foregroundColor(.secondary)
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 16)
-                            .frame(maxWidth: .infinity)
-                            .background(AppColors.backgroundSecondary)
-                            .cornerRadius(16)
+                VStack(spacing: 24) {
+                    HStack(spacing: 12) {
+                        ColorWheelView(gradient: gradiente, size: 44)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(pacco.modello)
+                                .font(.headline)
+                            Text(pacco.tipo)
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
                         }
-                        .padding(.horizontal, 0)
+                        Spacer()
                     }
-                    .padding(.horizontal, 0)
-                    .padding(.vertical, 20)
-                    .background(AppColors.backgroundPrimary)
-                    .cornerRadius(16)
-                    
-                    // Expiration Date Section
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Expiration Date")
-                            .font(.headline)
-                            .fontWeight(.bold)
-                            .foregroundColor(.primary)
-                            .padding(.horizontal, 20)
-                        
-                        VStack(spacing: 1) {
-                            Toggle("Set expiration date", isOn: $mostraScadenza)
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 16)
-                                .frame(maxWidth: .infinity)
-                                                            .background(AppColors.backgroundSecondary)
-                            .cornerRadius(16)
-                                .onChange(of: mostraScadenza) { newValue in
-                                    if newValue && dataScadenza == nil {
-                                        // Se attivo il toggle e non c'è data, imposta oggi come default
-                                        dataScadenza = Date()
-                                    }
-                                }
-                            
-                            if mostraScadenza {
-                                DatePicker("Expiration date", selection: Binding(
-                                    get: { dataScadenza ?? Date() },
+
+                    VStack(spacing: 16) {
+                        ShotFrames(remaining: scattiRimanenti, total: pacco.scattiTotali, frameSize: 14)
+
+                        HStack(spacing: 24) {
+                            Button {
+                                withAnimation(.snappy) { scattiRimanenti -= 1 }
+                            } label: {
+                                Image(systemName: "minus")
+                                    .glassCircleButton()
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(scattiRimanenti <= 0)
+                            .accessibilityLabel("One shot less")
+
+                            VStack(spacing: 2) {
+                                Text("\(scattiRimanenti)")
+                                    .font(.largeTitle.weight(.bold))
+                                    .fontDesign(.rounded)
+                                    .monospacedDigit()
+                                    .contentTransition(.numericText())
+                                Text("of \(pacco.scattiTotali) shots left")
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .frame(minWidth: 110)
+
+                            Button {
+                                withAnimation(.snappy) { scattiRimanenti += 1 }
+                            } label: {
+                                Image(systemName: "plus")
+                                    .glassCircleButton()
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(scattiRimanenti >= pacco.scattiTotali)
+                            .accessibilityLabel("One shot more")
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+
+                    Card {
+                        Toggle("Has expiry date", isOn: $mostraScadenza)
+
+                        if mostraScadenza {
+                            DatePicker(
+                                "Expiry date",
+                                selection: Binding(
+                                    get: { dataScadenza ?? FilmPack.calcolaScadenzaDefault(dataAcquisto: pacco.dataAcquisto) },
                                     set: { dataScadenza = $0 }
-                                ), displayedComponents: .date)
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 16)
-                                .frame(maxWidth: .infinity)
-                                .background(AppColors.backgroundSecondary)
-                                .cornerRadius(16)
-                            }
+                                ),
+                                displayedComponents: .date
+                            )
                         }
                     }
-                    .padding(.horizontal, 0)
-                    .padding(.vertical, 20)
-                    .background(AppColors.backgroundPrimary)
-                    .cornerRadius(16)
-                    
-                    // Delete Pack Section
-                    VStack(alignment: .leading, spacing: 16) {
-                        Button(action: {
-                            mostraDeleteAlert = true
-                        }) {
-                            HStack {
-                                Image(systemName: "trash")
-                                    .font(.system(size: 18))
-                                Text("Delete Pack")
-                                    .font(.headline)
-                                    .fontWeight(.semibold)
-                            }
-                            .foregroundColor(AppColors.buttonText)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                            .background(Color.red.opacity(0.8))
-                            .cornerRadius(16)
-                        }
-                        .padding(.horizontal, 16)
+
+                    Button(role: .destructive) {
+                        mostraDeleteAlert = true
+                    } label: {
+                        Label("Delete Pack", systemImage: "trash")
                     }
-                    .padding(.horizontal, 0)
-                    .padding(.vertical, 20)
-                    .background(AppColors.backgroundPrimary)
-                    .cornerRadius(16)
+                    .buttonStyle(.secondaryBox)
                 }
-                .padding(.top, 20)
+                .padding(.horizontal, DS.margin)
+                .padding(.vertical, 16)
             }
-            .background(AppColors.backgroundPrimary)
+            .groupedScreenBackground()
             .navigationTitle("Edit Pack")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(role: .close) {
                         dismiss()
                     }
-                    .foregroundColor(AppColors.navigationButton)
                 }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         salvaModifiche()
                     }
-                    .foregroundColor(AppColors.navigationButton)
                 }
             }
             .alert("Delete Pack", isPresented: $mostraDeleteAlert) {
@@ -176,68 +129,41 @@ struct ModificaRapidaPaccoView: View {
             } message: {
                 Text("Are you sure you want to delete this pack? This action cannot be undone.")
             }
+            .onChange(of: mostraScadenza) { _, attiva in
+                if attiva && dataScadenza == nil {
+                    dataScadenza = FilmPack.calcolaScadenzaDefault(dataAcquisto: pacco.dataAcquisto)
+                }
+            }
         }
+        .tint(.primary)
+        .presentationDetents([.medium])
+        .sensoryFeedback(.impact, trigger: scattiRimanenti)
+        .sensoryFeedback(.success, trigger: salvato)
     }
-    
+
     private func salvaModifiche() {
-        print("🔧 [EDIT] ===== INIZIO SALVAMODIFICHE PACCO =====")
-        print("🔧 [EDIT] Valori negli stati:")
-        print("   - mostraScadenza: \(mostraScadenza)")
-        print("   - dataScadenza: \(dataScadenza?.description ?? "nil")")
-        
-        print("🔧 [EDIT] Pacco ORIGINALE:")
-        print("   - id: \(pacco.id)")
-        print("   - dataScadenza: \(pacco.dataScadenza?.description ?? "nil")")
-        
-        // Creo una NUOVA istanza del pacco con i valori aggiornati
-        print("🔧 [EDIT] Creazione pacco aggiornato...")
         var paccoAggiornato = pacco
+        paccoAggiornato.scattiRimanenti = min(max(scattiRimanenti, 0), pacco.scattiTotali)
         paccoAggiornato.dataScadenza = mostraScadenza ? dataScadenza : nil
-        
-        print("🔧 [EDIT] Pacco AGGIORNATO:")
-        print("   - id: \(paccoAggiornato.id)")
-        print("   - dataScadenza: \(paccoAggiornato.dataScadenza?.description ?? "nil")")
-        
-        print("🔧 [EDIT] Chiamata viewModel.aggiornaPaccoFilm()")
+
         viewModel.aggiornaPaccoFilm(paccoAggiornato)
-        print("🔧 [EDIT] viewModel.aggiornaPaccoFilm() completata")
-        
-        print("🔧 [EDIT] Chiusura vista")
+        salvato.toggle()
         dismiss()
-        print("🔧 [EDIT] ===== FINE SALVAMODIFICHE PACCO =====")
     }
-    
+
     private func eliminaPacco() {
-        // Salva le informazioni del tipo prima di eliminarlo
         let tipoPacco = pacco.tipo
-        let modelliPacco = pacco.modello
-        
-        // Elimina il pacco
+        let modelloPacco = pacco.modello
+
         viewModel.rimuoviPaccoFilm(pacco)
-        
-        // Controlla se ci sono ancora pacchi dello stesso tipo e modello
-        let pacchiRimanenti = viewModel.pacchiFilm.filter { 
-            $0.tipo == tipoPacco && $0.modello == modelliPacco 
+
+        let pacchiRimanenti = viewModel.pacchiFilm.filter {
+            $0.tipo == tipoPacco && $0.modello == modelloPacco
         }
-        
-        // Se non ci sono più pacchi di questo tipo, torna alla home dei film pack
         if pacchiRimanenti.isEmpty {
             selectedTab = 1
         }
-        
+
         dismiss()
     }
 }
-
-#Preview {
-    ModificaRapidaPaccoView(
-        pacco: .constant(FilmPack(
-            tipo: "600",
-            modello: "Color",
-            scattiTotali: 8
-        )),
-        viewModel: FilmPackViewModel(),
-        selectedTab: .constant(0)
-    )
-}
-

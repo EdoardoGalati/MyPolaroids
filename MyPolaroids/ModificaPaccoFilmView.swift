@@ -1,173 +1,207 @@
 import SwiftUI
 
+/// Full edit sheet for one film pack.
 struct ModificaPaccoFilmView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var viewModel: FilmPackViewModel
     @Binding var pacco: FilmPack
-    
+
     @State private var tipoSelezionato: String
     @State private var modelloSelezionato: String
-    @State private var scattiTotali: String
-    @State private var scattiRimanenti: String
+    @State private var scattiTotali: Int
+    @State private var scattiRimanenti: Int
     @State private var dataAcquisto: Date
     @State private var dataScadenza: Date?
     @State private var note: String
     @State private var mostraScadenza: Bool
     @State private var fotocameraSelezionata: UUID?
-    
+    @State private var salvato = false
+
     init(pacco: Binding<FilmPack>, viewModel: FilmPackViewModel) {
         self._pacco = pacco
         self.viewModel = viewModel
         self._tipoSelezionato = State(initialValue: pacco.wrappedValue.tipo)
         self._modelloSelezionato = State(initialValue: pacco.wrappedValue.modello)
-        self._scattiTotali = State(initialValue: String(pacco.wrappedValue.scattiTotali))
-        self._scattiRimanenti = State(initialValue: String(pacco.wrappedValue.scattiRimanenti))
+        self._scattiTotali = State(initialValue: max(pacco.wrappedValue.scattiTotali, 1))
+        self._scattiRimanenti = State(initialValue: max(pacco.wrappedValue.scattiRimanenti, 0))
         self._dataAcquisto = State(initialValue: pacco.wrappedValue.dataAcquisto)
         self._dataScadenza = State(initialValue: pacco.wrappedValue.dataScadenza)
         self._note = State(initialValue: pacco.wrappedValue.note ?? "")
         self._mostraScadenza = State(initialValue: pacco.wrappedValue.dataScadenza != nil)
         self._fotocameraSelezionata = State(initialValue: pacco.wrappedValue.fotocameraAssociata)
     }
-    
+
+    private var modelli: [String] {
+        viewModel.modelliPerTipo(tipoSelezionato)
+    }
+
+    /// The pack as it would be after saving, used for the status rows.
+    private var anteprima: FilmPack {
+        var copia = pacco
+        copia.tipo = tipoSelezionato
+        copia.modello = modelloSelezionato
+        copia.scattiTotali = scattiTotali
+        copia.scattiRimanenti = scattiRimanenti
+        copia.dataAcquisto = dataAcquisto
+        copia.dataScadenza = mostraScadenza ? dataScadenza : nil
+        return copia
+    }
+
+    private var stato: String {
+        let p = anteprima
+        if p.isFinito { return "Finished" }
+        if p.isScaduto { return "Expired" }
+        if p.isInScadenza { return "Expiring" }
+        return "Available"
+    }
+
+    private var scadenzaDescrizione: String? {
+        guard let giorni = anteprima.giorniAllaScadenza else { return nil }
+        if giorni < 0 { return "Expired \(giorniTesto(-giorni)) ago" }
+        if giorni == 0 { return "Expires today" }
+        return "In \(giorniTesto(giorni))"
+    }
+
+    private func giorniTesto(_ n: Int) -> String {
+        n == 1 ? "1 day" : "\(n) days"
+    }
+
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
-                Section(header: Text("Informazioni Pacco Film")) {
-                    Picker("Tipo di film", selection: $tipoSelezionato) {
+                Section("Pack") {
+                    Picker("Format", selection: $tipoSelezionato) {
                         ForEach(viewModel.tipiDisponibili, id: \.self) { tipo in
                             Text(tipo).tag(tipo)
                         }
                     }
-                    
-                    Picker("Modello", selection: $modelloSelezionato) {
-                        ForEach(viewModel.modelliPerTipo(tipoSelezionato), id: \.self) { modello in
+
+                    Picker("Variant", selection: $modelloSelezionato) {
+                        ForEach(modelli, id: \.self) { modello in
                             Text(modello).tag(modello)
                         }
                     }
-                    
-                    TextField("Scatti totali", text: $scattiTotali)
-                        .keyboardType(.numberPad)
-                    
-                    TextField("Scatti rimanenti", text: $scattiRimanenti)
-                        .keyboardType(.numberPad)
                 }
-                
-                Section(header: Text("Date")) {
-                    DatePicker("Data acquisto", selection: $dataAcquisto, displayedComponents: .date)
-                    
-                    Toggle("Imposta scadenza", isOn: $mostraScadenza)
-                    
+
+                Section("Shots") {
+                    Stepper(value: $scattiTotali, in: 1...99) {
+                        HStack {
+                            Text("Total")
+                            Spacer()
+                            Text("\(scattiTotali)")
+                                .foregroundStyle(.secondary)
+                                .monospacedDigit()
+                                .contentTransition(.numericText())
+                        }
+                    }
+
+                    Stepper(value: $scattiRimanenti, in: 0...scattiTotali) {
+                        HStack {
+                            Text("Remaining")
+                            Spacer()
+                            Text("\(scattiRimanenti)")
+                                .foregroundStyle(.secondary)
+                                .monospacedDigit()
+                                .contentTransition(.numericText())
+                        }
+                    }
+                }
+
+                Section("Dates") {
+                    DatePicker("Purchase date", selection: $dataAcquisto, displayedComponents: .date)
+
+                    Toggle("Has expiry date", isOn: $mostraScadenza)
+
                     if mostraScadenza {
-                        DatePicker("Data scadenza", selection: Binding(
-                            get: { dataScadenza ?? FilmPack.calcolaScadenzaDefault(dataAcquisto: dataAcquisto) },
-                            set: { dataScadenza = $0 }
-                        ), displayedComponents: .date)
+                        DatePicker(
+                            "Expiry date",
+                            selection: Binding(
+                                get: { dataScadenza ?? FilmPack.calcolaScadenzaDefault(dataAcquisto: dataAcquisto) },
+                                set: { dataScadenza = $0 }
+                            ),
+                            displayedComponents: .date
+                        )
                     }
                 }
-                
-                Section(header: Text("Associazione Fotocamera")) {
-                    if let fotocameraId = fotocameraSelezionata,
-                       let fotocamera = viewModel.fotocamere.first(where: { $0.id == fotocameraId }) {
-                        HStack {
-                            Text("Associato a:")
-                            Spacer()
-                            Text(fotocamera.nickname)
-                                .foregroundColor(AppColors.textPrimary)
-                        }
-                        
-                        Button("Disassocia") {
-                            fotocameraSelezionata = nil
-                        }
-                        .foregroundColor(.red)
+
+                Section("Camera") {
+                    if viewModel.fotocamere.isEmpty {
+                        Text("No cameras yet")
+                            .foregroundStyle(.secondary)
                     } else {
-                        Text("Nessuna fotocamera associata")
-                            .foregroundColor(.secondary)
-                        
-                        if !viewModel.fotocamere.isEmpty {
-                            Picker("Associa a fotocamera", selection: $fotocameraSelezionata) {
-                                Text("Nessuna").tag(nil as UUID?)
-                                ForEach(viewModel.fotocamere) { fotocamera in
-                                    Text(fotocamera.nickname).tag(fotocamera.id as UUID?)
-                                }
+                        Picker("Camera", selection: $fotocameraSelezionata) {
+                            Text("None").tag(nil as UUID?)
+                            ForEach(viewModel.fotocamere) { fotocamera in
+                                Text(fotocamera.displayName).tag(fotocamera.id as UUID?)
                             }
                         }
                     }
                 }
-                
-                Section(header: Text("Note")) {
-                    TextField("Note (opzionale)", text: $note)
+
+                Section("Notes") {
+                    TextField("Notes", text: $note, axis: .vertical)
                 }
-                
-                Section(header: Text("Stato Pacco")) {
-                    HStack {
-                        Text("Percentuale utilizzo:")
-                        Spacer()
-                        Text("\(Int(pacco.percentualeUtilizzo))%")
-                            .foregroundColor(.blue)
-                    }
-                    
-                    if let giorni = pacco.giorniAllaScadenza {
-                        HStack {
-                            Text("Giorni alla scadenza:")
-                            Spacer()
-                            if pacco.isScaduto {
-                                Text("Scaduto")
-                                    .foregroundColor(.red)
-                            } else if pacco.isInScadenza {
-                                Text("\(giorni) giorni")
-                                    .foregroundColor(.orange)
-                            } else {
-                                Text("\(giorni) giorni")
-                                    .foregroundColor(.secondary)
-                            }
-                        }
+
+                Section("Status") {
+                    LabeledContent("Status", value: stato)
+                    LabeledContent("Used", value: "\(Int(anteprima.percentualeUtilizzo))%")
+                    if let scadenzaDescrizione {
+                        LabeledContent("Expiry", value: scadenzaDescrizione)
                     }
                 }
             }
-            .navigationTitle("Modifica Pacco Film")
+            .navigationTitle("Edit Film Pack")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Annulla") {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
                         dismiss()
                     }
                 }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Salva") {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") {
                         salvaModifiche()
                     }
-                    .disabled(tipoSelezionato.isEmpty || modelloSelezionato.isEmpty || scattiTotali.isEmpty || scattiRimanenti.isEmpty)
+                    .disabled(tipoSelezionato.isEmpty || modelloSelezionato.isEmpty)
+                }
+            }
+            .onChange(of: tipoSelezionato) {
+                // Keep the variant valid for the newly chosen format.
+                if !modelli.contains(modelloSelezionato) {
+                    modelloSelezionato = modelli.first ?? ""
+                }
+            }
+            .onChange(of: scattiTotali) { _, nuovo in
+                if scattiRimanenti > nuovo {
+                    scattiRimanenti = nuovo
+                }
+            }
+            .onChange(of: mostraScadenza) { _, attiva in
+                if attiva && dataScadenza == nil {
+                    dataScadenza = FilmPack.calcolaScadenzaDefault(dataAcquisto: dataAcquisto)
                 }
             }
         }
+        .tint(.primary)
+        .sensoryFeedback(.success, trigger: salvato)
     }
-    
+
     private func salvaModifiche() {
-        guard let scattiTotaliInt = Int(scattiTotali),
-              let scattiRimanentiInt = Int(scattiRimanenti) else { return }
-        
-        pacco.tipo = tipoSelezionato
-        pacco.modello = modelloSelezionato
-        pacco.scattiTotali = scattiTotaliInt
-        pacco.scattiRimanenti = scattiRimanentiInt
-        pacco.dataAcquisto = dataAcquisto
-        pacco.dataScadenza = mostraScadenza ? dataScadenza : nil
-        pacco.note = note.isEmpty ? nil : note
-        pacco.fotocameraAssociata = fotocameraSelezionata
-        
-        viewModel.aggiornaPaccoFilm(pacco)
+        let noteRipulite = note.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        var aggiornato = pacco
+        aggiornato.tipo = tipoSelezionato
+        aggiornato.modello = modelloSelezionato
+        aggiornato.scattiTotali = scattiTotali
+        aggiornato.scattiRimanenti = min(scattiRimanenti, scattiTotali)
+        aggiornato.dataAcquisto = dataAcquisto
+        aggiornato.dataScadenza = mostraScadenza ? dataScadenza : nil
+        aggiornato.note = noteRipulite.isEmpty ? nil : noteRipulite
+        aggiornato.fotocameraAssociata = fotocameraSelezionata
+
+        pacco = aggiornato
+        viewModel.aggiornaPaccoFilm(aggiornato)
+        salvato.toggle()
         dismiss()
     }
-}
-
-#Preview {
-    ModificaPaccoFilmView(
-        pacco: .constant(FilmPack(
-            tipo: "600",
-            modello: "Color",
-            scattiTotali: 8
-        )),
-        viewModel: FilmPackViewModel()
-    )
 }

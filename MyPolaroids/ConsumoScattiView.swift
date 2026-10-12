@@ -5,113 +5,139 @@ struct ConsumoScattiView: View {
     @ObservedObject var viewModel: FilmPackViewModel
     @Binding var selectedTab: Int
     @State private var numeroScatti: Int
+    @State private var recordFeedback = false
     @Environment(\.dismiss) private var dismiss
-    
+
     init(fotocamera: Camera, viewModel: FilmPackViewModel, selectedTab: Binding<Int>) {
         self.fotocamera = fotocamera
         self.viewModel = viewModel
         self._selectedTab = selectedTab
-        
-        // Inizializza numeroScatti sempre a 1 indipendentemente da scatti
         self._numeroScatti = State(initialValue: 1)
     }
-    
-    var scattiDisponibili: Int {
-        viewModel.filmCaricato(in: fotocamera)?.scattiRimanenti ?? 0
+
+    private var pacco: FilmPack? {
+        viewModel.filmCaricato(in: fotocamera)
     }
-    
+
+    var scattiDisponibili: Int {
+        pacco?.scattiRimanenti ?? 0
+    }
+
     var body: some View {
-        VStack(spacing: 0) {
-            // Selezione numero scatti
-            VStack(spacing: 0) {
+        NavigationStack {
+            VStack(spacing: 24) {
+                if let pacco {
+                    VStack(spacing: 10) {
+                        Text("\(pacco.tipo) · \(pacco.modello)")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        ShotFrames(remaining: pacco.scattiRimanenti, total: pacco.scattiTotali, frameSize: 14)
+                    }
+                }
+
                 if scattiDisponibili > 0 {
-                    Picker("Number of photos", selection: $numeroScatti) {
-                        ForEach(1...scattiDisponibili, id: \.self) { numero in
-                            Text("\(numero)")
-                                .font(.system(size: 24, weight: .medium))
-                                .frame(height: 44)
-                                .tag(numero)
+                    HStack(spacing: 28) {
+                        Button {
+                            withAnimation(.snappy) {
+                                numeroScatti = max(1, numeroScatti - 1)
+                            }
+                        } label: {
+                            Image(systemName: "minus")
+                                .glassCircleButton()
                         }
+                        .buttonStyle(.plain)
+                        .disabled(numeroScatti <= 1)
+                        .accessibilityLabel("Fewer shots")
+
+                        Text("\(numeroScatti)")
+                            .font(.system(.largeTitle, design: .rounded, weight: .bold))
+                            .monospacedDigit()
+                            .contentTransition(.numericText())
+                            .frame(minWidth: 64)
+
+                        Button {
+                            withAnimation(.snappy) {
+                                numeroScatti = min(scattiDisponibili, numeroScatti + 1)
+                            }
+                        } label: {
+                            Image(systemName: "plus")
+                                .glassCircleButton()
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(numeroScatti >= scattiDisponibili)
+                        .accessibilityLabel("More shots")
                     }
-                    .pickerStyle(.wheel)
-                    .frame(maxHeight: .infinity)
-                    .clipped()
+                    .padding(.vertical, 8)
                 } else {
-                    // Nessuno scatto disponibile
-                    VStack {
-                        Text("No photos available")
-                            .font(.title2)
-                            .fontWeight(.medium)
-                            .foregroundColor(.secondary)
-                    }
-                    .frame(maxHeight: .infinity)
+                    Text("No shots available")
+                        .font(.title2)
+                        .fontDesign(.rounded)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.secondary)
+                        .padding(.vertical, 8)
                 }
+
+                Spacer(minLength: 0)
+
+                Button("Record \(numeroScatti) shot\(numeroScatti == 1 ? "" : "s")") {
+                    confermaScatti()
+                }
+                .buttonStyle(.primaryBox)
+                .disabled(scattiDisponibili == 0)
             }
-            .frame(maxHeight: .infinity)
-            
-            // Pulsante conferma
-            Button(action: {
-                guard scattiDisponibili > 0 else { return }
-                
-                // Salva le informazioni del pacco prima di consumarlo
-                let paccoPrima = viewModel.filmCaricato(in: fotocamera)
-                let tipoPacco = paccoPrima?.tipo ?? ""
-                let modelliPacco = paccoPrima?.modello ?? ""
-                
-                let filmFinito = viewModel.consumaScatti(numeroScatti, da: fotocamera)
-                if filmFinito {
-                    // Film finito - controlla se ci sono ancora pacchi dello stesso tipo
-                    let pacchiRimanenti = viewModel.pacchiFilm.filter { 
-                        $0.tipo == tipoPacco && $0.modello == modelliPacco 
-                    }
-                    
-                    // Se non ci sono più pacchi di questo tipo, torna alla home
-                    if pacchiRimanenti.isEmpty {
-                        selectedTab = 0
+            .padding(DS.margin)
+            .padding(.top, 8)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .navigationTitle("Take Shots")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(role: .close) {
+                        dismiss()
                     }
                 }
-                dismiss()
-            }) {
-                HStack {
-                    Image(systemName: "checkmark.circle.fill")
-                    Text("Confirm \(numeroScatti) Photo\(numeroScatti == 1 ? "" : "s")")
-                }
-                .font(.headline)
-                .fontWeight(.semibold)
-                .foregroundColor(AppColors.buttonText)
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 16)
-                .background(AppColors.buttonPrimary)
-                .cornerRadius(16)
             }
-            .disabled(scattiDisponibili == 0)
-            .padding(.horizontal, 20)
-            .padding(.bottom, 20)
-            
-            // Pulsante annulla
-            Button(action: { dismiss() }) {
-                Text("Cancel")
-                    .font(.headline)
-                    .fontWeight(.medium)
-                    .foregroundColor(.secondary)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-            }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 20)
         }
-        .frame(maxHeight: .infinity)
-        .background(AppColors.backgroundPrimary)
+        .tint(.primary)
         .presentationDetents([.medium])
         .interactiveDismissDisabled()
+        .sensoryFeedback(.success, trigger: recordFeedback)
+        .onChange(of: scattiDisponibili) { _, nuovo in
+            if nuovo > 0 && numeroScatti > nuovo {
+                numeroScatti = nuovo
+            }
+        }
+    }
+
+    private func confermaScatti() {
+        guard scattiDisponibili > 0 else { return }
+
+        // Remember the pack type before consuming: a finished pack is removed by the view model.
+        let paccoPrima = viewModel.filmCaricato(in: fotocamera)
+        let tipoPacco = paccoPrima?.tipo ?? ""
+        let modelliPacco = paccoPrima?.modello ?? ""
+
+        let filmFinito = viewModel.consumaScatti(numeroScatti, da: fotocamera)
+        recordFeedback.toggle()
+
+        if filmFinito {
+            // If no packs of this type and model remain, go back to the Cameras tab.
+            let pacchiRimanenti = viewModel.pacchiFilm.filter {
+                $0.tipo == tipoPacco && $0.modello == modelliPacco
+            }
+
+            if pacchiRimanenti.isEmpty {
+                selectedTab = 0
+            }
+        }
+        dismiss()
     }
 }
 
 #Preview {
     ConsumoScattiView(
         fotocamera: Camera(
-            nickname: "Fotocamera temporanea",
+            nickname: "My Camera",
             modello: "Polaroid 600"
         ),
         viewModel: FilmPackViewModel(),

@@ -1,318 +1,251 @@
 import SwiftUI
 
+/// Pushed from the Film tab: every pack of one format + variant.
 struct DettagliTipologiaView: View {
     let tipologia: TipologiaPaccoFilm
     @ObservedObject var viewModel: FilmPackViewModel
     @Binding var selectedTab: Int
-    @State private var mostraModifica = false
+
+    @Environment(\.dismiss) private var dismiss
     @State private var paccoDaModificare: FilmPack?
-    @State private var mostraDeleteAlert = false
-    @State private var paccoDaEliminare: FilmPack?
-    @State private var animationTrigger = false
-    @State private var nuovoPackId: UUID?
-    @State private var mostraModificaRapida = false
     @State private var paccoDaModificareRapido: FilmPack?
+    @State private var paccoDaEliminare: FilmPack?
+    @State private var mostraDeleteAlert = false
+    @State private var aggiuntaTrigger = false
+    @State private var eliminazioneTrigger = false
 
-    
+    private var gradiente: FilmPackGradient? {
+        FilmPackColors.gradientePerTipo(tipologia.tipo, modello: tipologia.modello, modelliDisponibili: viewModel.modelliFilm)
+    }
+
+    /// Live packs of this group (most recent purchase first), so edits and
+    /// additions show up without leaving the screen.
+    private var pacchi: [FilmPack] {
+        viewModel.pacchiFilm
+            .filter { $0.tipo == tipologia.tipo && $0.modello == tipologia.modello }
+            .sorted { $0.dataAcquisto > $1.dataAcquisto }
+    }
+
+    private var scattiDisponibili: Int {
+        pacchi.reduce(0) { $0 + $1.scattiRimanenti }
+    }
+
     var body: some View {
-        ZStack(alignment: .bottom) {
-            // Contenuto scrollabile (header incluso)
-            ScrollView {
-                VStack(alignment: .leading, spacing: 1) {
-                    // Header con nome pack e cerchio del colore
-                    headerSection
-                    
-                    // Lista dei pacchi
-                    pacchiSection
-                    
-                    // Singoli film pack
-                    if tipologia.conteggioTotale > 0 {
-                        filmPacksListSection
-                    }
-                    
-                    // Spazio per il bottone floating
-                    Spacer(minLength: 120)
-                }
-            }
-            
-            // Bottone floating fisso in basso
-            VStack {
-                addPackSection
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 16)
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(AppColors.backgroundPrimary)
-        .navigationTitle("Film Pack Details")
-        .navigationBarTitleDisplayMode(.inline)
-        .tint(AppColors.navigationButton)
-        .onReceive(viewModel.$pacchiFilm) { _ in
-            // Forza l'aggiornamento della UI quando cambiano i pacchi film
-            // Questo assicura che la vista rimanga stabile dopo l'aggiunta di nuovi pacchi
-        }
-        .sheet(isPresented: $mostraModifica) {
-            if let pacco = paccoDaModificare {
-                ModificaPaccoFilmView(pacco: Binding(
-                    get: { pacco },
-                    set: { newValue in
-                        viewModel.aggiornaPaccoFilm(newValue)
-                    }
-                ), viewModel: viewModel)
-            }
-        }
-        .sheet(isPresented: $mostraModificaRapida) {
-            if let pacco = paccoDaModificareRapido {
-                ModificaRapidaPaccoView(
-                    pacco: Binding(
-                        get: { pacco },
-                        set: { newValue in
-                            // Aggiorna il pacco nel viewModel
-                            viewModel.aggiornaPaccoFilm(newValue)
-                        }
-                    ),
-                    viewModel: viewModel,
-                    selectedTab: $selectedTab
-                )
-            }
-        }
+        ScrollView {
+            VStack(spacing: 24) {
+                hero
 
-        .alert("Delete Film Pack", isPresented: $mostraDeleteAlert) {
+                Card(title: "Packs") {
+                    if pacchi.isEmpty {
+                        Text("No packs left in this group.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    } else {
+                        ForEach(pacchi) { pacco in
+                            VStack(spacing: 12) {
+                                PaccoRow(
+                                    pacco: pacco,
+                                    nomeFotocamera: nomeFotocamera(per: pacco),
+                                    onQuickEdit: { paccoDaModificareRapido = pacco },
+                                    onEdit: { paccoDaModificare = pacco },
+                                    onDelete: {
+                                        paccoDaEliminare = pacco
+                                        mostraDeleteAlert = true
+                                    }
+                                )
+                                if pacco.id != pacchi.last?.id {
+                                    Divider()
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Button {
+                    aggiungiPaccoIdentico()
+                } label: {
+                    Label("Add another pack", systemImage: "plus")
+                }
+                .buttonStyle(.secondaryBox)
+            }
+            .padding(.horizontal, DS.margin)
+            .padding(.vertical, 16)
+            .animation(.snappy, value: pacchi.count)
+        }
+        .groupedScreenBackground()
+        .navigationTitle(tipologia.modello)
+        .navigationBarTitleDisplayMode(.inline)
+        .tint(.primary)
+        .sheet(item: $paccoDaModificare) { pacco in
+            ModificaPaccoFilmView(
+                pacco: Binding(
+                    get: { pacco },
+                    set: { viewModel.aggiornaPaccoFilm($0) }
+                ),
+                viewModel: viewModel
+            )
+        }
+        .sheet(item: $paccoDaModificareRapido) { pacco in
+            ModificaRapidaPaccoView(
+                pacco: Binding(
+                    get: { pacco },
+                    set: { viewModel.aggiornaPaccoFilm($0) }
+                ),
+                viewModel: viewModel,
+                selectedTab: $selectedTab
+            )
+        }
+        .alert("Delete Film Pack", isPresented: $mostraDeleteAlert, presenting: paccoDaEliminare) { pacco in
             Button("Cancel", role: .cancel) { }
             Button("Delete", role: .destructive) {
-                if let pacco = paccoDaEliminare {
-                    // Salva le informazioni del tipo prima di eliminarlo
-                    let tipoPacco = pacco.tipo
-                    let modelliPacco = pacco.modello
-                    
-                    // Elimina il pacco
-                    viewModel.rimuoviPaccoFilm(pacco)
-                    
-                    // Controlla se ci sono ancora pacchi dello stesso tipo e modello
-                    let pacchiRimanenti = viewModel.pacchiFilm.filter { 
-                        $0.tipo == tipoPacco && $0.modello == modelliPacco 
-                    }
-                    
-                    // Se non ci sono più pacchi di questo tipo, torna alla home dei film pack
-                    if pacchiRimanenti.isEmpty {
-                        selectedTab = 1
-                    }
-                }
+                elimina(pacco)
             }
-        } message: {
+        } message: { _ in
             Text("Are you sure you want to delete this film pack? This action cannot be undone.")
         }
-    }
-    
-    // MARK: - Header Section
-    private var headerSection: some View {
-        VStack(spacing: 20) {
-            // Cerchio del colore del film
-            FilmPackColorIndicator(
-                tipo: tipologia.tipo,
-                modello: tipologia.modello,
-                modelliDisponibili: viewModel.modelliFilm,
-                size: 80
-            )
-            
-            // Nome del tipo
-            Text("\(tipologia.tipo) • \(tipologia.modello)")
-                .font(.title2)
-                .fontWeight(.bold)
-                .foregroundColor(.primary)
+        .onChange(of: pacchi.count) { _, nuovo in
+            // The group no longer exists: go back to the Film list.
+            if nuovo == 0 { dismiss() }
         }
-        .padding(.vertical, 50)
-        .frame(maxWidth: .infinity)
-        .background(AppColors.backgroundSecondary)
-        .cornerRadius(16)
-        .padding(.top, 20)
+        .sensoryFeedback(.success, trigger: aggiuntaTrigger)
+        .sensoryFeedback(.impact, trigger: eliminazioneTrigger)
     }
-    
 
-    
-    // MARK: - Pacchi Section
-    private var pacchiSection: some View {
-        VStack(spacing: 16) {
-            HStack {
-                Text("Film Packs")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-                
-                Spacer()
-                
-                // Numero di film pack in un rettangolo arrotondato
-                                    Text("\(tipologia.conteggioTotale)")
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundColor(AppColors.buttonText)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(AppColors.buttonPrimary)
-                        .cornerRadius(8)
-            }
-            
-            if tipologia.conteggioTotale == 0 {
-                VStack(spacing: 12) {
-                    Image(systemName: "film")
-                        .font(.system(size: 40))
-                        .foregroundColor(.gray)
-                    
-                    Text("No film packs yet")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 40)
-            }
+    // MARK: - Hero
+
+    private var hero: some View {
+        VStack(spacing: 12) {
+            ColorWheelView(gradient: gradiente, size: 120)
+
+            Text(tipologia.modello)
+                .font(.title2.weight(.bold))
+                .fontDesign(.rounded)
+                .multilineTextAlignment(.center)
+
+            Chip(text: tipologia.tipo)
+
+            Text("\(conta(pacchi.count, "pack")) · \(conta(scattiDisponibili, "shot"))")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .contentTransition(.numericText())
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 20)
-        .background(AppColors.backgroundSecondary)
-        .cornerRadius(16)
+        .frame(maxWidth: .infinity)
+        .padding(.top, 8)
     }
-    
-    // MARK: - Film Packs List Section
-    private var filmPacksListSection: some View {
-        VStack(spacing: 1) {
-            ForEach(pacchiOrdinati, id: \.id) { pacco in
-                paccoRowView(for: pacco)
-            }
-        }
-        .animation(.spring(response: 0.6, dampingFraction: 0.8), value: animationTrigger)
-        .onChange(of: animationTrigger) { newValue in
-            print("🎨 [DettagliTipologiaView] animationTrigger cambiato: \(newValue)")
-        }
+
+    // MARK: - Helpers
+
+    private func nomeFotocamera(per pacco: FilmPack) -> String? {
+        guard let id = pacco.fotocameraAssociata,
+              let fotocamera = viewModel.fotocamere.first(where: { $0.id == id }) else { return nil }
+        return fotocamera.displayName
     }
-    
-    private func paccoRowView(for pacco: FilmPack) -> some View {
-        PaccoFilmRowView(pacco: pacco, viewModel: viewModel, selectedTab: $selectedTab)
-            .padding(.horizontal, 20)
-            .padding(.vertical, 16)
-            .frame(maxWidth: .infinity)
-            .background(AppColors.backgroundSecondary)
-            .cornerRadius(16)
-            .scaleEffect(pacco.id == nuovoPackId && animationTrigger ? 1.02 : 1.0)
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(pacco.id == nuovoPackId && animationTrigger ? Color.gray.opacity(0.15) : Color.clear)
-            )
-            .contextMenu {
-                Button("Quick Edit") {
-                    paccoDaModificareRapido = pacco
-                    mostraModificaRapida = true
-                }
-                
-                Button("Delete", role: .destructive) {
-                    paccoDaEliminare = pacco
-                    mostraDeleteAlert = true
-                }
-            }
-            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                Button("Delete", role: .destructive) {
-                    paccoDaEliminare = pacco
-                    mostraDeleteAlert = true
-                }
-            }
-            .contentShape(Rectangle())
-            .onTapGesture {
-                paccoDaModificareRapido = pacco
-                mostraModificaRapida = true
-            }
+
+    private func conta(_ n: Int, _ parola: String) -> String {
+        n == 1 ? "\(n) \(parola)" : "\(n) \(parola)s"
     }
-    
-    // MARK: - Add Pack Section
-    private var addPackSection: some View {
-        VStack(spacing: 16) {
-            Button(action: { aggiungiPaccoIdentico() }) {
-                HStack {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 18))
-                    Text("Add Film Pack of This Type")
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                }
-                .foregroundColor(AppColors.buttonText)
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 16)
-                .background(AppColors.buttonPrimary)
-                .cornerRadius(16)
-            }
-        }
-        .padding(.top, 16)
-    }
-    
-    // MARK: - Helper Properties
-    private var pacchiOrdinati: [FilmPack] {
-        let pacchi = viewModel.pacchiFilm.filter { pacco in
-            pacco.tipo == tipologia.tipo && pacco.modello == tipologia.modello
-        }
-        
-        return ordinaPacchi(pacchi)
-    }
-    
-    private func ordinaPacchi(_ pacchi: [FilmPack]) -> [FilmPack] {
-        return pacchi.sorted { first, second in
-            // Ordina per data di aggiunta inversa (più recenti prima)
-            return first.dataAcquisto > second.dataAcquisto
-        }
-    }
-    
-    // MARK: - Add Pack Function
+
+    // MARK: - Actions
+
     private func aggiungiPaccoIdentico() {
-        print("🎬 [DettagliTipologiaView] Inizio aggiunta pack identico...")
-        
-        // Crea un nuovo pack con lo stesso tipo e modello
         let nuovoPacco = FilmPack(
             tipo: tipologia.tipo,
             modello: tipologia.modello,
-            scattiTotali: 8, // Default per la maggior parte dei tipi
+            scattiTotali: viewModel.capacitaDefaultPerTipo(tipologia.tipo),
             dataAcquisto: Date(),
-            dataScadenza: nil, // Nessuna data di scadenza automatica
+            dataScadenza: nil,
             note: "Added from film pack details"
         )
-        
-        print("📦 [DettagliTipologiaView] Nuovo pack creato: \(nuovoPacco.tipo) • \(nuovoPacco.modello)")
-        
-        // Aggiungi il nuovo pack in cima alla lista con animazione
-        print("🎭 [DettagliTipologiaView] Avvio animazione spring...")
-        nuovoPackId = nuovoPacco.id
-        
-        // Aggiungi il pacco e aggiorna la UI
-        withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+        withAnimation(.snappy) {
             viewModel.aggiungiPaccoFilmInCima(nuovoPacco)
-            animationTrigger.toggle()
-            print("🔄 [DettagliTipologiaView] animationTrigger toggled: \(animationTrigger)")
         }
-        
-        // Scroll automatico verso il nuovo pack dopo un breve delay
-        print("⏰ [DettagliTipologiaView] Pianificazione scroll automatico...")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            print("🎯 [DettagliTipologiaView] Esecuzione scroll automatico...")
-            withAnimation(.easeInOut(duration: 0.5)) {
-                // Trigger per scroll automatico
-                animationTrigger.toggle()
-                print("🔄 [DettagliTipologiaView] animationTrigger toggled di nuovo: \(animationTrigger)")
-            }
+        aggiuntaTrigger.toggle()
+    }
+
+    private func elimina(_ pacco: FilmPack) {
+        let tipoPacco = pacco.tipo
+        let modelloPacco = pacco.modello
+
+        withAnimation(.snappy) {
+            viewModel.rimuoviPaccoFilm(pacco)
         }
-        
-        print("✅ [DettagliTipologiaView] Aggiunta pack completata!")
+        eliminazioneTrigger.toggle()
+
+        let pacchiRimanenti = viewModel.pacchiFilm.filter {
+            $0.tipo == tipoPacco && $0.modello == modelloPacco
+        }
+        if pacchiRimanenti.isEmpty {
+            selectedTab = 1
+        }
     }
 }
 
+// MARK: - Pack row
 
+private struct PaccoRow: View {
+    let pacco: FilmPack
+    let nomeFotocamera: String?
+    let onQuickEdit: () -> Void
+    let onEdit: () -> Void
+    let onDelete: () -> Void
 
-#Preview {
-    NavigationView {
-        DettagliTipologiaView(
-            tipologia: TipologiaPaccoFilm(
-                tipo: "600",
-                modello: "Color",
-                pacchi: []
-            ),
-            viewModel: FilmPackViewModel(),
-            selectedTab: .constant(0)
-        )
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            VStack(alignment: .leading, spacing: 6) {
+                ShotFrames(remaining: pacco.scattiRimanenti, total: pacco.scattiTotali, frameSize: 10)
+
+                Text("\(pacco.scattiRimanenti)/\(pacco.scattiTotali) shots")
+                    .font(.subheadline.weight(.medium))
+                    .monospacedDigit()
+                    .contentTransition(.numericText())
+
+                if let nomeFotocamera {
+                    Label(nomeFotocamera, systemImage: "camera")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+
+                HStack(spacing: 8) {
+                    if let scadenza = pacco.dataScadenza {
+                        Text("Expires \(scadenza.shortDisplay)")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    } else {
+                        Text("Bought \(pacco.dataAcquisto.shortDisplay)")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    if pacco.isFinito {
+                        Chip(text: "Finished")
+                    } else if pacco.isScaduto {
+                        Chip(text: "Expired", prominent: true)
+                    } else if pacco.isInScadenza {
+                        Chip(text: "Expiring")
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
+            .onTapGesture(perform: onQuickEdit)
+
+            Menu {
+                Button("Quick edit", systemImage: "slider.horizontal.3", action: onQuickEdit)
+                Button("Edit", systemImage: "pencil", action: onEdit)
+                Button("Delete", systemImage: "trash", role: .destructive, action: onDelete)
+            } label: {
+                Image(systemName: "ellipsis.circle")
+                    .font(.title3)
+                    .foregroundStyle(.secondary)
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
+            }
+            .accessibilityLabel("Pack actions")
+        }
+        .contextMenu {
+            Button("Quick edit", systemImage: "slider.horizontal.3", action: onQuickEdit)
+            Button("Edit", systemImage: "pencil", action: onEdit)
+            Button("Delete", systemImage: "trash", role: .destructive, action: onDelete)
+        }
     }
 }

@@ -4,315 +4,208 @@ struct ModificaFotocameraView: View {
     @Binding var fotocamera: Camera
     @ObservedObject var viewModel: CameraViewModel
     @Environment(\.dismiss) private var dismiss
-    
+
     @State private var nickname: String
     @State private var modelloSelezionato: String
     @State private var coloreSelezionato: String
     @State private var mostraSelezioneModello: Bool = false
-    
+    @State private var didSave = false
+
     init(fotocamera: Binding<Camera>, viewModel: CameraViewModel) {
         self._fotocamera = fotocamera
         self.viewModel = viewModel
-        
-        // Inizializza gli stati con i valori correnti
         self._nickname = State(initialValue: fotocamera.wrappedValue.nickname.isEmpty ? "" : fotocamera.wrappedValue.nickname)
         self._modelloSelezionato = State(initialValue: fotocamera.wrappedValue.modello)
         self._coloreSelezionato = State(initialValue: fotocamera.wrappedValue.coloreIcona)
     }
-    
+
+    private var modelloCorrente: CameraModel? {
+        viewModel.modelliDisponibili.first(where: { $0.name == modelloSelezionato })
+    }
+
+    private var iconaCorrente: String {
+        if let modelloCorrente { return modelloCorrente.default_icon }
+        return modelloSelezionato == fotocamera.modello ? fotocamera.icona : "camera.fill"
+    }
+
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                ScrollView {
-                    VStack(spacing: 1) {
-                        // Header con icona e modello
-                        headerSection
-                        
-                        // Sezione Nickname
+        NavigationStack {
+            Form {
+                Section {
+                    CameraTile(symbol: iconaCorrente, colorHex: coloreSelezionato, size: 96)
+                        .animation(.snappy(duration: 0.2), value: coloreSelezionato)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .listRowBackground(Color.clear)
+                }
+
+                Section("Name") {
+                    TextField(modelloSelezionato, text: $nickname)
+                }
+
+                Section("Model") {
+                    Button {
+                        mostraSelezioneModello = true
+                    } label: {
                         HStack {
-                            Text("Nickname")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.primary)
-                            
+                            Text(modelloSelezionato)
                             Spacer()
-                            
-                            TextField("Enter camera nickname", text: $nickname)
-                                .textFieldStyle(PlainTextFieldStyle())
-                                .font(.body)
-                                .multilineTextAlignment(.trailing)
+                            Image(systemName: "chevron.right")
+                                .font(.footnote.weight(.semibold))
+                                .foregroundStyle(.tertiary)
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 16)
-                        .background(AppColors.backgroundSecondary)
-                        .cornerRadius(16)
-                        
-                        // Sezione Modello
-                        HStack {
-                            Text("Camera Model")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.primary)
-                            
-                            Spacer()
-                            
-                            Button(action: { mostraSelezioneModello = true }) {
-                                HStack {
-                                    Text(modelloSelezionato)
-                                        .foregroundColor(.primary)
-                                        .font(.body)
-                                    Image(systemName: "chevron.right")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                }
-                            }
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 16)
-                        .background(AppColors.backgroundSecondary)
-                        .cornerRadius(16)
-                        
-                        // Sezione Colore Icona
-                        HStack {
-                            Text("Icon Color")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.primary)
-                            
-                            Spacer()
-                            
-                            HStack(spacing: 8) {
-                                ForEach(Camera.coloriDisponibili, id: \.self) { colore in
-                                    Button(action: {
-                                        coloreSelezionato = colore
-                                    }) {
-                                        ColorWheelView(gradient: FilmPackGradient(
-                                            stops: [GradientStop(color: FilmPackColors.hexToRGB(colore), location: 0.0)],
-                                            type: nil,
-                                            startPoint: GradientPoint(x: 0.0, y: 0.0),
-                                            endPoint: GradientPoint(x: 1.0, y: 1.0),
-                                            center: nil
-                                        ), size: 32)
-                                            .overlay(
-                                                Circle()
-                                                    .stroke(Color.primary, lineWidth: coloreSelezionato == colore ? 3 : 0)
-                                            )
-                                            .scaleEffect(coloreSelezionato == colore ? 1.1 : 1.0)
-                                            .animation(.easeInOut(duration: 0.2), value: coloreSelezionato)
-                                    }
-                                    .buttonStyle(PlainButtonStyle())
-                                }
-                            }
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 16)
-                        .background(AppColors.backgroundSecondary)
-                        .cornerRadius(16)
                     }
-                    .padding(.vertical, 16)
+                }
+
+                Section("Color") {
+                    CameraColorPicker(selection: $coloreSelezionato)
                 }
             }
-            .background(AppColors.backgroundPrimary)
             .navigationTitle("Edit Camera")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                    .foregroundColor(AppColors.navigationButton)
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(role: .close) { dismiss() }
                 }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Save") {
-                        salvaModifiche()
-                    }
-                    .fontWeight(.semibold)
-                    .foregroundColor(AppColors.navigationButton)
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") { salvaModifiche() }
                 }
             }
+            .sheet(isPresented: $mostraSelezioneModello) {
+                SelezioneModelloView(
+                    modelloSelezionato: $modelloSelezionato,
+                    modelliDisponibili: viewModel.modelliDisponibili
+                )
+            }
         }
+        .tint(.primary)
         .presentationDetents([.large])
-        .sheet(isPresented: $mostraSelezioneModello) {
-            SelezioneModelloView(
-                modelloSelezionato: $modelloSelezionato,
-                modelliDisponibili: viewModel.modelliDisponibili
-            )
-        }
+        .sensoryFeedback(.success, trigger: didSave)
     }
-    
-    private var headerSection: some View {
-        VStack {
-            Spacer(minLength: 0)
-            VStack(spacing: 12) {
-                // Icona fotocamera
-                let iconaModello = viewModel.modelliDisponibili.first(where: { $0.name == modelloSelezionato })?.default_icon ?? "camera.fill"
-                
-                Image(systemName: iconaModello)
-                    .font(.system(size: 80))
-                    .foregroundColor(Camera.coloreDaNome(coloreSelezionato))
-                
-                // Nome modello
-                Text(modelloSelezionato)
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundColor(AppColors.textPrimary)
-            }
-            .frame(maxWidth: .infinity)
-            Spacer(minLength: 0)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 50)
-        .background(AppColors.backgroundSecondary)
-        .cornerRadius(16)
-    }
-    
+
     private func salvaModifiche() {
-        print("🔧 [EDIT] ===== INIZIO SALVAMODIFICHE =====")
-        print("🔧 [EDIT] Valori negli stati:")
-        print("   - nickname: '\(nickname)'")
-        print("   - modelloSelezionato: '\(modelloSelezionato)'")
-        print("   - coloreSelezionato: '\(coloreSelezionato)'")
-        
-        print("🔧 [EDIT] Fotocamera ORIGINALE:")
-        print("   - id: \(fotocamera.id)")
-        print("   - nickname: '\(fotocamera.nickname)'")
-        print("   - modello: '\(fotocamera.modello)'")
-        print("   - coloreIcona: '\(fotocamera.coloreIcona)'")
-        
-        // Creo una NUOVA fotocamera con i valori aggiornati
-        print("🔧 [EDIT] Creazione fotocamera aggiornata...")
         var fotocameraAggiornata = fotocamera
         fotocameraAggiornata.nickname = nickname.isEmpty ? "" : nickname
         fotocameraAggiornata.modello = modelloSelezionato
         fotocameraAggiornata.coloreIcona = coloreSelezionato
         fotocameraAggiornata.brand = Camera.brandDefault(modello: modelloSelezionato, modelliDisponibili: viewModel.modelliDisponibili)
         fotocameraAggiornata.annoProduzione = Camera.annoProduzioneDefault(modello: modelloSelezionato, modelliDisponibili: viewModel.modelliDisponibili)
-        
-        print("🔧 [EDIT] Fotocamera AGGIORNATA:")
-        print("   - nickname: '\(fotocameraAggiornata.nickname)'")
-        print("   - modello: '\(fotocameraAggiornata.modello)'")
-        print("   - brand: '\(fotocameraAggiornata.brand)'")
-        print("   - annoProduzione: \(fotocameraAggiornata.annoProduzione)")
-        print("   - coloreIcona: '\(fotocameraAggiornata.coloreIcona)'")
-        
-        print("🔧 [EDIT] Chiamata viewModel.aggiornaFotocamera()")
+
+        // When the model changes, refresh the model-derived fields too so the
+        // glyph, capacity and film format follow the new model.
+        if modelloSelezionato != fotocamera.modello {
+            fotocameraAggiornata.capienza = Camera.calcolaCapienza(modello: modelloSelezionato, modelliDisponibili: viewModel.modelliDisponibili)
+            fotocameraAggiornata.icona = Camera.iconaDefault(modello: modelloSelezionato, modelliDisponibili: viewModel.modelliDisponibili)
+            fotocameraAggiornata.immagine = Camera.immagineDefault(modello: modelloSelezionato, modelliDisponibili: viewModel.modelliDisponibili)
+            fotocameraAggiornata.filmType = Camera.filmTypeDefault(modello: modelloSelezionato, modelliDisponibili: viewModel.modelliDisponibili)
+        }
+
         viewModel.aggiornaFotocamera(fotocameraAggiornata)
-        print("🔧 [EDIT] viewModel.aggiornaFotocamera() completata")
-        
-        print("🔧 [EDIT] Chiusura vista")
+        didSave = true
         dismiss()
-        print("🔧 [EDIT] ===== FINE SALVAMODIFICHE =====")
     }
 }
 
-// MARK: - Vista Selezione Modello
+// MARK: - Model picker
+
 struct SelezioneModelloView: View {
     @Environment(\.dismiss) private var dismiss
     @Binding var modelloSelezionato: String
     let modelliDisponibili: [CameraModel]
-    
+
     @State private var searchText = ""
-    
+
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                // Barra di ricerca
-                searchBar
-                
-                // Lista modelli
-                ScrollView {
-                    LazyVStack(spacing: 1) {
-                        ForEach(modelliFiltrati, id: \.id) { modello in
-                            Button(action: {
+        NavigationStack {
+            List {
+                ForEach(sections, id: \.filmType) { section in
+                    Section(section.filmType) {
+                        ForEach(section.models, id: \.id) { modello in
+                            Button {
                                 modelloSelezionato = modello.name
                                 dismiss()
-                            }) {
-                                bottoneModello(modello: modello)
+                            } label: {
+                                modelRow(modello)
                             }
-                            .buttonStyle(PlainButtonStyle())
                         }
                     }
-                    .padding(.vertical, 16)
                 }
             }
-            .background(AppColors.backgroundPrimary)
-            .navigationTitle("Select Camera Model")
+            .overlay {
+                if sections.isEmpty, !searchText.isEmpty {
+                    ContentUnavailableView.search(text: searchText)
+                }
+            }
+            .searchable(text: $searchText, prompt: "Search models")
+            .navigationTitle("Select Model")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                    .foregroundColor(AppColors.navigationButton)
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(role: .close) { dismiss() }
                 }
             }
         }
+        .tint(.primary)
     }
-    
-    // MARK: - Barra di Ricerca
-    private var searchBar: some View {
-        HStack {
-            Image(systemName: "magnifyingglass")
-                .foregroundColor(.gray)
-            
-            TextField("Search models...", text: $searchText)
-                .textFieldStyle(PlainTextFieldStyle())
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .background(AppColors.backgroundSecondary)
-        .cornerRadius(26)
-        .padding(.horizontal, 20)
-        .padding(.top, 20)
-        .padding(.bottom, 16)
-    }
-    
-    // MARK: - Bottone Modello
-    private func bottoneModello(modello: CameraModel) -> some View {
-        HStack {
-            Image(modello.default_icon)
-                .font(.title2)
-                .foregroundColor(AppColors.textPrimary)
-            
-            VStack(alignment: .leading, spacing: 4) {
+
+    private func modelRow(_ modello: CameraModel) -> some View {
+        HStack(spacing: 12) {
+            CameraTile(symbol: modello.default_icon, colorHex: "000", size: 44)
+            VStack(alignment: .leading, spacing: 2) {
                 Text(modello.name)
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(AppColors.textPrimary)
-                
-                Text("\(modello.brand) • \(String(modello.year_introduced))")
-                    .font(.caption)
-                    .foregroundColor(.gray)
+                    .font(.headline)
+                Text("\(modello.brand) · \(String(modello.year_introduced)) · \(modello.capacity) shots")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
             }
-            
             Spacer()
-            
             if modelloSelezionato == modello.name {
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.title2)
-                    .foregroundColor(AppColors.textPrimary)
-            } else {
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundColor(.gray)
+                Image(systemName: "checkmark")
+                    .font(.body.weight(.semibold))
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 16)
-        .background(AppColors.backgroundSecondary)
-        .cornerRadius(16)
+        .padding(.vertical, 2)
+        .contentShape(Rectangle())
     }
-    
-    // MARK: - Computed Properties
+
     private var modelliFiltrati: [CameraModel] {
         if searchText.isEmpty {
             return modelliDisponibili
-        } else {
-            return modelliDisponibili.filter { 
-                $0.name.localizedCaseInsensitiveContains(searchText) ||
-                $0.model.localizedCaseInsensitiveContains(searchText) ||
-                $0.brand.localizedCaseInsensitiveContains(searchText)
-            }
+        }
+        return modelliDisponibili.filter {
+            $0.name.localizedCaseInsensitiveContains(searchText) ||
+            $0.model.localizedCaseInsensitiveContains(searchText) ||
+            $0.brand.localizedCaseInsensitiveContains(searchText)
+        }
+    }
+
+    private var sections: [(filmType: String, models: [CameraModel])] {
+        EditCameraSections.grouped(modelliFiltrati)
+    }
+}
+
+// MARK: - Grouping by film type
+
+private enum EditCameraSections {
+    static let priority = ["i-Type", "600", "SX-70", "Go", "Spectra"]
+
+    static func rank(_ filmType: String) -> Int {
+        if let index = priority.firstIndex(of: filmType) { return index * 2 }
+        if let index = priority.firstIndex(where: { filmType.localizedCaseInsensitiveContains($0) }) {
+            return index * 2 + 1
+        }
+        return priority.count * 2
+    }
+
+    static func grouped(_ models: [CameraModel]) -> [(filmType: String, models: [CameraModel])] {
+        let groups = Dictionary(grouping: models, by: { $0.film_type })
+        let keys = groups.keys.sorted { a, b in
+            let ra = rank(a), rb = rank(b)
+            if ra != rb { return ra < rb }
+            return a.localizedStandardCompare(b) == .orderedAscending
+        }
+        return keys.map { key in
+            (filmType: key, models: (groups[key] ?? []).sorted { $0.year_introduced > $1.year_introduced })
         }
     }
 }
