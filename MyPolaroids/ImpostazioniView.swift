@@ -16,6 +16,7 @@ struct ImpostazioniView: View {
     @State private var showingRestoreAlert = false
     @State private var restoreAlertTitle = ""
     @State private var restoreAlertMessage = ""
+    @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
         NavigationView {
@@ -225,10 +226,10 @@ struct ImpostazioniView: View {
                                             .font(.caption)
                                             .fontWeight(.medium)
                                     }
-                                    .foregroundColor(.white)
+                                    .foregroundColor(colorScheme == .light ? .white : .black)
                                     .padding(.horizontal, 12)
                                     .padding(.vertical, 6)
-                                    .background(AppColors.accentPrimary)
+                                    .background(colorScheme == .light ? .black : .white)
                                     .cornerRadius(8)
                                 }
                             }
@@ -243,10 +244,10 @@ struct ImpostazioniView: View {
                             HStack {
                                 VStack(alignment: .leading, spacing: 4) {
                                     HStack(spacing: 8) {
-                                        Text("Development Reminders")
-                                            .font(.headline)
-                                            .fontWeight(.semibold)
-                                            .foregroundColor(.primary)
+                                                                            Text("Photo Ready Notifications")
+                                        .font(.headline)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.primary)
                                         
                                         // Badge Premium
                                         HStack(spacing: 4) {
@@ -264,7 +265,7 @@ struct ImpostazioniView: View {
                                         .cornerRadius(4)
                                     }
                                     
-                                    Text("Get notified when it's time to develop your photos")
+                                    Text("Get notified when your photo is ready to be scanned")
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                         .multilineTextAlignment(.leading)
@@ -299,7 +300,7 @@ struct ImpostazioniView: View {
                             if isPremiumUser && UserDefaults.standard.bool(forKey: "notificationsEnabled") {
                                 VStack(alignment: .leading, spacing: 8) {
                                     HStack {
-                                        Text("Reminder delay (minutes):")
+                                        Text("Notification delay (minutes):")
                                             .font(.caption)
                                             .foregroundColor(.secondary)
                                         
@@ -328,10 +329,10 @@ struct ImpostazioniView: View {
                                             .font(.caption)
                                             .fontWeight(.medium)
                                     }
-                                    .foregroundColor(.white)
+                                    .foregroundColor(colorScheme == .light ? .white : .black)
                                     .padding(.horizontal, 12)
                                     .padding(.vertical, 6)
-                                    .background(AppColors.accentPrimary)
+                                    .background(colorScheme == .light ? .black : .white)
                                     .cornerRadius(8)
                                 }
                             }
@@ -354,10 +355,16 @@ struct ImpostazioniView: View {
                                         .fontWeight(.semibold)
                                         .foregroundColor(.primary)
                                     
-                                    Text("Support the project")
+                                    Text("Support the project and unlock premium features")
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                         .multilineTextAlignment(.leading)
+                                    
+                                    Text("☁️ iCloud Sync across all devices\n🔔 Development Reminders for photos")
+                                        .font(.caption2)
+                                        .foregroundColor(.secondary)
+                                        .multilineTextAlignment(.leading)
+                                        .padding(.top, 2)
                                 }
                                 
                                 Spacer()
@@ -470,7 +477,7 @@ struct ImpostazioniView: View {
                 await MainActor.run {
                     // Controlla se l'utente ha fatto almeno una donazione
                     isPremiumUser = !customerInfo.activeSubscriptions.isEmpty || 
-                                   !customerInfo.nonSubscriptionTransactions.isEmpty
+                                   !customerInfo.nonSubscriptions.isEmpty
                     
                     // Salva lo stato premium in UserDefaults per il NotificationManager
                     UserDefaults.standard.set(isPremiumUser, forKey: "isPremiumUser")
@@ -495,7 +502,7 @@ struct ImpostazioniView: View {
                 await MainActor.run {
                     // Controlla se il restore ha rivelato acquisti
                     isPremiumUser = !customerInfo.activeSubscriptions.isEmpty || 
-                                   !customerInfo.nonSubscriptionTransactions.isEmpty
+                                   !customerInfo.nonSubscriptions.isEmpty
                     
                     // Salva lo stato premium in UserDefaults per il NotificationManager
                     UserDefaults.standard.set(isPremiumUser, forKey: "isPremiumUser")
@@ -507,7 +514,7 @@ struct ImpostazioniView: View {
                         
                         // Mostra popup di successo
                         restoreAlertTitle = "Restore Successful! 🎉"
-                        restoreAlertMessage = "Your premium access has been restored. You can now use iCloud sync and development reminders!"
+                        restoreAlertMessage = "Your premium access has been restored. You can now use iCloud sync and photo ready notifications!"
                         showingRestoreAlert = true
                     } else {
                         print("⚠️ [ImpostazioniView] Restore completato - Nessun acquisto trovato")
@@ -540,7 +547,7 @@ struct ImpostazioniView: View {
             await MainActor.run {
                 // Mostra alert per spiegare come abilitare le notifiche
                 restoreAlertTitle = "Notifications Permission Required"
-                restoreAlertMessage = "To receive development reminders, please enable notifications in Settings > MyPolaroids > Notifications"
+                restoreAlertMessage = "To receive photo ready notifications, please enable notifications in Settings > MyPolaroids > Notifications"
                 showingRestoreAlert = true
             }
         }

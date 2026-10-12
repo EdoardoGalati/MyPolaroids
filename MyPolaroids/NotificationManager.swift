@@ -65,8 +65,8 @@ class NotificationManager {
         
         // Crea il contenuto della notifica
         let content = UNMutableNotificationContent()
-        content.title = "📸 Develop your photo!"
-        content.body = "It's been \(notificationDelayMinutes) minute\(notificationDelayMinutes == 1 ? "" : "s") since you took a photo with \(camera.displayName). Time to develop your Polaroid!"
+        content.title = "📸 Your photo is ready!"
+        content.body = "It's been \(notificationDelayMinutes) minute\(notificationDelayMinutes == 1 ? "" : "s") since you took a photo with \(camera.displayName). Your photo is ready to be scanned!"
         content.sound = .default
         content.badge = 1
         
