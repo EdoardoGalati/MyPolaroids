@@ -125,7 +125,7 @@ class CloudKitManager: ObservableObject {
             do {
                 let customerInfo = try await Purchases.shared.customerInfo()
                 let isPremium = !customerInfo.activeSubscriptions.isEmpty || 
-                               !customerInfo.nonSubscriptionTransactions.isEmpty
+                               !customerInfo.nonSubscriptions.isEmpty
                 
                 if isPremium {
                     cloudKitEnabled.toggle()

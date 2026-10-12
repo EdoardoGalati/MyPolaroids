@@ -1,4 +1,0 @@
-module RevenueCat {
-header "RevenueCat-Swift.h"
-export *
-}
